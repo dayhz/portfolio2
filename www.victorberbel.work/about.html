@@ -510,4 +510,81 @@ const swiper = new Swiper("#about", {
 });
 
 
-</script> --></body></html>
+</script> -->
+<style>
+  /* Correction pour la première section de about */
+  .about_main_wrap,
+  .about_main_contain,
+  .about-header,
+  [data-w-id="b00b3c37-e428-f7b8-ba0f-106cdae27c4d"],
+  [data-w-id="dedbec10-cefe-299f-aa71-060b8f506116"],
+  [data-w-id="a7fda2c7-8caf-16ea-01a7-5e51e0a57bd4"],
+  .gif_container,
+  .about_main-img,
+  
+  /* Correction pour le footer */
+  .footer_main_wrap,
+  .footer-text-group,
+  [data-w-id="15828fe9-b698-9ed3-3a55-9a383fb763b2"],
+  
+  /* Correction générale */
+  [fade-in] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+  
+  /* Correction complète pour la disposition de la vidéo et de la photo */
+  .about_main-img {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+    width: 100% !important;
+  }
+  
+  .about_main-img_victor {
+    width: 100% !important;
+  }
+  
+  /* Désactiver le comportement du slider Swiper */
+  .swiper.about {
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  .swiper-wrapper.is-about-page {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    transform: none !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+  .swiper-slide.is-about-page {
+    width: 100% !important;
+    height: auto !important;
+    position: relative !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+    margin: 0 !important;
+  }
+  
+  /* S'assurer que la vidéo est visible */
+  .comp-video-card {
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Désactiver les animations et transitions qui pourraient causer des problèmes */
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+</style>
+</body></html>
