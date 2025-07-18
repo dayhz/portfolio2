@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test des Animations de Titres</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #111;
+            color: white;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+        
+        .charSplit {
+            display: inline-block;
+            transform: translateY(100%);
+        }
+        
+        .page_wrap-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #111;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        
+        .test-section {
+            margin: 40px 0;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+        
+        button {
+            background: #f75b00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        
+        button:hover {
+            background: #e54a00;
+        }
+    </style>
+</head>
+<body>
+    <div class="page_wrap-overlay"></div>
+    
+    <div class="test-section">
+        <h2>Test des Animations de Titres</h2>
+        <p>Cette page teste spécifiquement les animations SplitText des titres H1.</p>
+        
+        <button onclick="testWorkAnimation()">Tester Animation Work</button>
+        <button onclick="testAboutAnimation()">Tester Animation About</button>
+        <button onclick="testServicesAnimation()">Tester Animation Services</button>
+        <button onclick="resetTitle()">Reset Titre</button>
+        
+        <div id="status"></div>
+    </div>
+    
+    <h1 id="test-title">Test Animation Title</h1>
+    
+    <div class="test-section">
+        <h2>Logs</h2>
+        <div id="logs" style="background: #222; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto;"></div>
+    </div>
+
+    <script>
+        // Fonction pour logger
+        function log(message) {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            logsDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        // Override console.log pour capturer les logs
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            log(args.join(' '));
+        };
+        
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'warning';
+            statusDiv.innerHTML = `<p class="${className}">${message}</p>`;
+        }
+        
+        function resetTitle() {
+            const title = document.getElementById('test-title');
+            title.innerHTML = 'Test Animation Title';
+            title.style.zIndex = '';
+            updateStatus('Titre réinitialisé');
+        }
+        
+        function testWorkAnimation() {
+            if (typeof gsap === 'undefined' || typeof SplitText === 'undefined') {
+                updateStatus('GSAP ou SplitText non chargé', 'error');
+                return;
+            }
+            
+            resetTitle();
+            
+            setTimeout(() => {
+                try {
+                    const title = document.getElementById('test-title');
+                    title.textContent = 'Work Page Title Animation';
+                    
+                    let h1Split = SplitText.create("#test-title", {
+                        types: "words, chars",
+                        mask: "words",
+                        charsClass: "charSplit"
+                    });
+                    
+                    const workTimeline = gsap.timeline();
+                    
+                    workTimeline
+                        .set("#test-title", { zIndex: 100 })
+                        .fromTo(h1Split.chars, 
+                            { yPercent: 100 }, 
+                            { yPercent: 0, stagger: 0.03, ease: "back(1.7).out" }
+                        )
+                        .to(".page_wrap-overlay", { autoAlpha: 0, visibility: "hidden" }, ">")
+                        .to("#test-title", { zIndex: 10 });
+                    
+                    updateStatus('Animation Work lancée avec succès', 'success');
+                } catch (error) {
+                    updateStatus('Erreur animation Work: ' + error.message, 'error');
+                }
+            }, 100);
+        }
+        
+        function testAboutAnimation() {
+            if (typeof gsap === 'undefined' || typeof SplitText === 'undefined') {
+                updateStatus('GSAP ou SplitText non chargé', 'error');
+                return;
+            }
+            
+            resetTitle();
+            
+            setTimeout(() => {
+                try {
+                    const title = document.getElementById('test-title');
+                    title.textContent = 'About Page Title Animation';
+                    
+                    let h1Split = SplitText.create("#test-title", {
+                        types: "words, chars",
+                        mask: "words",
+                        charsClass: "charSplit"
+                    });
+                    
+                    const aboutTimeline = gsap.timeline();
+                    
+                    aboutTimeline
+                        .set("#test-title", { zIndex: 100 })
+                        .fromTo(h1Split.chars, 
+                            { yPercent: 100 }, 
+                            { yPercent: 0, stagger: 0.02, ease: "back(1.7).out" }
+                        )
+                        .to(".page_wrap-overlay", { autoAlpha: 0, visibility: "hidden" }, ">")
+                        .to("#test-title", { zIndex: 10 });
+                    
+                    updateStatus('Animation About lancée avec succès', 'success');
+                } catch (error) {
+                    updateStatus('Erreur animation About: ' + error.message, 'error');
+                }
+            }, 100);
+        }
+        
+        function testServicesAnimation() {
+            if (typeof gsap === 'undefined' || typeof SplitText === 'undefined') {
+                updateStatus('GSAP ou SplitText non chargé', 'error');
+                return;
+            }
+            
+            resetTitle();
+            
+            setTimeout(() => {
+                try {
+                    const title = document.getElementById('test-title');
+                    title.textContent = 'Services Page Title Animation';
+                    
+                    let h1Split = SplitText.create("#test-title", {
+                        types: "words, chars",
+                        mask: "words",
+                        charsClass: "charSplit"
+                    });
+                    
+                    const servicesTimeline = gsap.timeline();
+                    
+                    servicesTimeline
+                        .set("#test-title", { zIndex: 100 })
+                        .fromTo(h1Split.chars, 
+                            { yPercent: 100 }, 
+                            { yPercent: 0, stagger: 0.01, ease: "back(1.7).out" }
+                        )
+                        .to(".page_wrap-overlay", { autoAlpha: 0, visibility: "hidden" }, "-=.4")
+                        .to("#test-title", { zIndex: 10 });
+                    
+                    updateStatus('Animation Services lancée avec succès', 'success');
+                } catch (error) {
+                    updateStatus('Erreur animation Services: ' + error.message, 'error');
+                }
+            }, 100);
+        }
+        
+        // Test initial
+        document.addEventListener('DOMContentLoaded', function() {
+            log('DOM chargé');
+            
+            setTimeout(() => {
+                if (typeof gsap !== 'undefined') {
+                    log('✅ GSAP chargé (version: ' + gsap.version + ')');
+                } else {
+                    log('❌ GSAP non chargé');
+                }
+                
+                if (typeof SplitText !== 'undefined') {
+                    log('✅ SplitText chargé');
+                } else {
+                    log('❌ SplitText non chargé');
+                }
+                
+                if (typeof ScrollTrigger !== 'undefined') {
+                    log('✅ ScrollTrigger chargé');
+                } else {
+                    log('❌ ScrollTrigger non chargé');
+                }
+                
+                updateStatus('Scripts chargés - Prêt pour les tests', 'success');
+            }, 1000);
+        });
+    </script>
+    
+    <!-- Charger les scripts nécessaires -->
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <script src="js/gsap.min.js"></script>
+    <script src="js/ScrollTrigger.min.js"></script>
+    <script src="js/SplitText.min.js"></script>
+    <script>gsap.registerPlugin(ScrollTrigger, SplitText);</script>
+</body>
+</html>

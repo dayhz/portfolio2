@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test des Animations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #111;
+            color: white;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+    </style>
+</head>
+<body>
+    <h1>Test des Animations - Victor Berbel Portfolio</h1>
+    
+    <div class="test-section">
+        <h2>Scripts chargés</h2>
+        <div id="script-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Fichiers d'animation</h2>
+        <div id="animation-files"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Éléments d'animation trouvés</h2>
+        <div id="animation-elements"></div>
+    </div>
+
+    <script>
+        // Test des scripts chargés
+        function testScripts() {
+            const scriptStatus = document.getElementById('script-status');
+            let html = '';
+            
+            // Test GSAP
+            if (typeof gsap !== 'undefined') {
+                html += '<p class="success">✅ GSAP chargé (version: ' + gsap.version + ')</p>';
+            } else {
+                html += '<p class="error">❌ GSAP non chargé</p>';
+            }
+            
+            // Test ScrollTrigger
+            if (typeof ScrollTrigger !== 'undefined') {
+                html += '<p class="success">✅ ScrollTrigger chargé</p>';
+            } else {
+                html += '<p class="error">❌ ScrollTrigger non chargé</p>';
+            }
+            
+            // Test SplitText
+            if (typeof SplitText !== 'undefined') {
+                html += '<p class="success">✅ SplitText chargé</p>';
+            } else {
+                html += '<p class="error">❌ SplitText non chargé</p>';
+            }
+            
+            // Test jQuery
+            if (typeof $ !== 'undefined') {
+                html += '<p class="success">✅ jQuery chargé</p>';
+            } else {
+                html += '<p class="error">❌ jQuery non chargé</p>';
+            }
+            
+            scriptStatus.innerHTML = html;
+        }
+        
+        // Test des fichiers d'animation
+        function testAnimationFiles() {
+            const animationFiles = document.getElementById('animation-files');
+            const files = [
+                'js/animations-main.js',
+                'js/animations-home.js',
+                'js/animations-services.js',
+                'js/animations-work.js',
+                'js/animations-about.js',
+                'js/animations-contact.js'
+            ];
+            
+            let html = '';
+            files.forEach(file => {
+                fetch(file)
+                    .then(response => {
+                        if (response.ok) {
+                            html += '<p class="success">✅ ' + file + ' accessible</p>';
+                        } else {
+                            html += '<p class="error">❌ ' + file + ' non accessible</p>';
+                        }
+                        animationFiles.innerHTML = html;
+                    })
+                    .catch(() => {
+                        html += '<p class="error">❌ ' + file + ' erreur de chargement</p>';
+                        animationFiles.innerHTML = html;
+                    });
+            });
+        }
+        
+        // Test des éléments d'animation
+        function testAnimationElements() {
+            const animationElements = document.getElementById('animation-elements');
+            let html = '';
+            
+            // Éléments fade-in
+            const fadeInElements = document.querySelectorAll('[fade-in]');
+            html += '<p>Éléments [fade-in]: ' + fadeInElements.length + '</p>';
+            
+            // Éléments avec data-w-id
+            const dataWIdElements = document.querySelectorAll('[data-w-id]');
+            html += '<p>Éléments [data-w-id]: ' + dataWIdElements.length + '</p>';
+            
+            // Éléments spécifiques
+            const specificSelectors = [
+                '.scroll_section',
+                '.marquee_track',
+                '.brands_main_group-item',
+                '.work_card',
+                '.approach-iitem'
+            ];
+            
+            specificSelectors.forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                if (elements.length > 0) {
+                    html += '<p class="success">✅ ' + selector + ': ' + elements.length + ' trouvé(s)</p>';
+                } else {
+                    html += '<p class="warning">⚠️ ' + selector + ': aucun élément trouvé</p>';
+                }
+            });
+            
+            animationElements.innerHTML = html;
+        }
+        
+        // Lancer les tests
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                testScripts();
+                testAnimationFiles();
+                testAnimationElements();
+            }, 1000);
+        });
+    </script>
+    
+    <!-- Charger les scripts nécessaires -->
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <script src="js/gsap.min.js"></script>
+    <script src="js/ScrollTrigger.min.js"></script>
+    <script src="js/SplitText.min.js"></script>
+    <script>gsap.registerPlugin(ScrollTrigger, SplitText);</script>
+</body>
+</html>
