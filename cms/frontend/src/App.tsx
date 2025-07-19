@@ -7,6 +7,9 @@ import Dashboard from './pages/Dashboard';
 import ProfilePage from './pages/ProfilePage';
 import MediaPage from './pages/MediaPage';
 import TestimonialsPage from './pages/TestimonialsPage';
+import ProjectsPage from './pages/ProjectsPage';
+import ProjectNewPage from './pages/ProjectNewPage';
+import ProjectContentPage from './pages/ProjectContentPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
@@ -34,7 +37,9 @@ function App() {
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/profile" element={<ProfilePage />} />
-                      <Route path="/projects" element={<div className="p-8 text-center text-gray-500">Page Projets - En cours de développement</div>} />
+                      <Route path="/projects" element={<ProjectsPage />} />
+                      <Route path="/projects/new" element={<ProjectNewPage />} />
+                      <Route path="/projects/new/content" element={<ProjectContentPage />} />
                       <Route path="/testimonials" element={<TestimonialsPage />} />
                       <Route path="/services" element={<div className="p-8 text-center text-gray-500">Page Services - En cours de développement</div>} />
                       <Route path="/media" element={<MediaPage />} />

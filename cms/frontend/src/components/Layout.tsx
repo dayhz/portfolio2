@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { Toaster } from 'sonner';
 import {
   Home,
   User,
@@ -128,6 +129,9 @@ export default function Layout({ children }: LayoutProps) {
           onClick={() => setSidebarOpen(false)}
         />
       )}
+      
+      {/* Toast notifications */}
+      <Toaster position="top-right" />
     </div>
   );
 }
