@@ -9,7 +9,7 @@
   - Configurer ESLint, Prettier et les outils de développement
   - _Requirements: 11.1, 11.2_
 
-- [ ] 2. Configuration du backend et base de données
+- [x] 2. Configuration du backend et base de données
 - [ ] 2.1 Finaliser la configuration Prisma et créer les migrations
   - Créer les migrations initiales pour toutes les tables
   - Tester la connexion à la base de données
@@ -51,7 +51,7 @@
   - Implémenter la gestion d'erreurs d'authentification
   - _Requirements: 1.4, 1.5_
 
-- [ ] 6. Installer les composants Shadcn/ui manquants
+- [x] 6. Installer les composants Shadcn/ui manquants
   - Installer et configurer les composants: Dialog, Form, Select, Textarea, Table, Badge, DropdownMenu, AlertDialog
   - Créer les composants personnalisés nécessaires (ImageUpload, etc.)
   - _Requirements: 11.1, 11.2_
@@ -87,12 +87,11 @@
 - Ajouter la pagination si nécessaire
 - _Requirements: 4.1, 4.7_
 
-## 10. Gestion des projets - Formulaire de création/édition
-
-- Créer le formulaire de projet avec Shadcn/ui (Dialog, Form, Select, Textarea)
-- Implémenter l'upload multiple d'images avec prévisualisation
-- Ajouter la validation des champs avec React Hook Form
-- Créer les endpoints API pour CRUD des projets
+- [x] 10. Gestion des projets - Formulaire de création/édition
+  - Créer le formulaire de projet avec Shadcn/ui (Dialog, Form, Select, Textarea)
+  - Implémenter l'upload multiple d'images avec prévisualisation
+  - Ajouter la validation des champs avec React Hook Form
+  - Créer les endpoints API pour CRUD des projets
 - Implémenter la sauvegarde en brouillon
 - Ajouter la prévisualisation du projet avant publication
 - _Requirements: 4.2, 4.3, 4.4, 4.5, 4.6_
