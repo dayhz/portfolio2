@@ -47,6 +47,30 @@ export const AVAILABLE_BLOCKS: BlockType[] = [
     description: 'Bloc de texte simple sans formatage'
   },
   {
+    id: 'heading-1',
+    name: 'Titre H1',
+    category: 'text',
+    icon: '🏷️',
+    preview: '/previews/heading-1.png',
+    description: 'Titre principal de niveau 1'
+  },
+  {
+    id: 'heading-2',
+    name: 'Titre H2',
+    category: 'text',
+    icon: '🔖',
+    preview: '/previews/heading-2.png',
+    description: 'Titre de section de niveau 2'
+  },
+  {
+    id: 'heading-3',
+    name: 'Titre H3',
+    category: 'text',
+    icon: '📌',
+    preview: '/previews/heading-3.png',
+    description: 'Sous-titre de niveau 3'
+  },
+  {
     id: 'testimony',
     name: 'Témoignage',
     category: 'text',

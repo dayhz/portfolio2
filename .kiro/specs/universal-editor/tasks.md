@@ -39,7 +39,7 @@
   - Ajouter les raccourcis clavier pour navigation rapide
   - _Requirements: 1.1, 2.4, 2.5_
 
-- [ ] 6. Aperçus et tooltips
+- [x] 6. Aperçus et tooltips
   - Créer les composants d'aperçu pour chaque type de bloc
   - Implémenter les tooltips avec descriptions détaillées
   - Ajouter les animations de transition fluides
@@ -108,14 +108,14 @@
 
 ## Phase 5: Extension Vidéo et Médias
 
-- [ ] 15. Extension Vidéo Universelle
+- [x] 15. Extension Vidéo Universelle
   - Améliorer l'extension Video existante pour le système universel
   - Ajouter l'encapsulation dans la structure du site
   - Implémenter l'intégration dans les grilles
   - Gérer les différents formats et sources vidéo
   - _Requirements: 4.3, 5.2_
 
-- [ ] 16. NodeView pour Vidéos
+- [x] 16. NodeView pour Vidéos
   - Créer le composant VideoView avec contrôles
   - Implémenter l'upload de vidéos locales
   - Ajouter les contrôles de lecture/pause

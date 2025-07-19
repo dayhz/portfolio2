@@ -18,7 +18,7 @@ import { ImageExtension } from './extensions/ImageExtension';
 import { TextExtension } from './extensions/TextExtension';
 import { TestimonyExtension } from './extensions/TestimonyExtension';
 import { ImageGridExtension } from './extensions/ImageGridExtension';
-// import { VideoExtension } from './extensions/VideoExtension';
+import { VideoExtension } from './extensions/VideoExtension';
 
 export function UniversalEditor({ 
   content = '', 
@@ -86,7 +86,7 @@ export function UniversalEditor({
       TextExtension,
       TestimonyExtension,
       ImageGridExtension,
-      // VideoExtension,
+      VideoExtension,
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -112,26 +112,39 @@ export function UniversalEditor({
           const isValidSlashPosition = textBefore === '' || textBefore === ' ' || textBefore === '\n';
           
           if (isValidSlashPosition) {
-            // Calculer la position du menu avec gestion des bords
+            // Calculer la position du menu avec gestion intelligente des bords
             const coords = view.coordsAtPos(from);
             const viewportHeight = window.innerHeight;
-            const menuHeight = 400; // Hauteur approximative du menu
+            const viewportWidth = window.innerWidth;
+            const menuHeight = 500; // Hauteur du menu avec aperçus
+            const menuWidth = 384; // w-96 = 384px
             
+            let menuX = coords.left;
             let menuY = coords.bottom + 5;
             
-            // Si le menu dépasse en bas, le positionner au-dessus
-            if (menuY + menuHeight > viewportHeight) {
-              menuY = coords.top - menuHeight - 5;
+            // Gestion horizontale - éviter le débordement à droite
+            if (menuX + menuWidth > viewportWidth - 20) {
+              menuX = viewportWidth - menuWidth - 20;
             }
             
-            // S'assurer que le menu ne dépasse pas en haut non plus
-            if (menuY < 10) {
-              menuY = 10;
+            // Gestion verticale - positionnement intelligent
+            const spaceBelow = viewportHeight - coords.bottom;
+            const spaceAbove = coords.top;
+            
+            if (spaceBelow < menuHeight && spaceAbove > spaceBelow) {
+              // Plus d'espace au-dessus, positionner au-dessus
+              menuY = coords.top - menuHeight - 5;
+            } else if (spaceBelow < menuHeight) {
+              // Peu d'espace des deux côtés, centrer verticalement
+              menuY = Math.max(10, (viewportHeight - menuHeight) / 2);
             }
+            
+            // S'assurer que le menu reste dans les limites
+            menuY = Math.max(10, Math.min(menuY, viewportHeight - menuHeight - 10));
             
             setBlockMenuState({
               isOpen: true,
-              position: { x: coords.left, y: menuY },
+              position: { x: menuX, y: menuY },
               query: ''
             });
             
@@ -205,6 +218,18 @@ export function UniversalEditor({
         break;
       case 'about-section':
         editor.chain().focus().setUniversalText({ variant: 'about' }).run();
+        break;
+      case 'heading-1':
+        editor.chain().focus().toggleHeading({ level: 1 }).run();
+        break;
+      case 'heading-2':
+        editor.chain().focus().toggleHeading({ level: 2 }).run();
+        break;
+      case 'heading-3':
+        editor.chain().focus().toggleHeading({ level: 3 }).run();
+        break;
+      case 'video':
+        editor.chain().focus().setUniversalVideo().run();
         break;
       default:
         console.log(`Type de bloc non implémenté: ${blockType}`);
