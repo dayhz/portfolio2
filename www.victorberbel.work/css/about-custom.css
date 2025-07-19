@@ -1,0 +1,178 @@
+/* CSS personnalisé pour la page about */
+
+/* Styles pour la navigation active */
+.navbar_link_item.w--current {
+  position: relative;
+}
+
+.navbar_link_item.w--current::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background-color: var(--swatch--orange);
+  border-radius: 50%;
+}
+
+/* Styles pour les liens avec soulignement */
+.c-global-link {
+  width: fit-content;
+}
+
+.uline {
+  --bottom: -.2em;
+  display: inline-flex;
+  white-space: nowrap;
+}
+
+.uline:before {
+  background-color: #F75B00;
+  bottom: var(--bottom);
+  content: "";
+  height: .05em;
+  left: 0;
+  min-height: 1px;
+  position: absolute;
+  right: 0;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform .55s cubic-bezier(.785, .135, .15, .86);
+}
+
+.uline:hover:before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.uline-double {
+  --bottom: -.2em;
+  display: inline-flex;
+  position: relative;
+  white-space: nowrap;
+}
+
+.uline-double:after,
+.uline-double:before {
+  background-color: #F75B00;
+  bottom: var(--bottom);
+  content: "";
+  height: .05em;
+  left: 0;
+  min-height: 1px;
+  position: absolute;
+  right: 0;
+}
+
+.uline-double:before {
+  transform: scaleX(1);
+  transform-origin: left;
+  transition: transform .55s cubic-bezier(.785, .135, .15, .86);
+  transition-delay: .5s;
+}
+
+.uline-double:after {
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform .55s cubic-bezier(.785, .135, .15, .86);
+  transition-delay: 0s;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .uline-double:hover:before {
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform .55s cubic-bezier(.785, .135, .15, .86);
+    transition-delay: 0s;
+  }
+
+  .uline-double:hover:after {
+    transform: scaleX(1);
+    transform-origin: left;
+    transition: transform .55s cubic-bezier(.785, .135, .15, .86);
+    transition-delay: .2s;
+  }
+}
+
+/* Corrections pour la page about */
+.about_main_wrap,
+.about_main_contain,
+.about-header,
+[data-w-id="b00b3c37-e428-f7b8-ba0f-106cdae27c4d"],
+[data-w-id="dedbec10-cefe-299f-aa71-060b8f506116"],
+.about_main-img {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Masquer complètement l'élément GIF */
+[data-w-id="a7fda2c7-8caf-16ea-01a7-5e51e0a57bd4"],
+.gif_container {
+  display: none !important;
+}
+
+/* Correction pour le footer */
+.footer_main_wrap,
+.footer-text-group,
+[data-w-id="15828fe9-b698-9ed3-3a55-9a383fb763b2"],
+[fade-in] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Correction complète pour la disposition de la vidéo et de la photo */
+.about_main-img {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 20px !important;
+  width: 100% !important;
+}
+
+.about_main-img_victor {
+  width: 100% !important;
+}
+
+/* Désactiver le comportement du slider Swiper */
+.swiper.about {
+  width: 100% !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.swiper-wrapper.is-about-page {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  transform: none !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+.swiper-slide.is-about-page {
+  width: 100% !important;
+  height: auto !important;
+  position: relative !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  margin: 0 !important;
+}
+
+/* S'assurer que la vidéo est visible */
+.comp-video-card {
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Désactiver les animations et transitions qui pourraient causer des problèmes */
+* {
+  transition: none !important;
+  animation: none !important;
+}
