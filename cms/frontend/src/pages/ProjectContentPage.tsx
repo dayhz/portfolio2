@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TiptapEditor } from '@/components/TiptapEditor';
+import { UniversalEditor } from '@/components/UniversalEditor';
 import { ArrowLeft } from 'react-iconly';
 import { toast } from 'sonner';
 
@@ -161,9 +161,11 @@ export default function ProjectContentPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <TiptapEditor
+          <UniversalEditor
             content={content}
             onChange={setContent}
+            projectId={projectData?.id}
+            autoSave={true}
           />
         </CardContent>
       </Card>

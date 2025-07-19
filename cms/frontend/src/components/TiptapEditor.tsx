@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Upload } from 'react-iconly';
 import React from 'react';
 import './TiptapEditor.css';
+import { Video } from './VideoExtension';
 
 interface TiptapEditorProps {
   content?: string;
@@ -54,6 +55,12 @@ export function TiptapEditor({ content = '', onChange }: TiptapEditorProps) {
           return 'Commencez à écrire votre contenu...';
         },
       }),
+      Video.configure({
+        HTMLAttributes: {
+          class: 'tiptap-video',
+        },
+        inline: false,
+      }),
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -73,6 +80,18 @@ export function TiptapEditor({ content = '', onChange }: TiptapEditorProps) {
       reader.onload = (e) => {
         const url = e.target?.result as string;
         editor?.chain().focus().setImage({ src: url }).run();
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith('video/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const url = e.target?.result as string;
+        editor?.chain().focus().setVideo({ src: url }).run();
       };
       reader.readAsDataURL(file);
     }
@@ -178,6 +197,24 @@ export function TiptapEditor({ content = '', onChange }: TiptapEditorProps) {
               Image
             </Button>
           </div>
+
+          {/* Upload de vidéo */}
+          <div className="relative">
+            <input
+              type="file"
+              accept="video/*"
+              onChange={handleVideoUpload}
+              className="hidden"
+              id="video-upload"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => document.getElementById('video-upload')?.click()}
+            >
+              🎥 Vidéo
+            </Button>
+          </div>
         </div>
       </Card>
 
@@ -189,6 +226,7 @@ export function TiptapEditor({ content = '', onChange }: TiptapEditorProps) {
       {/* Instructions */}
       <div className="text-sm text-gray-600 space-y-1">
         <p>• Utilisez la barre d'outils pour formater le texte</p>
+        <p>• Cliquez sur "Image" ou "Vidéo" pour ajouter des médias</p>
         <p>• Tapez <kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs">**texte**</kbd> pour du gras</p>
         <p>• Tapez <kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs"># </kbd> pour un titre</p>
         <p>• Tapez <kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs">- </kbd> pour une liste</p>
