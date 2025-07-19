@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Document, Edit, Plus, Award } from 'react-iconly';
+import { Document, Edit, Plus } from 'react-iconly';
 
 export default function AboutPage() {
   return (
@@ -98,7 +98,7 @@ I love video games, movies, pizza and pasta."
             ].map((award, index) => (
               <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center space-x-3">
-                  <Award size="medium" primaryColor="#f59e0b" />
+                  <span className="text-2xl">🏆</span>
                   <div>
                     <h3 className="font-medium text-gray-900">{award.name}</h3>
                     <p className="text-sm text-gray-600">{award.description}</p>

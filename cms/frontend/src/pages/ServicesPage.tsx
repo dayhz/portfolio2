@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Setting, Edit } from 'react-iconly';
+import { Edit } from 'react-iconly';
 
 export default function ServicesPage() {
   const services = [

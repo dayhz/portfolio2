@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Upload, X, Image as ImageIcon } from 'react-iconly';
+import { Upload, Image as ImageIcon } from 'react-iconly';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
 
@@ -76,8 +76,7 @@ export function ImageUpload({
               onClick={onRemove}
               disabled={disabled}
             >
-              <X size="small" primaryColor="#ffffff" />
-              Supprimer
+              ✕ Supprimer
             </Button>
           </div>
         </div>
