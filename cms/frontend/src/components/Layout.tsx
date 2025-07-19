@@ -11,7 +11,7 @@ import {
   Image,
   Document,
   Logout,
-  Menu,
+  Category,
 } from 'react-iconly';
 
 interface LayoutProps {
@@ -19,13 +19,13 @@ interface LayoutProps {
 }
 
 const sidebarItems = [
-  { icon: Home, label: 'Dashboard', href: '/dashboard' },
-  { icon: User, label: 'Profil', href: '/dashboard/profile' },
-  { icon: Work, label: 'Projets', href: '/dashboard/projects' },
-  { icon: Chat, label: 'Témoignages', href: '/dashboard/testimonials' },
-  { icon: Setting, label: 'Services', href: '/dashboard/services' },
-  { icon: Image, label: 'Médias', href: '/dashboard/media' },
-  { icon: Document, label: 'À Propos', href: '/dashboard/about' },
+  { icon: Home, label: 'Dashboard', href: '/' },
+  { icon: User, label: 'Profil', href: '/profile' },
+  { icon: Work, label: 'Projets', href: '/projects' },
+  { icon: Chat, label: 'Témoignages', href: '/testimonials' },
+  { icon: Setting, label: 'Services', href: '/services' },
+  { icon: Image, label: 'Médias', href: '/media' },
+  { icon: Document, label: 'À Propos', href: '/about' },
 ];
 
 export default function Layout({ children }: LayoutProps) {
@@ -40,8 +40,8 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   const isActive = (href: string) => {
-    if (href === '/dashboard') {
-      return location.pathname === '/dashboard' || location.pathname === '/dashboard/';
+    if (href === '/') {
+      return location.pathname === '/';
     }
     return location.pathname.startsWith(href);
   };
@@ -108,7 +108,7 @@ export default function Layout({ children }: LayoutProps) {
               size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
-              <Menu size="medium" primaryColor="#374151" />
+              <Category size="medium" primaryColor="#374151" />
             </Button>
             <h1 className="text-lg font-semibold text-gray-800">Portfolio CMS</h1>
             <div className="w-10" /> {/* Spacer */}

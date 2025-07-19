@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
 import { Home } from 'react-iconly';
+import { toast } from 'sonner';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -17,7 +17,6 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      // TODO: Implement actual authentication
       if (email === 'admin@portfolio.com' && password === 'admin123') {
         localStorage.setItem('auth-token', 'dummy-token');
         toast.success('Connexion réussie');
@@ -33,7 +32,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
