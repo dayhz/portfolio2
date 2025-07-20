@@ -1,5 +1,5 @@
 /**
- * Extension Tiptap pour les grilles d'images
+ * Extension Tiptap pour les grilles d'images et vidéos
  */
 
 import { Node } from '@tiptap/core';
@@ -56,10 +56,28 @@ export const ImageGridExtension = Node.create<{}>({
         [
           'div',
           { class: 'temp-comp-img_grid' },
-          ...(images || []).map((image: any) => [
+          ...(images || []).map((item: any) => [
             'div',
             { class: 'img_grid-container' },
-            [
+            item.hasVideo && item.videoSrc ? [
+              'div',
+              { class: 'temp-img none-ratio' },
+              [
+                'div',
+                { class: 'img-wrp' },
+                [
+                  'video',
+                  {
+                    class: 'comp-img',
+                    'data-wf--template-image--variant': 'radius-16px',
+                    src: item.videoSrc || '',
+                    controls: 'controls',
+                    muted: 'muted',
+                    preload: 'metadata',
+                  }
+                ]
+              ]
+            ] : [
               'div',
               { class: 'temp-img none-ratio' },
               [
@@ -70,8 +88,8 @@ export const ImageGridExtension = Node.create<{}>({
                   {
                     class: 'comp-img',
                     'data-wf--template-image--variant': 'radius-16px',
-                    src: image.src || '',
-                    alt: image.alt || '',
+                    src: item.src || '',
+                    alt: item.alt || '',
                   }
                 ]
               ]

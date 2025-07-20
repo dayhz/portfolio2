@@ -62,14 +62,14 @@
   - Gérer l'édition en place et les contrôles contextuels
   - _Requirements: 3.2, 4.1, 4.2, 5.1_
 
-- [ ] 9. Extension Grille d'Images
+- [x] 9. Extension Grille d'Images
   - Créer l'extension pour grilles 2 colonnes
   - Implémenter la gestion de multiple images
   - Ajouter le support pour vidéos dans les grilles
   - Gérer l'ajout/suppression d'éléments dans la grille
   - _Requirements: 1.3, 4.4, 5.2_
 
-- [ ] 10. NodeView pour Grilles
+- [x] 10. NodeView pour Grilles
   - Créer le composant ImageGridView
   - Implémenter l'upload multiple et réorganisation
   - Ajouter les contrôles pour chaque élément de la grille
