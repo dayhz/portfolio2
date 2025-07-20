@@ -2,7 +2,7 @@
  * Composant de tooltip détaillé pour les blocs
  */
 
-import React from 'react';
+// React import removed - not needed in this component
 import { BlockType } from '../types';
 import { BlockPreview } from './BlockPreview';
 

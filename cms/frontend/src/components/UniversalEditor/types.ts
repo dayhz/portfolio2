@@ -50,6 +50,9 @@ export interface VideoAttributes {
   alt?: string;
   title?: string;
   autoplay?: boolean;
+  controls?: boolean;
+  loop?: boolean;
+  muted?: boolean;
 }
 
 export interface ImageGridAttributes {

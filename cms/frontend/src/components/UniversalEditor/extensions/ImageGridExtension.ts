@@ -42,7 +42,7 @@ export const ImageGridExtension = Node.create<{}>({
   },
 
   renderHTML({ HTMLAttributes }) {
-    const { images, layout } = HTMLAttributes;
+    const { images } = HTMLAttributes; // layout unused for now
     
     return [
       'div',
@@ -56,30 +56,40 @@ export const ImageGridExtension = Node.create<{}>({
         [
           'div',
           { class: 'temp-comp-img_grid' },
-          [
+          ...(images || []).map((image: any) => [
             'div',
             { class: 'img_grid-container' },
-            ...(images || []).map((image: any) => [
+            [
               'div',
-              { class: 'img-wrp' },
+              { class: 'temp-img none-ratio' },
               [
-                'img',
-                {
-                  class: 'comp-img',
-                  'data-wf--template-image--variant': 'radius-16px',
-                  src: image.src || '',
-                  alt: image.alt || '',
-                }
+                'div',
+                { class: 'img-wrp' },
+                [
+                  'img',
+                  {
+                    class: 'comp-img',
+                    'data-wf--template-image--variant': 'radius-16px',
+                    src: image.src || '',
+                    alt: image.alt || '',
+                  }
+                ]
               ]
-            ])
-          ]
+            ]
+          ])
         ]
       ]
     ];
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(ImageGridBlockView);
+    return ReactNodeViewRenderer((props: any) => {
+      return ImageGridBlockView({
+        node: props.node,
+        updateAttributes: props.updateAttributes,
+        selected: props.selected
+      });
+    });
   },
 
   addCommands() {

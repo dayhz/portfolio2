@@ -3,15 +3,17 @@
  * Permet l'édition en place avec sélection de variant
  */
 
-import React, { useState, useCallback } from 'react';
-import { NodeViewWrapper, NodeViewContent, NodeViewProps } from '@tiptap/react';
+import { useState, useCallback } from 'react';
+import { NodeViewWrapper, NodeViewContent } from '@tiptap/react';
 import { TextAttributes } from '../types';
 import { SITE_CSS_CLASSES } from '../constants';
 
-interface TextBlockViewProps extends NodeViewProps {
+interface TextBlockViewProps {
   node: {
     attrs: TextAttributes;
   };
+  updateAttributes: (attrs: Partial<TextAttributes>) => void;
+  selected: boolean;
 }
 
 export function TextBlockView({ node, updateAttributes, selected }: TextBlockViewProps) {
@@ -19,7 +21,7 @@ export function TextBlockView({ node, updateAttributes, selected }: TextBlockVie
   const { variant } = node.attrs;
 
   // Gestion du changement de variant
-  const handleVariantChange = useCallback((newVariant: string) => {
+  const handleVariantChange = useCallback((newVariant: 'rich' | 'simple' | 'about') => {
     updateAttributes({ variant: newVariant });
   }, [updateAttributes]);
 

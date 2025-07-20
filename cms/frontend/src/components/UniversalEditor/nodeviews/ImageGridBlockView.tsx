@@ -4,14 +4,16 @@
  */
 
 import React, { useState, useRef, useCallback } from 'react';
-import { NodeViewWrapper, NodeViewProps } from '@tiptap/react';
+import { NodeViewWrapper } from '@tiptap/react';
 import { ImageGridAttributes } from '../types';
 import { SITE_CSS_CLASSES, SUPPORTED_IMAGE_FORMATS, FILE_SIZE_LIMITS, ERROR_MESSAGES } from '../constants';
 
-interface ImageGridBlockViewProps extends NodeViewProps {
+interface ImageGridBlockViewProps {
   node: {
     attrs: ImageGridAttributes;
   };
+  updateAttributes: (attrs: Partial<ImageGridAttributes>) => void;
+  selected: boolean;
 }
 
 export function ImageGridBlockView({ node, updateAttributes, selected }: ImageGridBlockViewProps) {
@@ -20,7 +22,7 @@ export function ImageGridBlockView({ node, updateAttributes, selected }: ImageGr
   const [showControls, setShowControls] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { images, layout } = node.attrs;
+  const { images } = node.attrs;
 
   // Gestion de l'upload d'images multiples
   const handleImageUpload = useCallback(async (files: FileList) => {
@@ -99,13 +101,13 @@ export function ImageGridBlockView({ node, updateAttributes, selected }: ImageGr
     updateAttributes({ images: newImages });
   }, [images, updateAttributes]);
 
-  // Réorganiser les images (drag & drop)
-  const handleImageReorder = useCallback((fromIndex: number, toIndex: number) => {
-    const newImages = [...images];
-    const [movedImage] = newImages.splice(fromIndex, 1);
-    newImages.splice(toIndex, 0, movedImage);
-    updateAttributes({ images: newImages });
-  }, [images, updateAttributes]);
+  // Réorganiser les images (drag & drop) - TODO: implémenter
+  // const handleImageReorder = useCallback((fromIndex: number, toIndex: number) => {
+  //   const newImages = [...images];
+  //   const [movedImage] = newImages.splice(fromIndex, 1);
+  //   newImages.splice(toIndex, 0, movedImage);
+  //   updateAttributes({ images: newImages });
+  // }, [images, updateAttributes]);
 
   return (
     <NodeViewWrapper

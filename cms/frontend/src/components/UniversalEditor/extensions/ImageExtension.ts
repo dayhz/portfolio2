@@ -48,7 +48,31 @@ export const ImageExtension = Node.create<{}>({
   },
 
   renderHTML({ HTMLAttributes }) {
-    const { variant, src, alt } = HTMLAttributes;
+    const { variant, src, alt, size } = HTMLAttributes;
+    
+    // Déterminer les classes CSS en fonction du variant et de la taille
+    const getImageContainerClass = () => {
+      if (variant === 'full') {
+        return 'temp-img_container full-width';
+      }
+      
+      switch (size) {
+        case 'small':
+          return 'temp-img_container small-width';
+        case 'large':
+          return 'temp-img_container large-width';
+        default:
+          return 'temp-img_container'; // medium est la valeur par défaut
+      }
+    };
+    
+    // Déterminer la classe CSS pour l'élément temp-img
+    const getTempImgClass = () => {
+      if (variant === '16-9') {
+        return 'temp-img'; // Pour 16:9, on utilise l'aspect-ratio défini en CSS
+      }
+      return 'temp-img none-ratio w-variant-e18145a5-28b8-affd-e283-83a4aa5ff6de';
+    };
     
     return [
       'div',
@@ -62,10 +86,10 @@ export const ImageExtension = Node.create<{}>({
         { class: 'u-container' },
         [
           'div',
-          { class: 'temp-img_container' },
+          { class: getImageContainerClass() },
           [
             'div',
-            { class: `temp-img${variant === '16-9' ? '' : ' w-variant-e18145a5-28b8-affd-e283-83a4aa5ff6de'}` },
+            { class: getTempImgClass() },
             [
               'div',
               { class: 'img-wrp' },
@@ -76,6 +100,7 @@ export const ImageExtension = Node.create<{}>({
                   'data-wf--template-image--variant': 'radius-16px',
                   src,
                   alt: alt || '',
+                  loading: 'lazy', // Ajout du lazy loading pour optimiser les performances
                 })
               ] : [
                 'div',
@@ -91,7 +116,7 @@ export const ImageExtension = Node.create<{}>({
                 [
                   'div',
                   { class: 'block-placeholder-text' },
-                  `Image ${variant === 'full' ? 'pleine largeur' : variant === '16-9' ? '16:9' : 'standard'}`
+                  `Image ${variant === 'full' ? 'pleine largeur' : variant === '16-9' ? '16:9' : 'standard'}${size !== 'medium' ? ` (${size === 'small' ? 'petite' : 'grande'})` : ''}`
                 ]
               ]
             ]
@@ -102,7 +127,13 @@ export const ImageExtension = Node.create<{}>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(ImageBlockView);
+    return ReactNodeViewRenderer((props: any) => {
+      return ImageBlockView({
+        node: props.node,
+        updateAttributes: props.updateAttributes,
+        selected: props.selected
+      });
+    });
   },
 
   addCommands() {

@@ -2,7 +2,7 @@
  * Composant d'aperçu visuel pour les blocs dans le menu de sélection
  */
 
-import React from 'react';
+// React import removed - not needed in this component
 import { BlockType } from '../types';
 
 interface BlockPreviewProps {

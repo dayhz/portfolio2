@@ -92,6 +92,25 @@
   margin: 0 auto;
 }
 
+/* Tailles d'images */
+.section[data-size="small"] .temp-img_container {
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section[data-size="medium"] .temp-img_container {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section[data-size="large"] .temp-img_container {
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .temp-img.w-variant-e18145a5-28b8-affd-e283-83a4aa5ff6de {
   /* Variant spécifique pour certaines images */
 }
@@ -427,4 +446,62 @@
 .block-placeholder-text {
   font-size: 0.9rem;
   font-weight: 500;
+}/* 
+Grilles d'images */
+.temp-comp-img_grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  margin: 2rem 0;
+}
+
+.img_grid-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.temp-img.none-ratio {
+  aspect-ratio: auto;
+  height: 100%;
+  width: 100%;
+}
+
+.temp-img.none-ratio .img-wrp {
+  height: 300px;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.temp-img.none-ratio .comp-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Maintient le ratio tout en remplissant le conteneur */
+  display: block;
+}
+
+/* Responsive pour les grilles */
+@media (max-width: 768px) {
+  .temp-comp-img_grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .temp-img.none-ratio .img-wrp {
+    height: 250px; /* Hauteur réduite sur mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .temp-img.none-ratio .img-wrp {
+    height: 200px; /* Encore plus petit sur très petits écrans */
+  }
+  
+  .temp-comp-img_grid {
+    gap: 1rem;
+  }
 }

@@ -48,7 +48,7 @@
 
 ## Phase 3: Extensions Universelles
 
-- [ ] 7. Extension Image Universelle
+- [x] 7. Extension Image Universelle
   - Créer l'extension ImageExtension avec tous les variants
   - Implémenter les attributs (src, alt, variant, size)
   - Gérer les différents types (full, 16-9, auto)
@@ -122,7 +122,7 @@
   - Gérer l'intégration dans les layouts complexes
   - _Requirements: 3.2, 4.3, 7.3_
 
-- [ ] 17. Système de gestion des médias
+- [x] 17. Système de gestion des médias
   - Créer un gestionnaire centralisé pour tous les médias
   - Implémenter la compression automatique des images
   - Ajouter la validation des formats et tailles
@@ -154,7 +154,7 @@
 
 ## Phase 7: Sauvegarde et Persistance
 
-- [ ] 21. Système d'auto-sauvegarde
+- [x] 21. Système d'auto-sauvegarde
   - Implémenter la sauvegarde automatique intelligente
   - Créer le système de debouncing pour éviter les sauvegardes excessives
   - Ajouter les indicateurs de statut de sauvegarde

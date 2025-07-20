@@ -2,7 +2,7 @@
  * Composant principal de l'éditeur universel
  */
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -12,6 +12,9 @@ import { BlockMenu } from './BlockMenu';
 import { debounce } from './utils';
 import { AUTO_SAVE_CONFIG } from './constants';
 import { injectSiteStyles, removeSiteStyles } from './utils/styleInjector';
+import { useAutoSave } from './hooks/useAutoSave';
+import { SaveStatusIndicator } from './components/SaveStatusIndicator';
+import { BackupRecovery } from './components/BackupRecovery';
 
 // Import des extensions
 import { ImageExtension } from './extensions/ImageExtension';
@@ -32,15 +35,40 @@ export function UniversalEditor({
     query: string;
   }>({ isOpen: false, position: { x: 0, y: 0 }, query: '' });
 
+  const [showBackupRecovery, setShowBackupRecovery] = useState(false);
+
   // Auto-sauvegarde avec debounce
   const debouncedOnChange = useMemo(
     () => debounce(onChange, AUTO_SAVE_CONFIG.DEBOUNCE_DELAY),
     [onChange]
   );
 
+  // Hook d'auto-sauvegarde
+  const { 
+    save: autoSaveContent, 
+    status: saveStatus, 
+    loadFromBackup, 
+    clearBackup 
+  } = useAutoSave({
+    projectId,
+    onSave: async (data) => {
+      // Ici on pourrait envoyer vers une API
+      console.log('Sauvegarde automatique:', data);
+      // Pour l'instant, on utilise juste le callback onChange
+      onChange(data.content);
+    },
+    enableLocalBackup: true
+  });
+
   // Injecter les styles du site au montage
   useEffect(() => {
     injectSiteStyles();
+    
+    // Vérifier s'il y a une sauvegarde à récupérer
+    const backup = loadFromBackup();
+    if (backup && backup.content !== content) {
+      setShowBackupRecovery(true);
+    }
     
     // Nettoyer au démontage
     return () => {
@@ -91,7 +119,10 @@ export function UniversalEditor({
     content,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
+      
       if (autoSave) {
+        // Utiliser l'auto-sauvegarde
+        autoSaveContent(html);
         debouncedOnChange(html);
       } else {
         onChange(html);
@@ -193,6 +224,20 @@ export function UniversalEditor({
     },
   });
 
+  // Gestion de la récupération de sauvegarde
+  const handleRestoreBackup = useCallback((backup: any) => {
+    if (editor) {
+      editor.commands.setContent(backup.content);
+    }
+    clearBackup();
+    setShowBackupRecovery(false);
+  }, [editor, clearBackup]);
+
+  const handleDismissBackup = useCallback(() => {
+    clearBackup();
+    setShowBackupRecovery(false);
+  }, [clearBackup]);
+
   const handleBlockSelect = useCallback((blockType: string) => {
     if (!editor) return;
 
@@ -253,6 +298,15 @@ export function UniversalEditor({
 
   return (
     <div className="universal-editor relative">
+      {/* Récupération de sauvegarde */}
+      {showBackupRecovery && (
+        <BackupRecovery
+          backup={loadFromBackup()}
+          onRestore={handleRestoreBackup}
+          onDismiss={handleDismissBackup}
+        />
+      )}
+
       {/* Styles locaux pour l'éditeur */}
       <style>{`
         .universal-editor-content {
@@ -314,6 +368,21 @@ export function UniversalEditor({
           font-weight: 500;
         }
       `}</style>
+
+      {/* En-tête avec indicateur de sauvegarde */}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-gray-900">Éditeur Universel</h3>
+          {autoSave && <SaveStatusIndicator status={saveStatus} compact />}
+        </div>
+        {autoSave && (
+          <SaveStatusIndicator 
+            status={saveStatus} 
+            showText={true}
+            className="text-sm"
+          />
+        )}
+      </div>
 
       {/* Éditeur principal */}
       <div className="border-2 border-gray-200 rounded-lg focus-within:border-blue-500 transition-colors">

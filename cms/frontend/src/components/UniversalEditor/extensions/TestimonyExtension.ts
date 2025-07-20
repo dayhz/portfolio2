@@ -2,7 +2,7 @@
  * Extension Tiptap pour les témoignages
  */
 
-import { Node, mergeAttributes } from '@tiptap/core';
+import { Node } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import { TestimonyAttributes } from '../types';
 import { TestimonyBlockView } from '../nodeviews/TestimonyBlockView';
@@ -99,7 +99,13 @@ export const TestimonyExtension = Node.create<{}>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(TestimonyBlockView);
+    return ReactNodeViewRenderer((props: any) => {
+      return TestimonyBlockView({
+        node: props.node,
+        updateAttributes: props.updateAttributes,
+        selected: props.selected
+      });
+    });
   },
 
   addCommands() {

@@ -4,14 +4,16 @@
  */
 
 import React, { useState, useRef, useCallback } from 'react';
-import { NodeViewWrapper, NodeViewProps } from '@tiptap/react';
+import { NodeViewWrapper } from '@tiptap/react';
 import { VideoAttributes } from '../types';
 import { SITE_CSS_CLASSES, SUPPORTED_VIDEO_FORMATS, FILE_SIZE_LIMITS, ERROR_MESSAGES } from '../constants';
 
-interface VideoBlockViewProps extends NodeViewProps {
+interface VideoBlockViewProps {
   node: {
     attrs: VideoAttributes;
   };
+  updateAttributes: (attrs: Partial<VideoAttributes>) => void;
+  selected: boolean;
 }
 
 export function VideoBlockView({ node, updateAttributes, selected }: VideoBlockViewProps) {

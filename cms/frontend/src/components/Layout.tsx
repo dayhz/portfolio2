@@ -27,6 +27,7 @@ const sidebarItems = [
   { icon: Setting, label: 'Services', href: '/services' },
   { icon: Image, label: 'Médias', href: '/media' },
   { icon: Document, label: 'À Propos', href: '/about' },
+  { icon: Document, label: '🧪 Test Éditeur', href: '/test-editor' },
 ];
 
 export default function Layout({ children }: LayoutProps) {

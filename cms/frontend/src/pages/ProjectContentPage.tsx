@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UniversalEditor } from '@/components/UniversalEditor';
+import { ProjectPreview } from '@/components/ProjectPreview';
 import { ArrowLeft } from 'react-iconly';
 import { toast } from 'sonner';
 
@@ -101,6 +102,10 @@ export default function ProjectContentPage() {
           </Button>
         </div>
         <div className="flex items-center space-x-4">
+          <ProjectPreview 
+            projectData={projectData}
+            content={content}
+          />
           <Button
             variant="outline"
             onClick={() => navigate('/projects')}
@@ -179,13 +184,20 @@ export default function ProjectContentPage() {
         >
           ← Précédent
         </Button>
-        <Button 
-          onClick={handleComplete}
-          disabled={isSubmitting}
-          size="lg"
-        >
-          {isSubmitting ? 'Création en cours...' : 'Créer le projet'}
-        </Button>
+        
+        <div className="flex items-center space-x-3">
+          <ProjectPreview 
+            projectData={projectData}
+            content={content}
+          />
+          <Button 
+            onClick={handleComplete}
+            disabled={isSubmitting}
+            size="lg"
+          >
+            {isSubmitting ? 'Création en cours...' : 'Créer le projet'}
+          </Button>
+        </div>
       </div>
     </div>
   );

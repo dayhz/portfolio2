@@ -105,7 +105,13 @@ export const VideoExtension = Node.create<{}>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(VideoBlockView);
+    return ReactNodeViewRenderer((props: any) => {
+      return VideoBlockView({
+        node: props.node,
+        updateAttributes: props.updateAttributes,
+        selected: props.selected
+      });
+    });
   },
 
   addCommands() {

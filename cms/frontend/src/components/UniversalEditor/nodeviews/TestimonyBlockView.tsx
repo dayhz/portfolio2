@@ -4,21 +4,24 @@
  */
 
 import React, { useState, useRef, useCallback } from 'react';
-import { NodeViewWrapper, NodeViewProps } from '@tiptap/react';
+import { NodeViewWrapper } from '@tiptap/react';
 import { TestimonyAttributes } from '../types';
 import { SITE_CSS_CLASSES, SUPPORTED_IMAGE_FORMATS, FILE_SIZE_LIMITS, ERROR_MESSAGES } from '../constants';
 
-interface TestimonyBlockViewProps extends NodeViewProps {
+interface TestimonyBlockViewProps {
   node: {
     attrs: TestimonyAttributes;
   };
+  updateAttributes: (attrs: Partial<TestimonyAttributes>) => void;
+  selected: boolean;
 }
 
 export function TestimonyBlockView({ node, updateAttributes, selected }: TestimonyBlockViewProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [showControls, setShowControls] = useState(false);
-  const [editingField, setEditingField] = useState<string | null>(null);
+  // TODO: Implémenter l'édition en place des champs
+  // const [editingField, setEditingField] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { quote, authorName, authorRole, authorImage } = node.attrs;
@@ -63,11 +66,13 @@ export function TestimonyBlockView({ node, updateAttributes, selected }: Testimo
   }, [updateAttributes]);
 
   const handleFieldFocus = useCallback((field: string) => {
-    setEditingField(field);
+    // TODO: setEditingField(field);
+    console.log('Focus on field:', field);
   }, []);
 
   const handleFieldBlur = useCallback(() => {
-    setEditingField(null);
+    // TODO: setEditingField(null);
+    console.log('Blur field');
   }, []);
 
   return (

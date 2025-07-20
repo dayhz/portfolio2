@@ -3,102 +3,72 @@
  * Permet l'édition interactive avec upload et contrôles
  */
 
-import React, { useState, useRef, useCallback } from 'react';
-import { NodeViewWrapper, NodeViewProps } from '@tiptap/react';
+import React, { useState, useCallback } from 'react';
+import { NodeViewWrapper } from '@tiptap/react';
 import { ImageAttributes } from '../types';
-import { SITE_CSS_CLASSES, IMAGE_VARIANTS, SUPPORTED_IMAGE_FORMATS, FILE_SIZE_LIMITS, ERROR_MESSAGES } from '../constants';
+import { SITE_CSS_CLASSES } from '../constants';
+import { useMediaManager } from '../hooks/useMediaManager';
+import { MediaUploader } from '../components/MediaUploader';
 
-interface ImageBlockViewProps extends NodeViewProps {
+interface ImageBlockViewProps {
   node: {
     attrs: ImageAttributes;
   };
+  updateAttributes: (attrs: Partial<ImageAttributes>) => void;
+  selected: boolean;
 }
 
 export function ImageBlockView({ node, updateAttributes, selected }: ImageBlockViewProps) {
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
   const [showControls, setShowControls] = useState(false);
   const [variantChanged, setVariantChanged] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [sizeChanged, setSizeChanged] = useState(false);
+  const { isUploading } = useMediaManager();
 
-  const { src, alt, variant, size } = node.attrs;
+  const { src, alt, variant, size = 'medium' } = node.attrs;
 
-  // Effet visuel temporaire quand le variant change
+  // Effet visuel temporaire quand le variant ou la taille change
   React.useEffect(() => {
     if (variantChanged) {
       const timer = setTimeout(() => setVariantChanged(false), 1000);
       return () => clearTimeout(timer);
     }
   }, [variantChanged]);
-
-  // Gestion de l'upload d'image
-  const handleImageUpload = useCallback(async (file: File) => {
-    // Validation du fichier
-    if (!SUPPORTED_IMAGE_FORMATS.includes(file.type)) {
-      setUploadError(ERROR_MESSAGES.UNSUPPORTED_IMAGE_FORMAT);
-      return;
+  
+  React.useEffect(() => {
+    if (sizeChanged) {
+      const timer = setTimeout(() => setSizeChanged(false), 1000);
+      return () => clearTimeout(timer);
     }
+  }, [sizeChanged]);
 
-    if (file.size > FILE_SIZE_LIMITS.IMAGE) {
-      setUploadError(ERROR_MESSAGES.IMAGE_TOO_LARGE);
-      return;
-    }
-
-    setIsUploading(true);
-    setUploadError(null);
-
-    try {
-      // Créer une URL temporaire pour l'aperçu
-      const imageUrl = URL.createObjectURL(file);
-      
-      // TODO: Implémenter l'upload vers le serveur
-      // const uploadedUrl = await uploadImageToServer(file);
-      
-      // Pour l'instant, utiliser l'URL temporaire
+  // Gestion de l'upload d'image avec MediaManager
+  const handleImageUpload = useCallback(async (mediaFiles: any[]) => {
+    if (mediaFiles.length > 0) {
+      const mediaFile = mediaFiles[0];
       updateAttributes({
-        src: imageUrl,
-        alt: alt || file.name.replace(/\.[^/.]+$/, '')
+        src: mediaFile.url,
+        alt: alt || mediaFile.file.name.replace(/\.[^/.]+$/, '')
       });
-
-    } catch (error) {
-      console.error('Erreur upload image:', error);
-      setUploadError(ERROR_MESSAGES.UPLOAD_FAILED);
-    } finally {
-      setIsUploading(false);
     }
   }, [updateAttributes, alt]);
 
-  // Gestion du clic sur l'input file
-  const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      handleImageUpload(file);
-    }
-    // Reset l'input pour permettre de sélectionner le même fichier
-    event.target.value = '';
-  }, [handleImageUpload]);
 
-  // Gestion du drag & drop
-  const handleDrop = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-    const file = event.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      handleImageUpload(file);
-    }
-  }, [handleImageUpload]);
-
-  const handleDragOver = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-  }, []);
 
   // Gestion du changement de variant
-  const handleVariantChange = useCallback((event: React.MouseEvent, newVariant: string) => {
+  const handleVariantChange = useCallback((event: React.MouseEvent, newVariant: 'full' | '16-9' | 'auto') => {
     event.preventDefault();
     event.stopPropagation();
-    console.log('Changing variant from', variant, 'to:', newVariant); // Debug
     updateAttributes({ variant: newVariant });
     setVariantChanged(true);
   }, [updateAttributes, variant]);
+  
+  // Gestion du changement de taille
+  const handleSizeChange = useCallback((event: React.MouseEvent, newSize: 'small' | 'medium' | 'large') => {
+    event.preventDefault();
+    event.stopPropagation();
+    updateAttributes({ size: newSize });
+    setSizeChanged(true);
+  }, [updateAttributes]);
 
   // Gestion du changement d'alt text
   const handleAltChange = useCallback((newAlt: string) => {
@@ -141,10 +111,25 @@ export function ImageBlockView({ node, updateAttributes, selected }: ImageBlockV
           border-radius: 6px;
           padding: 4px;
           display: flex;
+          flex-direction: column;
           gap: 4px;
           opacity: 0;
           transition: opacity 0.2s ease;
           z-index: 10;
+        }
+        
+        .control-group {
+          display: flex;
+          gap: 4px;
+          align-items: center;
+          padding: 2px;
+        }
+        
+        .control-label {
+          color: white;
+          font-size: 10px;
+          opacity: 0.8;
+          margin-right: 4px;
         }
         
         .universal-image-block:hover .image-controls,
@@ -317,7 +302,8 @@ export function ImageBlockView({ node, updateAttributes, selected }: ImageBlockV
           opacity: 1;
         }
         
-        .variant-changed {
+        .variant-changed,
+        .size-changed {
           animation: pulse 1s ease-in-out;
         }
         
@@ -325,15 +311,38 @@ export function ImageBlockView({ node, updateAttributes, selected }: ImageBlockV
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.02); }
         }
+        
+        /* Styles pour les différentes tailles d'images */
+        .universal-image-block .section[data-size="small"] .temp-img_container {
+          max-width: 500px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        
+        .universal-image-block .section[data-size="medium"] .temp-img_container {
+          max-width: 800px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        
+        .universal-image-block .section[data-size="large"] .temp-img_container {
+          max-width: 1000px;
+          margin-left: auto;
+          margin-right: auto;
+        }
       `}</style>
 
-      {/* Indicateur de variant */}
+      {/* Indicateur de variant et taille */}
       <div className="variant-indicator">
         {variant === '16-9' ? '16:9' : variant === 'full' ? 'Pleine largeur' : 'Auto'}
+        {variant !== 'full' && size !== 'medium' && ` • ${size === 'small' ? 'Petite' : 'Grande'}`}
       </div>
 
       {/* Structure HTML du site */}
-      <div className={`${SITE_CSS_CLASSES.section} ${variantChanged ? 'variant-changed' : ''}`} data-wf--template-section-image--variant={variant}>
+      <div 
+        className={`${SITE_CSS_CLASSES.section} ${variantChanged ? 'variant-changed' : ''} ${sizeChanged ? 'size-changed' : ''}`} 
+        data-wf--template-section-image--variant={variant}
+        data-size={size}>
         <div className={SITE_CSS_CLASSES.container}>
           <div className={SITE_CSS_CLASSES.imageContainer}>
             <div className={getImageClasses()}>
@@ -358,28 +367,21 @@ export function ImageBlockView({ node, updateAttributes, selected }: ImageBlockV
                     />
                   </>
                 ) : (
-                  <div
+                  <MediaUploader
+                    accept="image"
+                    onUpload={handleImageUpload}
+                    options={{ compress: true, quality: 0.8, maxWidth: 1920, maxHeight: 1080 }}
                     className="image-placeholder"
-                    onClick={() => fileInputRef.current?.click()}
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
                   >
                     <div className="placeholder-icon">🖼️</div>
                     <div className="placeholder-text">
                       <div>Cliquez pour ajouter une image</div>
                       <div>ou glissez-déposez un fichier ici</div>
                     </div>
-                    <button
-                      className="upload-button"
-                      disabled={isUploading}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        fileInputRef.current?.click();
-                      }}
-                    >
-                      {isUploading ? 'Upload...' : 'Choisir une image'}
+                    <button className="upload-button">
+                      Choisir une image
                     </button>
-                  </div>
+                  </MediaUploader>
                 )}
 
                 {/* Overlay de chargement */}
@@ -396,57 +398,73 @@ export function ImageBlockView({ node, updateAttributes, selected }: ImageBlockV
         {/* Contrôles d'édition */}
         {(showControls || selected) && (
           <div className="image-controls">
-            <button
-              className={`control-button ${variant === 'auto' ? 'active' : ''}`}
-              onClick={(e) => handleVariantChange(e, 'auto')}
-              title="Image standard"
-            >
-              Auto
-            </button>
-            <button
-              className={`control-button ${variant === '16-9' ? 'active' : ''}`}
-              onClick={(e) => handleVariantChange(e, '16-9')}
-              title="Image 16:9"
-            >
-              16:9
-            </button>
-            <button
-              className={`control-button ${variant === 'full' ? 'active' : ''}`}
-              onClick={(e) => handleVariantChange(e, 'full')}
-              title="Pleine largeur"
-            >
-              Full
-            </button>
-            <button
-              className="control-button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                fileInputRef.current?.click();
-              }}
-              title="Changer l'image"
-            >
-              📁
-            </button>
+            <div className="control-group">
+              <span className="control-label">Format:</span>
+              <button
+                className={`control-button ${variant === 'auto' ? 'active' : ''}`}
+                onClick={(e) => handleVariantChange(e, 'auto')}
+                title="Image standard"
+              >
+                Auto
+              </button>
+              <button
+                className={`control-button ${variant === '16-9' ? 'active' : ''}`}
+                onClick={(e) => handleVariantChange(e, '16-9')}
+                title="Image 16:9"
+              >
+                16:9
+              </button>
+              <button
+                className={`control-button ${variant === 'full' ? 'active' : ''}`}
+                onClick={(e) => handleVariantChange(e, 'full')}
+                title="Pleine largeur"
+              >
+                Full
+              </button>
+            </div>
+            
+            {variant !== 'full' && (
+              <div className="control-group">
+                <span className="control-label">Taille:</span>
+                <button
+                  className={`control-button ${size === 'small' ? 'active' : ''}`}
+                  onClick={(e) => handleSizeChange(e, 'small')}
+                  title="Petite taille"
+                >
+                  S
+                </button>
+                <button
+                  className={`control-button ${size === 'medium' ? 'active' : ''}`}
+                  onClick={(e) => handleSizeChange(e, 'medium')}
+                  title="Taille moyenne"
+                >
+                  M
+                </button>
+                <button
+                  className={`control-button ${size === 'large' ? 'active' : ''}`}
+                  onClick={(e) => handleSizeChange(e, 'large')}
+                  title="Grande taille"
+                >
+                  L
+                </button>
+              </div>
+            )}
+            
+            <div className="control-group">
+              <MediaUploader
+                accept="image"
+                onUpload={handleImageUpload}
+                options={{ compress: true, quality: 0.8 }}
+                className="control-button"
+              >
+                📁
+              </MediaUploader>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Input file caché */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept={SUPPORTED_IMAGE_FORMATS.join(',')}
-        onChange={handleFileSelect}
-        style={{ display: 'none' }}
-      />
 
-      {/* Message d'erreur */}
-      {uploadError && (
-        <div className="error-message">
-          {uploadError}
-        </div>
-      )}
     </NodeViewWrapper>
   );
 }

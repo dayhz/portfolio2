@@ -2,7 +2,7 @@
  * Extension Tiptap pour les blocs de texte universels
  */
 
-import { Node, mergeAttributes } from '@tiptap/core';
+import { Node } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import { TextAttributes } from '../types';
 import { TextBlockView } from '../nodeviews/TextBlockView';
@@ -66,7 +66,13 @@ export const TextExtension = Node.create<{}>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(TextBlockView);
+    return ReactNodeViewRenderer((props: any) => {
+      return TextBlockView({
+        node: props.node,
+        updateAttributes: props.updateAttributes,
+        selected: props.selected
+      });
+    });
   },
 
   addCommands() {
