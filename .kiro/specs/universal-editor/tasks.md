@@ -78,28 +78,28 @@
 
 ## Phase 4: Extensions Texte
 
-- [ ] 11. Extension Texte Universelle
+- [x] 11. Extension Texte Universelle
   - Créer l'extension TextExtension avec variants multiples
   - Implémenter les types (rich, simple, about, testimony)
   - Gérer les structures HTML différentes selon le variant
   - Ajouter les classes CSS appropriées automatiquement
   - _Requirements: 1.4, 5.2, 5.3_
 
-- [ ] 12. NodeView pour Texte Riche
+- [x] 12. NodeView pour Texte Riche
   - Créer le composant TextBlockView avec édition en place
   - Implémenter les contrôles de formatage intégrés
   - Ajouter la sélection de variant (rich/simple/about)
   - Gérer la préservation du formatage lors de l'édition
   - _Requirements: 3.1, 3.3, 5.1_
 
-- [ ] 13. Extension Témoignage
+- [x] 13. Extension Témoignage
   - Créer l'extension TestimonyExtension
   - Implémenter les attributs (quote, author, role, image)
   - Créer la structure HTML exacte des témoignages
   - Gérer l'intégration avec les autres blocs
   - _Requirements: 1.5, 5.2_
 
-- [ ] 14. NodeView pour Témoignages
+- [x] 14. NodeView pour Témoignages
   - Créer le composant TestimonyView
   - Implémenter l'édition de citation en place
   - Ajouter les contrôles pour informations auteur
@@ -131,21 +131,21 @@
 
 ## Phase 6: Édition WYSIWYG
 
-- [ ] 18. Système d'édition en place
+- [x] 18. Système d'édition en place
   - Implémenter l'édition directe dans tous les blocs
   - Créer les contrôles contextuels pour chaque type
   - Ajouter les indicateurs visuels d'édition active
   - Gérer les transitions fluides entre modes
   - _Requirements: 3.1, 3.2, 3.3, 7.3_
 
-- [ ] 19. Contrôles et toolbar dynamique
+- [x] 19. Contrôles et toolbar dynamique
   - Créer une toolbar qui s'adapte au bloc sélectionné
   - Implémenter les contrôles spécifiques à chaque type
   - Ajouter les raccourcis clavier contextuels
   - Gérer l'état des contrôles selon le contexte
   - _Requirements: 3.4, 7.5_
 
-- [ ] 20. Système de sélection et navigation
+- [x] 20. Système de sélection et navigation
   - Implémenter la sélection visuelle des blocs
   - Créer la navigation clavier entre les blocs
   - Ajouter les indicateurs de focus et sélection

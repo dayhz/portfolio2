@@ -15,6 +15,8 @@ import { injectSiteStyles, removeSiteStyles } from './utils/styleInjector';
 import { useAutoSave } from './hooks/useAutoSave';
 import { SaveStatusIndicator } from './components/SaveStatusIndicator';
 import { BackupRecovery } from './components/BackupRecovery';
+import { DynamicToolbar } from './components/DynamicToolbar';
+import { BlockSelectionManager } from './components/BlockSelectionManager';
 
 // Import des extensions
 import { ImageExtension } from './extensions/ImageExtension';
@@ -367,6 +369,55 @@ export function UniversalEditor({
           font-size: 0.75rem;
           font-weight: 500;
         }
+        
+        /* Styles pour l'édition en place */
+        .universal-editor-content .ProseMirror-selectednode {
+          outline: 2px solid #3b82f6;
+          border-radius: 8px;
+        }
+        
+        /* Styles pour les transitions entre modes */
+        .universal-editor-content .editable-block {
+          transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+        
+        .universal-editor-content .editable-block.editing {
+          transform: scale(1.005);
+        }
+        
+        /* Styles pour les indicateurs de sélection */
+        .universal-editor-content .block-selection-indicator {
+          position: absolute;
+          left: -20px;
+          width: 4px;
+          background-color: #3b82f6;
+          border-radius: 2px;
+          transition: top 0.2s ease, height 0.2s ease;
+        }
+        
+        /* Styles pour les raccourcis clavier */
+        .keyboard-shortcut {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 12px;
+          color: #6b7280;
+        }
+        
+        .keyboard-shortcut kbd {
+          background-color: #f3f4f6;
+          border: 1px solid #d1d5db;
+          border-radius: 3px;
+          box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+          color: #374151;
+          display: inline-block;
+          font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+          font-size: 11px;
+          font-weight: 500;
+          line-height: 1;
+          padding: 2px 4px;
+          white-space: nowrap;
+        }
       `}</style>
 
       {/* En-tête avec indicateur de sauvegarde */}
@@ -385,8 +436,11 @@ export function UniversalEditor({
       </div>
 
       {/* Éditeur principal */}
-      <div className="border-2 border-gray-200 rounded-lg focus-within:border-blue-500 transition-colors">
-        <EditorContent editor={editor} />
+      <div className="border-2 border-gray-200 rounded-lg focus-within:border-blue-500 transition-colors relative">
+        <BlockSelectionManager editor={editor}>
+          <EditorContent editor={editor} />
+          {editor && <DynamicToolbar editor={editor} />}
+        </BlockSelectionManager>
       </div>
 
       {/* Menu de sélection des blocs */}
@@ -403,7 +457,8 @@ export function UniversalEditor({
       {/* Instructions */}
       <div className="mt-4 text-sm text-gray-600 space-y-1">
         <p>• Tapez <kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs">/</kbd> pour ouvrir le menu des blocs</p>
-        <p>• Utilisez les raccourcis Markdown habituels</p>
+        <p>• Utilisez <span className="keyboard-shortcut"><kbd>Alt</kbd> + <kbd>↑</kbd>/<kbd>↓</kbd></span> pour naviguer entre les blocs</p>
+        <p>• Cliquez sur un bloc pour l'éditer directement</p>
         <p>• L'éditeur sauvegarde automatiquement vos modifications</p>
       </div>
     </div>
