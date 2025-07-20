@@ -13,10 +13,12 @@ import { debounce } from './utils';
 import { AUTO_SAVE_CONFIG } from './constants';
 import { injectSiteStyles, removeSiteStyles } from './utils/styleInjector';
 import { useAutoSave } from './hooks/useAutoSave';
+import { useVersionHistory } from './hooks/useVersionHistory';
 import { SaveStatusIndicator } from './components/SaveStatusIndicator';
 import { BackupRecovery } from './components/BackupRecovery';
 import { DynamicToolbar } from './components/DynamicToolbar';
 import { BlockSelectionManager } from './components/BlockSelectionManager';
+import { VersionHistoryPanel } from './components/VersionHistoryPanel';
 
 // Import des extensions
 import { ImageExtension } from './extensions/ImageExtension';
@@ -38,6 +40,7 @@ export function UniversalEditor({
   }>({ isOpen: false, position: { x: 0, y: 0 }, query: '' });
 
   const [showBackupRecovery, setShowBackupRecovery] = useState(false);
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
 
   // Auto-sauvegarde avec debounce
   const debouncedOnChange = useMemo(
@@ -60,6 +63,27 @@ export function UniversalEditor({
       onChange(data.content);
     },
     enableLocalBackup: true
+  });
+  
+  // Hook de gestion des versions
+  const {
+    versions,
+    currentVersionIndex,
+    isUndoAvailable,
+    isRedoAvailable,
+    addVersion,
+    undo,
+    redo,
+    restoreVersion,
+    labelVersion
+  } = useVersionHistory({
+    projectId,
+    initialContent: content,
+    onChange: (newContent) => {
+      if (onChange) {
+        onChange(newContent);
+      }
+    }
   });
 
   // Injecter les styles du site au montage
@@ -102,6 +126,11 @@ export function UniversalEditor({
             class: 'tiptap-ordered-list',
           },
         },
+        // Configurer l'historique intégré
+        history: {
+          depth: 100,
+          newGroupDelay: 500,
+        },
       }),
       Placeholder.configure({
         placeholder: ({ node }) => {
@@ -126,6 +155,9 @@ export function UniversalEditor({
         // Utiliser l'auto-sauvegarde
         autoSaveContent(html);
         debouncedOnChange(html);
+        
+        // Ajouter à l'historique des versions (sans label, auto-save)
+        addVersion(html);
       } else {
         onChange(html);
       }
@@ -230,15 +262,70 @@ export function UniversalEditor({
   const handleRestoreBackup = useCallback((backup: any) => {
     if (editor) {
       editor.commands.setContent(backup.content);
+      
+      // Ajouter à l'historique des versions
+      addVersion(backup.content, 'Restauration de sauvegarde');
     }
     clearBackup();
     setShowBackupRecovery(false);
-  }, [editor, clearBackup]);
+  }, [editor, clearBackup, addVersion]);
 
   const handleDismissBackup = useCallback(() => {
     clearBackup();
     setShowBackupRecovery(false);
   }, [clearBackup]);
+  
+  // Gestion de l'historique des versions
+  const handleCreateVersion = useCallback(() => {
+    if (editor) {
+      const html = editor.getHTML();
+      addVersion(html, `Version manuelle ${new Date().toLocaleTimeString()}`);
+    }
+  }, [editor, addVersion]);
+  
+  const handleRestoreVersion = useCallback((versionId: string) => {
+    const version = restoreVersion(versionId);
+    if (version && editor) {
+      editor.commands.setContent(version.content);
+    }
+  }, [editor, restoreVersion]);
+  
+  const handleLabelVersion = useCallback((versionId: string, label: string) => {
+    labelVersion(versionId, label);
+  }, [labelVersion]);
+  
+  // Gérer les raccourcis clavier pour undo/redo
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Undo avec Ctrl+Z
+      if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+        event.preventDefault();
+        if (isUndoAvailable) {
+          const version = undo();
+          if (version && editor) {
+            editor.commands.setContent(version.content);
+          }
+        }
+      }
+      
+      // Redo avec Ctrl+Y ou Ctrl+Shift+Z
+      if ((event.ctrlKey || event.metaKey) && (event.key === 'y' || (event.key === 'z' && event.shiftKey))) {
+        event.preventDefault();
+        if (isRedoAvailable) {
+          const version = redo();
+          if (version && editor) {
+            editor.commands.setContent(version.content);
+          }
+        }
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [editor, undo, redo, isUndoAvailable, isRedoAvailable]);
 
   const handleBlockSelect = useCallback((blockType: string) => {
     if (!editor) return;
@@ -426,13 +513,34 @@ export function UniversalEditor({
           <h3 className="text-lg font-semibold text-gray-900">Éditeur Universel</h3>
           {autoSave && <SaveStatusIndicator status={saveStatus} compact />}
         </div>
-        {autoSave && (
-          <SaveStatusIndicator 
-            status={saveStatus} 
-            showText={true}
-            className="text-sm"
-          />
-        )}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <button
+              className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-sm flex items-center gap-1"
+              onClick={() => setShowVersionHistory(true)}
+              title="Historique des versions"
+            >
+              <span className="text-xs">📋</span>
+              <span>Historique</span>
+              <span className="text-xs bg-gray-200 px-1.5 py-0.5 rounded-full">{versions.length}</span>
+            </button>
+            <button
+              className="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-sm flex items-center gap-1"
+              onClick={handleCreateVersion}
+              title="Créer une version"
+            >
+              <span className="text-xs">📌</span>
+              <span>Créer version</span>
+            </button>
+          </div>
+          {autoSave && (
+            <SaveStatusIndicator 
+              status={saveStatus} 
+              showText={true}
+              className="text-sm"
+            />
+          )}
+        </div>
       </div>
 
       {/* Éditeur principal */}
@@ -458,9 +566,21 @@ export function UniversalEditor({
       <div className="mt-4 text-sm text-gray-600 space-y-1">
         <p>• Tapez <kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs">/</kbd> pour ouvrir le menu des blocs</p>
         <p>• Utilisez <span className="keyboard-shortcut"><kbd>Alt</kbd> + <kbd>↑</kbd>/<kbd>↓</kbd></span> pour naviguer entre les blocs</p>
+        <p>• Utilisez <span className="keyboard-shortcut"><kbd>Ctrl</kbd> + <kbd>Z</kbd></span> pour annuler et <span className="keyboard-shortcut"><kbd>Ctrl</kbd> + <kbd>Y</kbd></span> pour rétablir</p>
         <p>• Cliquez sur un bloc pour l'éditer directement</p>
         <p>• L'éditeur sauvegarde automatiquement vos modifications</p>
       </div>
+      
+      {/* Panneau d'historique des versions */}
+      {showVersionHistory && (
+        <VersionHistoryPanel
+          versions={versions}
+          currentVersionIndex={currentVersionIndex}
+          onRestoreVersion={handleRestoreVersion}
+          onLabelVersion={handleLabelVersion}
+          onClose={() => setShowVersionHistory(false)}
+        />
+      )}
     </div>
   );
 }
