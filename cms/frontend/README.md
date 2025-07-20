@@ -1,59 +1,50 @@
 # Portfolio CMS - Frontend
 
-Interface d'administration React pour le Portfolio CMS.
+Ce projet est le frontend du CMS Portfolio, un système de gestion de contenu spécialisé pour les portfolios en ligne.
 
-## Stack Technique
+## Fonctionnalités implémentées
 
-- **React 18** avec TypeScript
-- **Vite** pour le build et dev server
-- **Tailwind CSS** pour le styling
-- **Shadcn/ui** pour les composants UI
-- **React Iconly** pour les icônes
-- **React Router** pour la navigation
-- **React Query** pour la gestion des données
-- **React Hook Form** pour les formulaires
-- **Sonner** pour les notifications
+### Système de notifications
+- Notifications persistantes avec stockage dans localStorage
+- Support pour différents types de notifications (info, succès, avertissement, erreur)
+- Gestion des notifications non lues
+- Support pour les notifications avec liens
+- Notifications temporaires avec expiration automatique
+- Interface utilisateur intuitive avec filtrage (toutes/non lues)
 
-## Installation
+### Tableau de bord analytique
+- Graphique des visiteurs avec statistiques de visites
+- Analyse des projets (total, publiés, brouillons, archivés)
+- Utilisation des médias avec répartition par type
+- Métriques de performance (temps de chargement, scores Lighthouse)
+- Répartition des visiteurs par appareil et navigateur
 
-```bash
-# Installer les dépendances
-npm install
+### Interface utilisateur
+- Layout principal responsive avec sidebar et header
+- Système de navigation intuitif
+- Composants UI modernes avec Shadcn/ui
+- Icônes avec Iconly
+- Formulaires avec validation
 
-# Démarrer le serveur de développement
-npm run dev
-
-# Build pour la production
-npm run build
-```
+## Prochaines fonctionnalités à implémenter
+- Système de recherche avancé
+- Mode hors ligne / synchronisation
+- Intégration avec le backend pour les données réelles
+- Tests unitaires et d'intégration
 
 ## Structure du projet
+- `src/components` : Composants React
+- `src/components/analytics` : Composants pour le tableau de bord analytique
+- `src/components/ui` : Composants UI réutilisables
+- `src/contexts` : Contextes React pour la gestion d'état globale
+- `src/hooks` : Hooks personnalisés
+- `src/pages` : Pages de l'application
 
-```
-src/
-├── components/          # Composants réutilisables
-│   ├── ui/             # Composants UI de base (Shadcn/ui)
-│   ├── Layout.tsx      # Layout principal avec sidebar
-│   └── ...
-├── pages/              # Pages principales
-│   ├── Login.tsx       # Page de connexion
-│   └── Dashboard.tsx   # Dashboard principal
-├── lib/                # Utilitaires et configuration
-├── hooks/              # Hooks personnalisés
-└── types/              # Types TypeScript
-```
-
-## Développement
-
-Le serveur de développement démarre sur `http://localhost:3000` avec proxy vers l'API sur le port 5000.
-
-### Identifiants de test
-- Email: `admin@portfolio.com`
-- Mot de passe: `admin123`
-
-## Scripts disponibles
-
-- `npm run dev` - Serveur de développement
-- `npm run build` - Build de production
-- `npm run lint` - Linting avec ESLint
-- `npm run preview` - Prévisualisation du build
+## Technologies utilisées
+- React
+- TypeScript
+- Tailwind CSS
+- Shadcn/ui
+- React Router
+- React Hook Form
+- Sonner (toasts)

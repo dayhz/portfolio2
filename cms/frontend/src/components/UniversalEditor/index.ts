@@ -13,15 +13,38 @@ export * from './constants';
 // Utilitaires
 export * from './utils';
 
-// Extensions et NodeViews seront ajoutés dans les prochaines tâches
-// export { ImageExtension } from './extensions/ImageExtension';
-// export { TextExtension } from './extensions/TextExtension';
-// export { TestimonyExtension } from './extensions/TestimonyExtension';
-// export { VideoExtension } from './extensions/VideoExtension';
-// export { ImageGridExtension } from './extensions/ImageGridExtension';
+// Services d'optimisation
+export {
+  initializeOptimizationServices,
+  cleanupOptimizationServices,
+  getOptimizationStats
+} from './services';
 
-// export { ImageBlockView } from './views/ImageBlockView';
-// export { TextBlockView } from './views/TextBlockView';
-// export { TestimonyBlockView } from './views/TestimonyBlockView';
-// export { VideoBlockView } from './views/VideoBlockView';
-// export { ImageGridBlockView } from './views/ImageGridBlockView';
+// Hooks d'optimisation
+export { useMemoryCleanup } from './hooks/useMemoryCleanup';
+export { usePerformanceMonitoring } from './hooks/usePerformanceMonitoring';
+export { useExtensionLoader } from './hooks/useExtensionLoader';
+
+// Composants d'optimisation
+export { OptimizedImage } from './components/OptimizedImage';
+export { PerformanceDiagnostics } from './components/PerformanceDiagnostics';
+
+// Composants responsives
+export { ResponsiveWrapper } from './components/ResponsiveWrapper';
+export { TouchControls } from './components/TouchControls';
+export { MobileEditor } from './components/MobileEditor';
+
+// Extensions
+export { ImageExtension } from './extensions/ImageExtension';
+export { TextExtension } from './extensions/TextExtension';
+export { TestimonyExtension } from './extensions/TestimonyExtension';
+export { VideoExtension } from './extensions/VideoExtension';
+export { ImageGridExtension } from './extensions/ImageGridExtension';
+export { HeadingExtension } from './extensions/HeadingExtension';
+
+// NodeViews
+export { ImageBlockView } from './nodeviews/ImageBlockView';
+export { TextBlockView } from './nodeviews/TextBlockView';
+export { TestimonyBlockView } from './nodeviews/TestimonyBlockView';
+export { VideoBlockView } from './nodeviews/VideoBlockView';
+export { ImageGridBlockView } from './nodeviews/ImageGridBlockView';

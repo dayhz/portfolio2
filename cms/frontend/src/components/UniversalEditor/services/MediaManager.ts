@@ -4,6 +4,7 @@
  */
 
 import { SUPPORTED_IMAGE_FORMATS, SUPPORTED_VIDEO_FORMATS, FILE_SIZE_LIMITS, ERROR_MESSAGES } from '../constants';
+import { imageOptimizationService } from './ImageOptimizationService';
 
 export interface MediaFile {
   id: string;
@@ -83,132 +84,41 @@ export class MediaManager {
   }
 
   /**
-   * Compresse une image
+   * Compresse une image en utilisant le service d'optimisation d'images
    */
   private async compressImage(file: File, options: UploadOptions): Promise<File> {
     console.log('MediaManager: compressImage called with', { fileName: file.name, fileType: file.type, fileSize: file.size, options });
     
-    return new Promise((resolve) => {
-      try {
-        // Créer une URL pour l'image
-        const objectUrl = URL.createObjectURL(file);
-        console.log('MediaManager: Object URL created for compression', objectUrl);
-        
-        const img = new Image();
-        
-        img.onload = () => {
-          try {
-            console.log('MediaManager: Image loaded for compression, dimensions:', { width: img.width, height: img.height });
-            
-            // Calculer les nouvelles dimensions
-            let { width, height } = img;
-            const maxWidth = options.maxWidth || 1920;
-            const maxHeight = options.maxHeight || 1080;
-
-            if (width > maxWidth || height > maxHeight) {
-              const ratio = Math.min(maxWidth / width, maxHeight / height);
-              width = Math.floor(width * ratio);
-              height = Math.floor(height * ratio);
-              console.log('MediaManager: Image resized to', { width, height });
-            } else {
-              console.log('MediaManager: No resize needed, dimensions within limits');
-            }
-
-            // Créer un canvas pour la compression
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            
-            const ctx = canvas.getContext('2d');
-            if (!ctx) {
-              console.error('MediaManager: Failed to get 2D context');
-              URL.revokeObjectURL(objectUrl);
-              resolve(file); // Retourner le fichier original en cas d'erreur
-              return;
-            }
-
-            // Dessiner l'image redimensionnée
-            ctx.drawImage(img, 0, 0, width, height);
-            console.log('MediaManager: Image drawn on canvas');
-
-            // Convertir en blob avec compression
-            if (canvas.toBlob) {
-              console.log('MediaManager: Using canvas.toBlob for compression');
-              canvas.toBlob(
-                (blob) => {
-                  // Libérer l'URL
-                  URL.revokeObjectURL(objectUrl);
-                  
-                  if (blob) {
-                    console.log('MediaManager: Blob created successfully', { blobSize: blob.size });
-                    try {
-                      const compressedFile = new File([blob], file.name, {
-                        type: file.type,
-                        lastModified: Date.now(),
-                      });
-                      console.log('MediaManager: Compressed file created', { fileSize: compressedFile.size });
-                      resolve(compressedFile);
-                    } catch (err) {
-                      console.error('MediaManager: Error creating File from blob', err);
-                      resolve(file);
-                    }
-                  } else {
-                    console.warn('MediaManager: Blob creation failed, using original file');
-                    resolve(file);
-                  }
-                },
-                file.type,
-                options.quality || 0.8
-              );
-            } else {
-              // Fallback si toBlob n'est pas disponible
-              console.log('MediaManager: canvas.toBlob not available, using toDataURL fallback');
-              try {
-                const dataUrl = canvas.toDataURL(file.type, options.quality || 0.8);
-                const byteString = atob(dataUrl.split(',')[1]);
-                const ab = new ArrayBuffer(byteString.length);
-                const ia = new Uint8Array(ab);
-                
-                for (let i = 0; i < byteString.length; i++) {
-                  ia[i] = byteString.charCodeAt(i);
-                }
-                
-                const blob = new Blob([ab], { type: file.type });
-                const compressedFile = new File([blob], file.name, {
-                  type: file.type,
-                  lastModified: Date.now(),
-                });
-                
-                // Libérer l'URL
-                URL.revokeObjectURL(objectUrl);
-                
-                console.log('MediaManager: Compressed file created with fallback method', { fileSize: compressedFile.size });
-                resolve(compressedFile);
-              } catch (err) {
-                console.error('MediaManager: Error in fallback compression', err);
-                URL.revokeObjectURL(objectUrl);
-                resolve(file);
-              }
-            }
-          } catch (err) {
-            console.error('MediaManager: Error in image onload handler', err);
-            URL.revokeObjectURL(objectUrl);
-            resolve(file);
-          }
-        };
-        
-        img.onerror = (err) => {
-          console.error('MediaManager: Error loading image for compression', err);
-          URL.revokeObjectURL(objectUrl);
-          resolve(file);
-        };
-        
-        img.src = objectUrl;
-      } catch (err) {
-        console.error('MediaManager: Unexpected error in compressImage', err);
-        resolve(file);
-      }
-    });
+    try {
+      // Utiliser le service d'optimisation d'images pour compresser l'image
+      const optimizedImageUrl = await imageOptimizationService.optimizeImage(file, {
+        maxWidth: options.maxWidth || 1920,
+        maxHeight: options.maxHeight || 1080,
+        quality: options.quality || 0.8,
+        format: 'webp' // Utiliser WebP pour une meilleure compression
+      });
+      
+      // Convertir l'URL en blob
+      const response = await fetch(optimizedImageUrl);
+      const blob = await response.blob();
+      
+      // Créer un nouveau fichier à partir du blob
+      const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, '.webp'), {
+        type: 'image/webp',
+        lastModified: Date.now()
+      });
+      
+      console.log('MediaManager: Image compressed successfully', { 
+        originalSize: file.size, 
+        compressedSize: compressedFile.size,
+        compressionRatio: (file.size / compressedFile.size).toFixed(2)
+      });
+      
+      return compressedFile;
+    } catch (error) {
+      console.error('MediaManager: Error compressing image', error);
+      return file; // Retourner le fichier original en cas d'erreur
+    }
   }
 
   /**

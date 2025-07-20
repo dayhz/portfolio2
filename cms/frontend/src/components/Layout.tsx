@@ -14,6 +14,7 @@ import {
   Logout,
   Category,
 } from 'react-iconly';
+import NotificationCenter from './NotificationCenter';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -103,17 +104,25 @@ export default function Layout({ children }: LayoutProps) {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white shadow-sm border-b lg:hidden">
+        <header className="bg-white shadow-sm border-b">
           <div className="flex items-center justify-between px-4 py-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
-              <Category size="medium" primaryColor="#374151" />
-            </Button>
-            <h1 className="text-lg font-semibold text-gray-800">Portfolio CMS</h1>
-            <div className="w-10" /> {/* Spacer */}
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="lg:hidden"
+              >
+                <Category size="medium" primaryColor="#374151" />
+              </Button>
+              <h1 className="text-lg font-semibold text-gray-800 lg:hidden">Portfolio CMS</h1>
+            </div>
+            <div className="flex items-center space-x-2">
+              <NotificationCenter />
+              <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-medium">
+                VB
+              </div>
+            </div>
           </div>
         </header>
 

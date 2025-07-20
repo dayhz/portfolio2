@@ -10,9 +10,9 @@ let stylesInjected = false;
 export const injectSiteStyles = (): void => {
   if (stylesInjected) return;
 
-  // Créer un élément style
-  const styleElement = document.createElement('style');
-  styleElement.id = 'universal-editor-site-styles';
+  // Créer un élément style pour les styles du site
+  const siteStyleElement = document.createElement('style');
+  siteStyleElement.id = 'universal-editor-site-styles';
   
   // CSS du site (extrait des fichiers du portfolio)
   const siteCSS = `
@@ -217,8 +217,287 @@ export const injectSiteStyles = (): void => {
     }
   `;
 
-  styleElement.textContent = siteCSS;
-  document.head.appendChild(styleElement);
+  siteStyleElement.textContent = siteCSS;
+  document.head.appendChild(siteStyleElement);
+  
+  // Créer un élément style pour les styles responsives
+  const responsiveStyleElement = document.createElement('style');
+  responsiveStyleElement.id = 'universal-editor-responsive-styles';
+  
+  // CSS responsive (importé du fichier responsive.css)
+  const responsiveCSS = `
+    /**
+     * Styles CSS responsives pour l'éditeur universel
+     */
+    
+    /* Variables CSS pour les breakpoints */
+    :root {
+      --breakpoint-xs: 0;
+      --breakpoint-sm: 576px;
+      --breakpoint-md: 768px;
+      --breakpoint-lg: 992px;
+      --breakpoint-xl: 1200px;
+      --breakpoint-xxl: 1400px;
+      
+      /* Variables pour les tailles de contrôles */
+      --control-size-mobile: 44px;
+      --control-size-tablet: 36px;
+      --control-size-desktop: 32px;
+      
+      /* Variables pour les espacements */
+      --spacing-mobile: 8px;
+      --spacing-tablet: 12px;
+      --spacing-desktop: 16px;
+      
+      /* Variables pour les tailles de police */
+      --font-size-mobile: 16px;
+      --font-size-tablet: 14px;
+      --font-size-desktop: 14px;
+      
+      /* Variables pour les animations */
+      --animation-duration-mobile: 150ms;
+      --animation-duration-tablet: 200ms;
+      --animation-duration-desktop: 300ms;
+    }
+    
+    /* Styles de base pour l'éditeur */
+    .universal-editor {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    
+    /* Styles responsives pour les appareils mobiles */
+    @media (max-width: 767px) {
+      .universal-editor {
+        font-size: var(--font-size-mobile);
+      }
+      
+      /* Augmenter la taille des contrôles pour les appareils tactiles */
+      .universal-editor button,
+      .universal-editor .control-button,
+      .universal-editor .toolbar-button {
+        min-width: var(--control-size-mobile);
+        min-height: var(--control-size-mobile);
+        padding: var(--spacing-mobile);
+        margin: calc(var(--spacing-mobile) / 2);
+      }
+      
+      /* Simplifier les menus sur mobile */
+      .universal-editor .dropdown-menu,
+      .universal-editor .context-menu {
+        width: 100%;
+        max-width: 100%;
+        left: 0 !important;
+        right: 0 !important;
+        border-radius: 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        border-bottom: none;
+        border-left: none;
+        border-right: none;
+      }
+      
+      /* Afficher les menus en bas de l'écran sur mobile */
+      .universal-editor .block-menu {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        transform: none !important;
+        max-height: 50vh;
+        overflow-y: auto;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        z-index: 1050;
+      }
+      
+      /* Adapter la grille pour mobile */
+      .universal-editor .image-grid {
+        grid-template-columns: 1fr !important;
+        gap: var(--spacing-mobile);
+      }
+      
+      /* Réduire les animations sur mobile */
+      .universal-editor .animated,
+      .universal-editor .fade-in,
+      .universal-editor .fade-out {
+        transition-duration: var(--animation-duration-mobile);
+      }
+      
+      /* Masquer les tooltips sur mobile en mode portrait */
+      @media (orientation: portrait) {
+        .universal-editor .tooltip {
+          display: none !important;
+        }
+      }
+      
+      /* Adapter la barre d'outils pour mobile */
+      .universal-editor .dynamic-toolbar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        background-color: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+        border-bottom: none;
+        border-radius: 0;
+        padding: var(--spacing-mobile);
+        z-index: 1000;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Adapter les contrôles de bloc pour mobile */
+      .universal-editor .block-controls {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        background-color: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+        border-radius: 0;
+        padding: var(--spacing-mobile);
+        z-index: 1000;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      /* Adapter les panneaux pour mobile */
+      .universal-editor .panel,
+      .universal-editor .version-history-panel,
+      .universal-editor .media-gallery {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 0;
+        z-index: 1100;
+      }
+      
+      /* Adapter les formulaires pour mobile */
+      .universal-editor input,
+      .universal-editor select,
+      .universal-editor textarea {
+        font-size: var(--font-size-mobile);
+        padding: var(--spacing-mobile);
+        height: var(--control-size-mobile);
+      }
+    }
+    
+    /* Styles responsives pour les tablettes */
+    @media (min-width: 768px) and (max-width: 991px) {
+      .universal-editor {
+        font-size: var(--font-size-tablet);
+      }
+      
+      /* Adapter la taille des contrôles pour les tablettes */
+      .universal-editor button,
+      .universal-editor .control-button,
+      .universal-editor .toolbar-button {
+        min-width: var(--control-size-tablet);
+        min-height: var(--control-size-tablet);
+        padding: var(--spacing-tablet);
+        margin: calc(var(--spacing-tablet) / 2);
+      }
+      
+      /* Adapter la grille pour tablette */
+      .universal-editor .image-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-tablet);
+      }
+      
+      /* Adapter les animations pour tablette */
+      .universal-editor .animated,
+      .universal-editor .fade-in,
+      .universal-editor .fade-out {
+        transition-duration: var(--animation-duration-tablet);
+      }
+      
+      /* Adapter les panneaux pour tablette */
+      .universal-editor .panel,
+      .universal-editor .version-history-panel,
+      .universal-editor .media-gallery {
+        max-width: 80%;
+        max-height: 80%;
+      }
+      
+      /* Adapter les formulaires pour tablette */
+      .universal-editor input,
+      .universal-editor select,
+      .universal-editor textarea {
+        font-size: var(--font-size-tablet);
+        padding: var(--spacing-tablet);
+        height: var(--control-size-tablet);
+      }
+    }
+    
+    /* Styles pour les appareils tactiles */
+    @media (hover: none) and (pointer: coarse) {
+      /* Augmenter la taille des zones cliquables */
+      .universal-editor button,
+      .universal-editor .control-button,
+      .universal-editor .toolbar-button,
+      .universal-editor .clickable {
+        min-width: var(--control-size-mobile);
+        min-height: var(--control-size-mobile);
+      }
+      
+      /* Désactiver les effets de survol */
+      .universal-editor .hover-effect:hover {
+        transform: none !important;
+        box-shadow: none !important;
+      }
+      
+      /* Ajouter un retour visuel pour les interactions tactiles */
+      .universal-editor .touch-feedback:active {
+        transform: scale(0.95);
+        opacity: 0.8;
+      }
+    }
+    
+    /* Styles pour les appareils à faible puissance */
+    .universal-editor.low-power-device .animated,
+    .universal-editor.low-power-device .animation,
+    .universal-editor.low-power-device .fade-in,
+    .universal-editor.low-power-device .fade-out {
+      transition: none !important;
+      animation: none !important;
+    }
+    
+    /* Styles pour l'orientation portrait */
+    @media (orientation: portrait) {
+      .universal-editor .portrait-only {
+        display: block;
+      }
+      
+      .universal-editor .landscape-only {
+        display: none;
+      }
+    }
+    
+    /* Styles pour l'orientation paysage */
+    @media (orientation: landscape) {
+      .universal-editor .portrait-only {
+        display: none;
+      }
+      
+      .universal-editor .landscape-only {
+        display: block;
+      }
+    }
+  `;
+
+  responsiveStyleElement.textContent = responsiveCSS;
+  document.head.appendChild(responsiveStyleElement);
   
   stylesInjected = true;
 };
@@ -227,11 +506,17 @@ export const injectSiteStyles = (): void => {
  * Supprime les styles injectés
  */
 export const removeSiteStyles = (): void => {
-  const existingStyle = document.getElementById('universal-editor-site-styles');
-  if (existingStyle) {
-    existingStyle.remove();
-    stylesInjected = false;
+  const existingSiteStyle = document.getElementById('universal-editor-site-styles');
+  if (existingSiteStyle) {
+    existingSiteStyle.remove();
   }
+  
+  const existingResponsiveStyle = document.getElementById('universal-editor-responsive-styles');
+  if (existingResponsiveStyle) {
+    existingResponsiveStyle.remove();
+  }
+  
+  stylesInjected = false;
 };
 
 /**

@@ -19,10 +19,16 @@ import { SaveStatusIndicator } from './components/SaveStatusIndicator';
 import { BackupRecovery } from './components/BackupRecovery';
 import { DynamicToolbar } from './components/DynamicToolbar';
 import { BlockSelectionManager } from './components/BlockSelectionManager';
-import { VersionHistoryPanel } from './components/VersionHistoryPanel';
-import { ContentPreview } from './components/ContentPreview';
+// VersionHistoryPanel est maintenant importé via lazy loading
+// Import des composants lazy loadés
+import { 
+  LazyContentPreview, 
+  LazyTemplateSelector, 
+  LazyVersionHistoryPanel,
+  preloadFrequentComponents
+} from './lazyComponents';
 import { SimplePreview } from './components/SimplePreview';
-import { TemplateSelector } from './components/TemplateSelector';
+// TemplateSelector est maintenant importé via lazy loading
 
 // Import des extensions
 import { ImageExtension } from './extensions/ImageExtension';
@@ -115,7 +121,7 @@ export function UniversalEditor({
     }
   });
 
-  // Injecter les styles du site au montage
+  // Injecter les styles du site au montage et précharger les composants fréquemment utilisés
   useEffect(() => {
     injectSiteStyles();
     
@@ -124,6 +130,11 @@ export function UniversalEditor({
     if (backup && backup.content !== content) {
       setShowBackupRecovery(true);
     }
+    
+    // Précharger les composants fréquemment utilisés
+    // Cela améliore l'expérience utilisateur en chargeant les composants
+    // avant qu'ils ne soient nécessaires
+    preloadFrequentComponents();
     
     // Nettoyer au démontage
     return () => {
@@ -798,9 +809,9 @@ export function UniversalEditor({
         <p>• L'éditeur sauvegarde automatiquement vos modifications</p>
       </div>
       
-      {/* Panneau d'historique des versions */}
+      {/* Panneau d'historique des versions (lazy loaded) */}
       {showVersionHistory && (
-        <VersionHistoryPanel
+        <LazyVersionHistoryPanel
           versions={versions}
           currentVersionIndex={currentVersionIndex}
           onRestoreVersion={handleRestoreVersion}
@@ -826,8 +837,8 @@ export function UniversalEditor({
             }}
           />
           
-          {/* Commenté temporairement pour tester avec la version simplifiée
-          <ContentPreview
+          {/* Version lazy loaded du ContentPreview (commenté pour le moment)
+          <LazyContentPreview
             content={exportedContent || editor.getHTML()}
             templateName={selectedTemplateType}
             metadata={{ title: "Prévisualisation", description: "Aperçu du contenu" }}
@@ -847,9 +858,9 @@ export function UniversalEditor({
         )
       )}
       
-      {/* Sélecteur de template */}
+      {/* Sélecteur de template (lazy loaded) */}
       {showTemplateSelector && (
-        <TemplateSelector
+        <LazyTemplateSelector
           selectedTemplate={selectedTemplateType}
           onTemplateChange={handleTemplateChange}
           className="mt-4"
