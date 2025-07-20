@@ -1,0 +1,126 @@
+/**
+ * Styles pour le template Nobe
+ */
+
+/* Variables */
+:root {
+  --nobe-primary: #000000;
+  --nobe-secondary: #f8f8f8;
+  --nobe-accent: #cccccc;
+  --nobe-text: #333333;
+  --nobe-background: #ffffff;
+  --nobe-spacing: 3rem;
+  --nobe-font: 'Helvetica Neue', sans-serif;
+}
+
+/* Styles globaux */
+body.nobe-template {
+  font-family: var(--nobe-font);
+  color: var(--nobe-text);
+  background-color: var(--nobe-background);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+.nobe-template .preview-content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--nobe-spacing);
+}
+
+/* En-tête */
+.nobe-template .project-header {
+  padding: calc(var(--nobe-spacing) * 2) var(--nobe-spacing);
+  margin-bottom: var(--nobe-spacing);
+}
+
+.nobe-template .project-title {
+  font-size: 3.5rem;
+  font-weight: 300;
+  margin-bottom: 1rem;
+  letter-spacing: -0.05em;
+}
+
+/* Images */
+.nobe-template img {
+  max-width: 100%;
+  height: auto;
+  margin: var(--nobe-spacing) 0;
+}
+
+.nobe-template .temp-img {
+  margin: var(--nobe-spacing) 0;
+}
+
+/* Texte */
+.nobe-template h1, 
+.nobe-template h2, 
+.nobe-template h3 {
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  margin-top: calc(var(--nobe-spacing) * 1.5);
+  margin-bottom: calc(var(--nobe-spacing) * 0.5);
+}
+
+.nobe-template h1 {
+  font-size: 3rem;
+}
+
+.nobe-template h2 {
+  font-size: 2.5rem;
+}
+
+.nobe-template h3 {
+  font-size: 2rem;
+}
+
+.nobe-template p {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 300;
+}
+
+/* Témoignages */
+.nobe-template .temp-comp-testimony {
+  font-style: normal;
+  padding: var(--nobe-spacing);
+  margin: var(--nobe-spacing) 0;
+  border-top: 1px solid var(--nobe-accent);
+  border-bottom: 1px solid var(--nobe-accent);
+}
+
+/* Grille d'images */
+.nobe-template .temp-comp-img_grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(var(--nobe-spacing) / 2);
+  margin: var(--nobe-spacing) 0;
+}
+
+/* Vidéos */
+.nobe-template video {
+  width: 100%;
+  margin: var(--nobe-spacing) 0;
+}
+
+/* Section À propos */
+.nobe-template .temp-about_container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--nobe-spacing);
+  margin: var(--nobe-spacing) 0;
+  padding: var(--nobe-spacing) 0;
+  border-top: 1px solid var(--nobe-accent);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nobe-template .temp-comp-img_grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .nobe-template .temp-about_container {
+    grid-template-columns: 1fr;
+  }
+}

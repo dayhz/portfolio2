@@ -16,6 +16,7 @@ export interface UniversalEditorProps {
   onChange: (content: string) => void;
   projectId?: string;
   autoSave?: boolean;
+  templateType?: string;
 }
 
 export interface BlockMenuProps {

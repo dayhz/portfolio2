@@ -168,6 +168,7 @@ export function EditablePlaceholder({
   isLoading = false,
   className = ''
 }: EditablePlaceholderProps) {
+  console.log('EditablePlaceholder rendering, isLoading:', isLoading);
   return (
     <div 
       className={`editable-placeholder ${className}`}
@@ -230,7 +231,8 @@ export function EditablePlaceholder({
       <button 
         className="placeholder-button"
         onClick={(e) => {
-          e.stopPropagation();
+          console.log('EditablePlaceholder button clicked');
+          // Ne pas arrêter la propagation pour permettre au MediaUploader de recevoir l'événement
           if (onClick) onClick();
         }}
         disabled={isLoading}

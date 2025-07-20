@@ -161,14 +161,14 @@
   - Gérer la récupération en cas d'erreur
   - _Requirements: 6.1, 6.4, 7.4_
 
-- [ ] 22. Gestion des versions et historique
+- [x] 22. Gestion des versions et historique
   - Créer un système d'historique des modifications
   - Implémenter Undo/Redo (Ctrl+Z/Ctrl+Y)
   - Ajouter la sauvegarde de versions multiples
   - Gérer la restauration de versions précédentes
   - _Requirements: 6.4, 7.5_
 
-- [ ] 23. Export et intégration site
+- [x] 23. Export et intégration site
   - Créer le système d'export vers format site
   - Implémenter la génération HTML/JSON appropriée
   - Ajouter la validation du contenu avant export

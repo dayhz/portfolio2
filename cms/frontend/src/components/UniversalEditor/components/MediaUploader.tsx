@@ -44,23 +44,37 @@ export function MediaUploader({
 
   // Gestion de l'upload
   const handleUpload = useCallback(async (files: FileList | File[]) => {
+    console.log('MediaUploader: handleUpload called with', files);
     try {
       clearError();
       const fileArray = Array.from(files);
       
-      if (fileArray.length === 0) return;
+      if (fileArray.length === 0) {
+        console.warn('MediaUploader: No files to upload');
+        return;
+      }
 
       let mediaFiles: MediaFile[];
       
       if (fileArray.length === 1) {
+        console.log('MediaUploader: Uploading single file', fileArray[0]);
         const mediaFile = await uploadFile(fileArray[0], options);
+        console.log('MediaUploader: Single file uploaded successfully', mediaFile);
         mediaFiles = [mediaFile];
       } else {
+        console.log('MediaUploader: Uploading multiple files', fileArray);
         mediaFiles = await uploadFiles(files, options);
+        console.log('MediaUploader: Multiple files uploaded successfully', mediaFiles);
       }
 
-      onUpload?.(mediaFiles);
+      if (onUpload) {
+        console.log('MediaUploader: Calling onUpload callback with', mediaFiles);
+        onUpload(mediaFiles);
+      } else {
+        console.warn('MediaUploader: No onUpload callback provided');
+      }
     } catch (error) {
+      console.error('MediaUploader: Upload error', error);
       const errorMessage = error instanceof Error ? error.message : 'Erreur d\'upload';
       onError?.(errorMessage);
     }

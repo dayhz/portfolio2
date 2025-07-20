@@ -14,11 +14,15 @@ import { AUTO_SAVE_CONFIG } from './constants';
 import { injectSiteStyles, removeSiteStyles } from './utils/styleInjector';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useVersionHistory } from './hooks/useVersionHistory';
+import { useContentExport } from './hooks/useContentExport';
 import { SaveStatusIndicator } from './components/SaveStatusIndicator';
 import { BackupRecovery } from './components/BackupRecovery';
 import { DynamicToolbar } from './components/DynamicToolbar';
 import { BlockSelectionManager } from './components/BlockSelectionManager';
 import { VersionHistoryPanel } from './components/VersionHistoryPanel';
+import { ContentPreview } from './components/ContentPreview';
+import { SimplePreview } from './components/SimplePreview';
+import { TemplateSelector } from './components/TemplateSelector';
 
 // Import des extensions
 import { ImageExtension } from './extensions/ImageExtension';
@@ -26,12 +30,14 @@ import { TextExtension } from './extensions/TextExtension';
 import { TestimonyExtension } from './extensions/TestimonyExtension';
 import { ImageGridExtension } from './extensions/ImageGridExtension';
 import { VideoExtension } from './extensions/VideoExtension';
+import { HeadingExtension } from './extensions/HeadingExtension';
 
 export function UniversalEditor({ 
   content = '', 
   onChange, 
   projectId,
-  autoSave = true 
+  autoSave = true,
+  templateType = 'poesial'
 }: UniversalEditorProps) {
   const [blockMenuState, setBlockMenuState] = useState<{
     isOpen: boolean;
@@ -41,6 +47,10 @@ export function UniversalEditor({
 
   const [showBackupRecovery, setShowBackupRecovery] = useState(false);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [showContentPreview, setShowContentPreview] = useState(false);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [selectedTemplateType, setSelectedTemplateType] = useState(templateType);
 
   // Auto-sauvegarde avec debounce
   const debouncedOnChange = useMemo(
@@ -85,6 +95,25 @@ export function UniversalEditor({
       }
     }
   });
+  
+  // Hook d'export de contenu
+  const {
+    isExporting,
+    exportedContent,
+    validationResult,
+    exportContent,
+    exportToJson,
+    integrateWithTemplate,
+    setExportedContent
+  } = useContentExport({
+    defaultTemplate: selectedTemplateType,
+    onExport: (content: string) => {
+      console.log('Export réussi:', content.substring(0, 100) + '...');
+    },
+    onValidationError: (result) => {
+      console.error('Erreur de validation lors de l\'export:', result.errors);
+    }
+  });
 
   // Injecter les styles du site au montage
   useEffect(() => {
@@ -105,12 +134,8 @@ export function UniversalEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3],
-          HTMLAttributes: {
-            class: 'tiptap-heading',
-          },
-        },
+        // Désactiver l'extension heading par défaut car nous utilisons notre propre extension
+        heading: false,
         blockquote: {
           HTMLAttributes: {
             class: 'tiptap-blockquote',
@@ -141,6 +166,7 @@ export function UniversalEditor({
         },
       }),
       // Extensions personnalisées
+      HeadingExtension,
       ImageExtension,
       TextExtension,
       TestimonyExtension,
@@ -294,6 +320,111 @@ export function UniversalEditor({
     labelVersion(versionId, label);
   }, [labelVersion]);
   
+  // Gestion de la prévisualisation et de l'export
+  const handlePreview = useCallback(() => {
+    if (editor) {
+      console.log('Prévisualisation avec template:', selectedTemplateType);
+      
+      // Approche simplifiée : afficher directement le contenu de l'éditeur
+      setShowContentPreview(true);
+      console.log('showContentPreview défini à true');
+      
+      /* Ancienne approche avec exportContent
+      const html = editor.getHTML();
+      console.log('Contenu HTML à prévisualiser:', html.substring(0, 100) + '...');
+      
+      try {
+        const exported = exportContent(html, {
+          cleanupEditorClasses: true,
+          optimizeImages: true,
+          templateName: selectedTemplateType
+        });
+        
+        console.log('Contenu exporté:', exported ? 'Succès' : 'Échec');
+        console.log('showContentPreview avant:', showContentPreview);
+        
+        if (exported) {
+          setShowContentPreview(true);
+          console.log('showContentPreview après:', true);
+        } else {
+          console.error('Échec de l\'export du contenu');
+        }
+      } catch (error) {
+        console.error('Erreur lors de la prévisualisation:', error);
+      }
+      */
+    } else {
+      console.error('Éditeur non disponible');
+    }
+  }, [editor, selectedTemplateType]);
+  
+  // Gestion du changement de template
+  const handleTemplateChange = useCallback((newTemplateType: string) => {
+    console.log('Changement de template:', newTemplateType);
+    setSelectedTemplateType(newTemplateType);
+    
+    // Forcer une prévisualisation avec le nouveau template
+    if (editor) {
+      const html = editor.getHTML();
+      console.log('Prévisualisation après changement de template');
+      const exported = exportContent(html, {
+        cleanupEditorClasses: true,
+        optimizeImages: true,
+        templateName: newTemplateType
+      });
+      
+      if (exported && showContentPreview) {
+        // Si la prévisualisation est déjà ouverte, la mettre à jour
+        console.log('Mise à jour de la prévisualisation avec le nouveau template');
+      }
+    }
+  }, [editor, exportContent, showContentPreview]);
+  
+  const handlePublish = useCallback(() => {
+    if (editor) {
+      setIsPublishing(true);
+      
+      try {
+        const html = editor.getHTML();
+        
+        // Exporter le contenu
+        const exportedHtml = exportContent(html, {
+          cleanupEditorClasses: true,
+          optimizeImages: true,
+          minifyHtml: true,
+          templateName: selectedTemplateType,
+          validateContent: true
+        });
+        
+        // Exporter également en JSON pour l'API
+        const exportedJson = exportToJson(html, {
+          metadata: { templateName: selectedTemplateType }
+        });
+        
+        if (exportedHtml && exportedJson) {
+          // Ici, vous pourriez envoyer le contenu exporté à une API
+          console.log('Publication du contenu:', { html: exportedHtml, json: exportedJson });
+          
+          // Créer une version étiquetée pour la publication
+          addVersion(html, `Publication ${new Date().toLocaleString()}`);
+          
+          // Fermer la prévisualisation
+          setShowContentPreview(false);
+          
+          // Notifier l'utilisateur
+          alert('Contenu publié avec succès!');
+        } else {
+          throw new Error('Échec de l\'export du contenu');
+        }
+      } catch (error) {
+        console.error('Erreur lors de la publication:', error);
+        alert(`Erreur lors de la publication: ${error instanceof Error ? error.message : String(error)}`);
+      } finally {
+        setIsPublishing(false);
+      }
+    }
+  }, [editor, exportContent, exportToJson, selectedTemplateType, addVersion]);
+  
   // Gérer les raccourcis clavier pour undo/redo
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -354,13 +485,17 @@ export function UniversalEditor({
         editor.chain().focus().setUniversalText({ variant: 'about' }).run();
         break;
       case 'heading-1':
-        editor.chain().focus().toggleHeading({ level: 1 }).run();
+        console.log('Insertion d\'un titre H1');
+        // Utiliser setHeading au lieu de toggleHeading
+        editor.chain().focus().setHeading({ level: 1 }).run();
         break;
       case 'heading-2':
-        editor.chain().focus().toggleHeading({ level: 2 }).run();
+        console.log('Insertion d\'un titre H2');
+        editor.chain().focus().setHeading({ level: 2 }).run();
         break;
       case 'heading-3':
-        editor.chain().focus().toggleHeading({ level: 3 }).run();
+        console.log('Insertion d\'un titre H3');
+        editor.chain().focus().setHeading({ level: 3 }).run();
         break;
       case 'video':
         editor.chain().focus().setUniversalVideo().run();
@@ -403,6 +538,40 @@ export function UniversalEditor({
           min-height: 400px;
           padding: 1rem;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        /* Styles pour les titres */
+        .universal-editor-content h1,
+        .universal-editor-content .universal-heading-1,
+        .universal-editor-content .universal-heading[data-level="1"] {
+          font-size: 2.5rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+          margin-top: 2rem;
+          color: #111827;
+          line-height: 1.2;
+        }
+        
+        .universal-editor-content h2,
+        .universal-editor-content .universal-heading-2,
+        .universal-editor-content .universal-heading[data-level="2"] {
+          font-size: 2rem;
+          font-weight: 600;
+          margin-bottom: 0.75rem;
+          margin-top: 1.5rem;
+          color: #1f2937;
+          line-height: 1.3;
+        }
+        
+        .universal-editor-content h3,
+        .universal-editor-content .universal-heading-3,
+        .universal-editor-content .universal-heading[data-level="3"] {
+          font-size: 1.5rem;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          margin-top: 1.25rem;
+          color: #374151;
+          line-height: 1.4;
         }
         
         /* Styles d'édition Tiptap */
@@ -532,6 +701,64 @@ export function UniversalEditor({
               <span className="text-xs">📌</span>
               <span>Créer version</span>
             </button>
+            <button
+              className="px-2 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded text-sm flex items-center gap-1"
+              onClick={handlePreview}
+              title="Prévisualiser"
+            >
+              <span className="text-xs">👁️</span>
+              <span>Prévisualiser</span>
+            </button>
+            <button
+              className="px-2 py-1 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded text-sm flex items-center gap-1"
+              onClick={() => setShowTemplateSelector(true)}
+              title="Changer de template"
+            >
+              <span className="text-xs">🖼️</span>
+              <span>Template: {selectedTemplateType}</span>
+            </button>
+            <button
+              className="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-sm flex items-center gap-1"
+              onClick={() => {
+                console.log('Forcer la prévisualisation');
+                if (editor) {
+                  const html = editor.getHTML();
+                  setExportedContent(html);
+                  setShowContentPreview(true);
+                }
+              }}
+              title="Forcer la prévisualisation (debug)"
+            >
+              <span className="text-xs">🔧</span>
+              <span>Debug Preview</span>
+            </button>
+            <button
+              className="px-2 py-1 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded text-sm flex items-center gap-1"
+              onClick={() => {
+                console.log('Test des titres');
+                if (editor) {
+                  // Insérer des titres de test avec la nouvelle approche
+                  editor.chain()
+                    .focus()
+                    .clearContent()
+                    .insertContent('<p>Test des titres :</p>')
+                    .setHeading({ level: 1 })
+                    .insertContent('Titre H1 de test')
+                    .insertContent('<p>Paragraphe après H1</p>')
+                    .setHeading({ level: 2 })
+                    .insertContent('Titre H2 de test')
+                    .insertContent('<p>Paragraphe après H2</p>')
+                    .setHeading({ level: 3 })
+                    .insertContent('Titre H3 de test')
+                    .insertContent('<p>Paragraphe après H3</p>')
+                    .run();
+                }
+              }}
+              title="Tester les titres"
+            >
+              <span className="text-xs">📝</span>
+              <span>Test Titres</span>
+            </button>
           </div>
           {autoSave && (
             <SaveStatusIndicator 
@@ -579,6 +806,53 @@ export function UniversalEditor({
           onRestoreVersion={handleRestoreVersion}
           onLabelVersion={handleLabelVersion}
           onClose={() => setShowVersionHistory(false)}
+        />
+      )}
+      
+      {/* Prévisualisation du contenu */}
+      {showContentPreview && editor ? (
+        <div>
+          <div className="bg-blue-100 p-2 mb-2 rounded">
+            Prévisualisation active: Template {selectedTemplateType}
+          </div>
+          
+          {/* Utiliser la prévisualisation simplifiée pour tester */}
+          <SimplePreview
+            content={editor.getHTML()}
+            templateName={selectedTemplateType}
+            onClose={() => {
+              console.log('Fermeture de la prévisualisation');
+              setShowContentPreview(false);
+            }}
+          />
+          
+          {/* Commenté temporairement pour tester avec la version simplifiée
+          <ContentPreview
+            content={exportedContent || editor.getHTML()}
+            templateName={selectedTemplateType}
+            metadata={{ title: "Prévisualisation", description: "Aperçu du contenu" }}
+            onClose={() => {
+              console.log('Fermeture de la prévisualisation');
+              setShowContentPreview(false);
+            }}
+            className="mt-4"
+          />
+          */}
+        </div>
+      ) : (
+        showContentPreview && (
+          <div className="bg-red-100 p-4 rounded mt-4">
+            Impossible d'afficher la prévisualisation. Contenu exporté non disponible.
+          </div>
+        )
+      )}
+      
+      {/* Sélecteur de template */}
+      {showTemplateSelector && (
+        <TemplateSelector
+          selectedTemplate={selectedTemplateType}
+          onTemplateChange={handleTemplateChange}
+          className="mt-4"
         />
       )}
     </div>

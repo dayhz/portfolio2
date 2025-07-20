@@ -25,6 +25,7 @@ export function ImageBlockView({ node, updateAttributes, selected }: ImageBlockV
   const [variantChanged, setVariantChanged] = useState(false);
   const [sizeChanged, setSizeChanged] = useState(false);
   const { isUploading } = useMediaManager();
+  console.log('ImageBlockView: useMediaManager hook initialized, isUploading:', isUploading);
   
   const { 
     isEditing, 
@@ -57,13 +58,18 @@ export function ImageBlockView({ node, updateAttributes, selected }: ImageBlockV
 
   // Gestion de l'upload d'image avec MediaManager
   const handleImageUpload = useCallback(async (mediaFiles: any[]) => {
+    console.log('ImageBlockView: handleImageUpload called with', mediaFiles);
     if (mediaFiles.length > 0) {
       const mediaFile = mediaFiles[0];
+      console.log('ImageBlockView: Using media file', mediaFile);
       updateAttributes({
         src: mediaFile.url,
         alt: alt || mediaFile.file.name.replace(/\.[^/.]+$/, '')
       });
+      console.log('ImageBlockView: Attributes updated with src', mediaFile.url);
       startEditing(); // Activer le mode édition après l'upload
+    } else {
+      console.warn('ImageBlockView: No media files received');
     }
   }, [updateAttributes, alt, startEditing]);
 
@@ -243,13 +249,19 @@ export function ImageBlockView({ node, updateAttributes, selected }: ImageBlockV
                         />
                       </>
                     ) : (
-                      <EditablePlaceholder
-                        icon="🖼️"
-                        text="Cliquez pour ajouter une image ou glissez-déposez un fichier ici"
-                        buttonText="Choisir une image"
-                        isLoading={isUploading}
-                        onClick={() => startEditing()}
-                      />
+                      <MediaUploader
+                        accept="image"
+                        onUpload={handleImageUpload}
+                        options={{ compress: true, quality: 0.8 }}
+                      >
+                        <EditablePlaceholder
+                          icon="🖼️"
+                          text="Cliquez pour ajouter une image ou glissez-déposez un fichier ici"
+                          buttonText="Choisir une image"
+                          isLoading={isUploading}
+                          onClick={() => console.log('EditablePlaceholder clicked')}
+                        />
+                      </MediaUploader>
                     )}
 
                     {/* Overlay de chargement */}

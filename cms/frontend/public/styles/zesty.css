@@ -1,0 +1,136 @@
+/**
+ * Styles pour le template Zesty
+ */
+
+/* Variables */
+:root {
+  --zesty-primary: #ff6b35;
+  --zesty-secondary: #f7c59f;
+  --zesty-accent: #2ec4b6;
+  --zesty-text: #1a535c;
+  --zesty-background: #ffffff;
+  --zesty-spacing: 1.5rem;
+  --zesty-font: 'Poppins', sans-serif;
+}
+
+/* Styles globaux */
+body.zesty-template {
+  font-family: var(--zesty-font);
+  color: var(--zesty-text);
+  background-color: var(--zesty-background);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+.zesty-template .preview-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--zesty-spacing);
+}
+
+/* En-tête */
+.zesty-template .project-header {
+  background-color: var(--zesty-primary);
+  color: white;
+  padding: calc(var(--zesty-spacing) * 2) var(--zesty-spacing);
+  margin-bottom: var(--zesty-spacing);
+  border-radius: 0 0 2rem 2rem;
+}
+
+.zesty-template .project-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+/* Images */
+.zesty-template img {
+  max-width: 100%;
+  height: auto;
+  margin: var(--zesty-spacing) 0;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.zesty-template .temp-img {
+  margin: var(--zesty-spacing) 0;
+  overflow: hidden;
+  border-radius: 1rem;
+}
+
+/* Texte */
+.zesty-template h1, 
+.zesty-template h2, 
+.zesty-template h3 {
+  font-weight: 700;
+  margin-top: calc(var(--zesty-spacing) * 1.5);
+  margin-bottom: calc(var(--zesty-spacing) * 0.5);
+  color: var(--zesty-primary);
+}
+
+.zesty-template h1 {
+  font-size: 2.5rem;
+}
+
+.zesty-template h2 {
+  font-size: 2rem;
+}
+
+.zesty-template h3 {
+  font-size: 1.75rem;
+}
+
+.zesty-template p {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+}
+
+/* Témoignages */
+.zesty-template .temp-comp-testimony {
+  padding: var(--zesty-spacing);
+  background-color: var(--zesty-secondary);
+  margin: var(--zesty-spacing) 0;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Grille d'images */
+.zesty-template .temp-comp-img_grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(var(--zesty-spacing));
+  margin: var(--zesty-spacing) 0;
+}
+
+/* Vidéos */
+.zesty-template video {
+  width: 100%;
+  margin: var(--zesty-spacing) 0;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+/* Section À propos */
+.zesty-template .temp-about_container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--zesty-spacing);
+  margin: var(--zesty-spacing) 0;
+  padding: var(--zesty-spacing);
+  background-color: var(--zesty-accent);
+  color: white;
+  border-radius: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .zesty-template .temp-comp-img_grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .zesty-template .temp-about_container {
+    grid-template-columns: 1fr;
+  }
+}
