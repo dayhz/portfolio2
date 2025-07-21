@@ -1,126 +1,137 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Edit } from 'react-iconly';
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ServiceEditor from '@/components/services/ServiceEditor';
+import ProcessStepsEditor from '@/components/services/ProcessStepsEditor';
+import SkillsEditor from '@/components/services/SkillsEditor';
+import VideoUploader from '@/components/services/VideoUploader';
+import { Card } from '@/components/ui/card';
 
-export default function ServicesPage() {
-  const services = [
+const ServicesPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('services');
+  
+  // Données pour les services
+  const [services, setServices] = useState([
     {
-      id: 1,
-      name: 'Website',
-      description: 'Clear and engaging websites that actually do their job, whether it\'s starting fresh or giving an old one a makeover.',
-      color: '#3b82f6'
+      id: '1',
+      title: 'Développement Web',
+      description: 'Création de sites web modernes et responsives avec les dernières technologies.',
+      icon: 'Code',
+      order: 1
     },
     {
-      id: 2,
-      name: 'Product',
-      description: 'Scalable and intuitive interfaces for B2B and B2C SaaS products that truly work. From user flows to design systems.',
-      color: '#10b981'
+      id: '2',
+      title: 'Design UI/UX',
+      description: 'Conception d\'interfaces utilisateur intuitives et expériences utilisateur optimales.',
+      icon: 'Edit',
+      order: 2
     },
     {
-      id: 3,
-      name: 'Mobile',
-      description: 'Seamless and fluid mobile experiences designed to fit how people use apps in the real world and actually loved by users.',
-      color: '#8b5cf6'
+      id: '3',
+      title: 'Consultation',
+      description: 'Conseils stratégiques pour optimiser votre présence numérique et vos processus.',
+      icon: 'Chat',
+      order: 3
     }
-  ];
+  ]);
+  
+  // Données pour les étapes du processus
+  const [processSteps, setProcessSteps] = useState([
+    {
+      id: '1',
+      title: 'Découverte',
+      description: 'Analyse de vos besoins et objectifs pour comprendre votre projet.',
+      icon: 'Search',
+      order: 1
+    },
+    {
+      id: '2',
+      title: 'Conception',
+      description: 'Création de maquettes et prototypes pour visualiser le projet.',
+      icon: 'Edit',
+      order: 2
+    },
+    {
+      id: '3',
+      title: 'Développement',
+      description: 'Programmation et intégration des fonctionnalités.',
+      icon: 'Code',
+      order: 3
+    },
+    {
+      id: '4',
+      title: 'Livraison',
+      description: 'Tests finaux et mise en ligne de votre projet.',
+      icon: 'Send',
+      order: 4
+    }
+  ]);
+  
+  // Données pour les compétences
+  const [skills, setSkills] = useState([
+    { id: 'skill-1', name: 'React', category: 'frontend', level: 90 },
+    { id: 'skill-2', name: 'TypeScript', category: 'frontend', level: 85 },
+    { id: 'skill-3', name: 'Node.js', category: 'backend', level: 80 },
+    { id: 'skill-4', name: 'Figma', category: 'design', level: 75 },
+    { id: 'skill-5', name: 'Docker', category: 'devops', level: 70 }
+  ]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Services</h1>
-          <p className="text-gray-600 mt-2">
-            Gérez vos services et votre processus de travail
-          </p>
-        </div>
-      </div>
-
-      {/* Services Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {services.map((service) => (
-          <Card key={service.id} className="relative">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center">
-                  <div 
-                    className="w-3 h-3 rounded-full mr-3"
-                    style={{ backgroundColor: service.color }}
-                  />
-                  {service.name}
-                </CardTitle>
-                <Button variant="ghost" size="sm">
-                  <Edit size="small" primaryColor="#6b7280" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 text-sm">
-                {service.description}
-              </p>
-            </CardContent>
+    <div className="p-8">
+      <h1 className="text-2xl font-bold mb-4">Gestion des Services</h1>
+      <p className="text-gray-500 mb-6">
+        Gérez les services, le processus de travail, les compétences et les vidéos de présentation qui seront affichés sur votre site.
+      </p>
+      
+      <Tabs defaultValue="services" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="services">Services</TabsTrigger>
+          <TabsTrigger value="process">Processus</TabsTrigger>
+          <TabsTrigger value="skills">Compétences</TabsTrigger>
+          <TabsTrigger value="video">Vidéo</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="services">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Services</h2>
+            <p className="text-gray-500 mb-6">
+              Gérez les 3 services principaux que vous proposez. Vous pourrez modifier leur titre, description et icône.
+            </p>
+            <ServiceEditor services={services} onUpdate={setServices} />
           </Card>
-        ))}
-      </div>
-
-      {/* Process Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Processus de Travail</CardTitle>
-            <Button variant="outline">
-              <Edit size="small" primaryColor="#6b7280" />
-              <span className="ml-2">Modifier</span>
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {[
-              { step: '1', title: 'Discovery', description: 'Learn about your project and understand the end goal' },
-              { step: '2', title: 'Wireframe', description: 'Organize information and address UX problems' },
-              { step: '3', title: 'Mood Board', description: 'Discuss design direction and visual preferences' },
-              { step: '4', title: 'Design', description: 'Create the final UI using approved wireframe and mood board' }
-            ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-blue-600 font-semibold">{item.step}</span>
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-600">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Skills Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Compétences</CardTitle>
-            <Button variant="outline">
-              <Edit size="small" primaryColor="#6b7280" />
-              <span className="ml-2">Modifier</span>
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {[
-              'User Interface', 'Prototyping', 'User Research', 'User Journey',
-              'Design System', 'Interface Animation', 'User Flow', 'UX Audit',
-              'Icon Design', 'Creative & Art Direction', 'User Persona', 'Wireframe'
-            ].map((skill) => (
-              <span
-                key={skill}
-                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+        </TabsContent>
+        
+        <TabsContent value="process">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Processus</h2>
+            <p className="text-gray-500 mb-6">
+              Décrivez votre processus de travail en 4 étapes. Chaque étape pourra avoir un titre, une description et une icône.
+            </p>
+            <ProcessStepsEditor steps={processSteps} onUpdate={setProcessSteps} />
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="skills">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Compétences</h2>
+            <p className="text-gray-500 mb-6">
+              Ajoutez et gérez vos compétences techniques avec leur niveau de maîtrise.
+            </p>
+            <SkillsEditor skills={skills} onUpdate={setSkills} />
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="video">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Vidéo</h2>
+            <p className="text-gray-500 mb-6">
+              Téléchargez une vidéo de présentation de vos services qui sera affichée sur votre site.
+            </p>
+            <VideoUploader />
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
-}
+};
+
+export default ServicesPage;
