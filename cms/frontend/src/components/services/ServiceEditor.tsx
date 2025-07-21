@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { GripVertical, Home, Code, Pencil, MessageCircle, Send, FileText, BarChart } from 'lucide-react';
+import { GripVertical, Home, Code, Pencil, MessageCircle, Send, FileText, BarChart, Eye } from 'lucide-react';
+import { RichTextEditor } from './RichTextEditor';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useNotificationSystem } from '@/hooks/useNotificationSystem';
 
 interface Service {
   id: string;
@@ -55,7 +58,11 @@ const defaultServices: Service[] = [
 ];
 
 const ServiceEditor: React.FC<ServiceEditorProps> = ({ services: propServices, onUpdate }) => {
-  const [services, setServices] = React.useState<Service[]>(propServices || defaultServices);
+  const [services, setServices] = useState<Service[]>(propServices || defaultServices);
+  const [previewService, setPreviewService] = useState<Service | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const notificationSystem = useNotificationSystem();
+  
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
     
@@ -71,6 +78,10 @@ const ServiceEditor: React.FC<ServiceEditorProps> = ({ services: propServices, o
     
     setServices(updatedItems);
     onUpdate?.(updatedItems);
+    
+    if (result.source.index !== result.destination.index) {
+      notificationSystem.info('Ordre modifié', 'L\'ordre des services a été mis à jour.');
+    }
   };
 
   const handleChange = (id: string, field: keyof Service, value: string) => {
@@ -81,6 +92,11 @@ const ServiceEditor: React.FC<ServiceEditorProps> = ({ services: propServices, o
     if (onUpdate) {
       onUpdate(updatedServices);
     }
+  };
+
+  const handlePreviewClick = (service: Service) => {
+    setPreviewService(service);
+    setIsPreviewOpen(true);
   };
 
   const getIconComponent = (iconName: string) => {
@@ -155,13 +171,23 @@ const ServiceEditor: React.FC<ServiceEditorProps> = ({ services: propServices, o
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor={`description-${service.id}`}>Description</Label>
-                              <Textarea
-                                id={`description-${service.id}`}
-                                value={service.description}
-                                onChange={(e) => handleChange(service.id, 'description', e.target.value)}
+                              <div className="flex justify-between items-center">
+                                <Label htmlFor={`description-${service.id}`}>Description</Label>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handlePreviewClick(service)}
+                                  className="text-gray-500 hover:text-gray-700"
+                                >
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Aperçu
+                                </Button>
+                              </div>
+                              <RichTextEditor
+                                content={service.description}
+                                onChange={(content) => handleChange(service.id, 'description', content)}
                                 placeholder="Description du service"
-                                rows={3}
+                                minHeight="120px"
                               />
                             </div>
                           </div>
@@ -191,6 +217,27 @@ const ServiceEditor: React.FC<ServiceEditorProps> = ({ services: propServices, o
           Note: Vous êtes limité à 3 services pour maintenir une présentation claire et concise sur votre portfolio.
         </p>
       </div>
+
+      {/* Dialogue de prévisualisation */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Aperçu du service</DialogTitle>
+          </DialogHeader>
+          {previewService && (
+            <div className="space-y-4 py-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-gray-100 rounded-full">
+                  {getIconComponent(previewService.icon)}
+                </div>
+                <h3 className="text-xl font-semibold">{previewService.title}</h3>
+              </div>
+              
+              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: previewService.description }} />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

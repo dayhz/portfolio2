@@ -8,6 +8,7 @@ import {
   SocialLinksEditor,
   AboutPreview
 } from '@/components/about';
+import PreviewButton from '@/components/preview/PreviewButton';
 
 // Types
 interface Photo {
@@ -145,6 +146,16 @@ export default function AboutPage() {
             Gérez votre biographie, statistiques et récompenses
           </p>
         </div>
+        <PreviewButton 
+          type="about" 
+          data={{
+            biography,
+            statistics,
+            awards,
+            photos,
+            socialLinks
+          }} 
+        />
       </div>
 
       {/* Biography */}
@@ -161,15 +172,6 @@ export default function AboutPage() {
 
       {/* Social Links */}
       <SocialLinksEditor initialLinks={socialLinks} onSave={saveSocialLinks} />
-
-      {/* Preview */}
-      <AboutPreview 
-        biography={biography}
-        statistics={statistics}
-        awards={awards}
-        photos={photos}
-        socialLinks={socialLinks}
-      />
     </div>
   );
 }

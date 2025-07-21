@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { GripVertical, Home, Code, Pencil, MessageCircle, Send, Search, FileText, BarChart } from 'lucide-react';
+import { GripVertical, Home, Code, Pencil, MessageCircle, Send, Search, FileText, BarChart, Eye } from 'lucide-react';
+import { RichTextEditor } from './RichTextEditor';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useNotificationSystem } from '@/hooks/useNotificationSystem';
 
 interface ProcessStep {
   id: string;
@@ -32,6 +35,10 @@ const iconOptions = [
 ];
 
 const ProcessStepsEditor: React.FC<ProcessStepsEditorProps> = ({ steps, onUpdate }) => {
+  const [previewStep, setPreviewStep] = useState<ProcessStep | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const notificationSystem = useNotificationSystem();
+
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
     
@@ -46,6 +53,10 @@ const ProcessStepsEditor: React.FC<ProcessStepsEditorProps> = ({ steps, onUpdate
     }));
     
     onUpdate(updatedItems);
+    
+    if (result.source.index !== result.destination.index) {
+      notificationSystem.info('Ordre modifié', 'L\'ordre des étapes a été mis à jour.');
+    }
   };
 
   const handleChange = (id: string, field: keyof ProcessStep, value: string) => {
@@ -53,6 +64,11 @@ const ProcessStepsEditor: React.FC<ProcessStepsEditorProps> = ({ steps, onUpdate
       step.id === id ? { ...step, [field]: value } : step
     );
     onUpdate(updatedSteps);
+  };
+
+  const handlePreviewClick = (step: ProcessStep) => {
+    setPreviewStep(step);
+    setIsPreviewOpen(true);
   };
 
   const getIconComponent = (iconName: string) => {
@@ -127,13 +143,23 @@ const ProcessStepsEditor: React.FC<ProcessStepsEditorProps> = ({ steps, onUpdate
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor={`description-${step.id}`}>Description</Label>
-                              <Textarea
-                                id={`description-${step.id}`}
-                                value={step.description}
-                                onChange={(e) => handleChange(step.id, 'description', e.target.value)}
+                              <div className="flex justify-between items-center">
+                                <Label htmlFor={`description-${step.id}`}>Description</Label>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={() => handlePreviewClick(step)}
+                                  className="text-gray-500 hover:text-gray-700"
+                                >
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Aperçu
+                                </Button>
+                              </div>
+                              <RichTextEditor
+                                content={step.description}
+                                onChange={(content) => handleChange(step.id, 'description', content)}
                                 placeholder="Description de l'étape"
-                                rows={2}
+                                minHeight="100px"
                               />
                             </div>
                           </div>
@@ -163,6 +189,30 @@ const ProcessStepsEditor: React.FC<ProcessStepsEditorProps> = ({ steps, onUpdate
           Note: Vous êtes limité à 4 étapes pour maintenir un processus clair et facile à comprendre pour vos clients.
         </p>
       </div>
+
+      {/* Dialogue de prévisualisation */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Aperçu de l'étape</DialogTitle>
+          </DialogHeader>
+          {previewStep && (
+            <div className="space-y-4 py-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-gray-100 rounded-full h-12 w-12 flex items-center justify-center">
+                  {getIconComponent(previewStep.icon)}
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold">{previewStep.title}</h3>
+                  <p className="text-sm text-gray-500">Étape {previewStep.order}</p>
+                </div>
+              </div>
+              
+              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: previewStep.description }} />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

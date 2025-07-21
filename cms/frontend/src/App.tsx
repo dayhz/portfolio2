@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import { Toaster as ShadcnToaster } from '@/components/ui/toaster';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { SearchProvider } from './contexts/SearchContext';
+import { PreviewProvider } from './contexts/PreviewContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProfilePage from './pages/ProfilePage';
@@ -22,6 +23,7 @@ import Layout from './components/Layout';
 import GlobalSearch from './components/search/GlobalSearch';
 import { Button } from '@/components/ui/button';
 import { initAuth } from './utils/authInit';
+import UnifiedPreview from './components/preview/UnifiedPreview';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,12 +42,13 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <NotificationProvider>
         <SearchProvider>
-          <Router>
-            <div className="min-h-screen bg-gray-50">
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/preview-project" element={<ProjectPreviewPage />} />
-                <Route path="/search" element={
+          <PreviewProvider>
+            <Router>
+              <div className="min-h-screen bg-gray-50">
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/preview-project" element={<ProjectPreviewPage />} />
+                  <Route path="/search" element={
                   <div className="min-h-screen bg-gray-50 p-8">
                     <div className="max-w-7xl mx-auto">
                       <h1 className="text-2xl font-bold mb-6">Recherche</h1>
@@ -93,7 +96,9 @@ function App() {
             </div>
             <Toaster position="top-right" />
             <ShadcnToaster />
+            <UnifiedPreview />
           </Router>
+          </PreviewProvider>
         </SearchProvider>
       </NotificationProvider>
     </QueryClientProvider>

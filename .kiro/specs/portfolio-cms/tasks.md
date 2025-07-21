@@ -130,7 +130,7 @@
   - Implémenter la validation des données
   - _Requirements: 5.1, 5.2, 5.3_
 
-- [ ] 13. Gestion des services
+- [x] 13. Gestion des services
   - Créer l'interface de gestion des 3 services
   - Implémenter l'édition des descriptions avec rich text
   - Ajouter la gestion du processus en 4 étapes
@@ -139,7 +139,7 @@
   - Ajouter la prévisualisation des modifications
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 14. Gestion de la page À Propos
+- [x] 14. Gestion de la page À Propos
   - Créer l'éditeur de biographie avec rich text
   - Implémenter la gestion des statistiques personnelles
   - Ajouter l'interface de gestion des récompenses
@@ -148,7 +148,7 @@
   - Ajouter la prévisualisation de la page About
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 15. Système de prévisualisation
+- [x] 15. Système de prévisualisation
   - Créer le mode prévisualisation avec iframe
   - Implémenter la génération de pages temporaires
   - Ajouter les boutons de prévisualisation dans chaque section
@@ -229,7 +229,7 @@
   - Déployer en production avec monitoring actif
   - _Requirements: 9.5, 10.1, 12.4_
 
-- [ ] 24. Système de recherche avancé
+- [x] 24. Système de recherche avancé
   - Créer un composant de recherche global pour l'application
   - Implémenter la recherche en temps réel avec debounce
   - Ajouter des filtres avancés pour les projets, médias et témoignages

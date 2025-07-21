@@ -1,8 +1,41 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Chat, Plus } from 'react-iconly';
+import { useState } from 'react';
+import PreviewButton from '@/components/preview/PreviewButton';
 
 export default function TestimonialsPage() {
+  // Données mock pour les témoignages
+  const [testimonials, setTestimonials] = useState([
+    {
+      id: '1',
+      name: 'Jean Dupont',
+      position: 'CEO',
+      company: 'Entreprise ABC',
+      content: 'Excellent travail ! Je recommande vivement les services de Victor.',
+      photoUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
+      isActive: true
+    },
+    {
+      id: '2',
+      name: 'Marie Martin',
+      position: 'Directrice Marketing',
+      company: 'XYZ Corp',
+      content: 'Une collaboration très professionnelle et des résultats qui dépassent nos attentes.',
+      photoUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
+      isActive: true
+    },
+    {
+      id: '3',
+      name: 'Pierre Durand',
+      position: 'Fondateur',
+      company: 'Startup Innovante',
+      content: 'Victor a su comprendre nos besoins et y répondre parfaitement.',
+      photoUrl: 'https://randomuser.me/api/portraits/men/3.jpg',
+      isActive: false
+    }
+  ]);
+  
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -12,10 +45,16 @@ export default function TestimonialsPage() {
             Gérez les témoignages de vos clients
           </p>
         </div>
-        <Button>
-          <Plus size="small" primaryColor="#ffffff" />
-          <span className="ml-2">Nouveau Témoignage</span>
-        </Button>
+        <div className="flex space-x-2">
+          <PreviewButton 
+            type="testimonials" 
+            data={{ testimonials }} 
+          />
+          <Button>
+            <Plus size="small" primaryColor="#ffffff" />
+            <span className="ml-2">Nouveau Témoignage</span>
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}

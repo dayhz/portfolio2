@@ -10,7 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Work, Plus, Search, Edit, Delete } from 'react-iconly';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import PreviewButton from '@/components/preview/PreviewButton';
 import { AdvancedProject } from '@/components/ProjectFormAdvanced';
+import { usePreviewMode } from '@/hooks/usePreviewMode';
 
 // Utilisation du type AdvancedProject
 type Project = AdvancedProject;
@@ -71,11 +73,11 @@ const mockProjects: Project[] = [
 export default function ProjectsPage() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const { showPreview } = usePreviewMode('projects');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
+  // État pour la gestion des projets
 
   // Filtrage des projets
   const filteredProjects = projects.filter(project => {
@@ -291,11 +293,16 @@ export default function ProjectsPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
                           onClick={() => {
-                            setSelectedProject(project);
-                            setPreviewOpen(true);
+                            const previewData = {
+                              ...project,
+                              content: project.content || ''
+                            };
+                            
+                            // Utiliser le système de prévisualisation unifié
+                            showPreview(previewData);
                           }}
                         >
-                          👁️ Aperçu
+                          👁️ Prévisualiser
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleEditProject(project)}>
                           <div className="mr-2">
@@ -322,89 +329,7 @@ export default function ProjectsPage() {
         </CardContent>
       </Card>
 
-      {/* Modal de prévisualisation */}
-      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Aperçu du projet</DialogTitle>
-          </DialogHeader>
-          {selectedProject && (
-            <div className="space-y-4">
-              <img
-                src={selectedProject.heroImage}
-                alt={selectedProject.title}
-                className="w-full h-64 object-cover rounded-lg"
-              />
-              <div>
-                <h3 className="text-xl font-semibold">{selectedProject.title}</h3>
-                <p className="text-gray-600 mt-1">{selectedProject.subtitle}</p>
-                <div className="flex items-center space-x-2 mt-2">
-                  {getCategoryBadge(selectedProject.category)}
-                  {getStatusBadge(selectedProject.status)}
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="font-medium">Client:</span> {selectedProject.client}
-                </div>
-                <div>
-                  <span className="font-medium">Année:</span> {selectedProject.year}
-                </div>
-                <div>
-                  <span className="font-medium">Durée:</span> {selectedProject.duration}
-                </div>
-                <div>
-                  <span className="font-medium">Industrie:</span> {selectedProject.industry}
-                </div>
-                {selectedProject.projectUrl && (
-                  <div className="col-span-2">
-                    <span className="font-medium">URL:</span>{' '}
-                    <a href={selectedProject.projectUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      Voir le projet
-                    </a>
-                  </div>
-                )}
-              </div>
 
-              <div className="space-y-3">
-                <div>
-                  <h4 className="font-medium">Scope:</h4>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {selectedProject.scope.map((item, index) => (
-                      <Badge key={index} variant="outline" className="text-xs">
-                        {item}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium">Challenge:</h4>
-                  <p className="text-gray-600 text-sm mt-1">{selectedProject.challenge}</p>
-                </div>
-
-                <div>
-                  <h4 className="font-medium">Approach:</h4>
-                  <p className="text-gray-600 text-sm mt-1">{selectedProject.approach}</p>
-                </div>
-
-                {selectedProject.testimonial && (
-                  <div>
-                    <h4 className="font-medium">Témoignage:</h4>
-                    <blockquote className="text-gray-600 text-sm italic mt-1">
-                      "{selectedProject.testimonial.quote}"
-                    </blockquote>
-                    <p className="text-xs text-gray-500 mt-1">
-                      — {selectedProject.testimonial.clientName}, {selectedProject.testimonial.clientRole}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
 
 
     </div>

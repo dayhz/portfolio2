@@ -177,21 +177,21 @@
 
 ## Phase 8: Performance et Optimisation
 
-- [ ] 24. Optimisation des performances
+- [x] 24. Optimisation des performances
   - Implémenter le lazy loading des composants lourds
   - Optimiser le rendu des images et médias
   - Ajouter le code splitting pour les extensions
   - Créer le système de cache intelligent
   - _Requirements: 7.1, 7.2, 7.4_
 
-- [ ] 25. Gestion mémoire et cleanup
+- [x] 25. Gestion mémoire et cleanup
   - Implémenter le cleanup automatique des ressources
   - Optimiser les re-renders React
   - Gérer la libération mémoire des médias
   - Ajouter le monitoring des performances
   - _Requirements: 7.4, 7.1_
 
-- [ ] 26. Optimisation responsive
+- [x] 26. Optimisation responsive
   - Tester et optimiser sur toutes les tailles d'écran
   - Adapter l'interface pour mobile/tablette
   - Optimiser les contrôles tactiles
@@ -200,21 +200,21 @@
 
 ## Phase 9: Tests et Validation
 
-- [ ] 27. Tests unitaires des extensions
+- [x] 27. Tests unitaires des extensions
   - Créer les tests pour chaque extension Tiptap
   - Tester la génération HTML pour tous les types de blocs
   - Valider les transformations et attributs
   - Tester les commandes et interactions
   - _Requirements: Tous_
 
-- [ ] 28. Tests d'intégration
+- [x] 28. Tests d'intégration
   - Tester l'interaction entre différents types de blocs
   - Valider le rendu WYSIWYG vs rendu final
   - Tester les workflows complets de création
   - Valider l'export et l'intégration site
   - _Requirements: Tous_
 
-- [ ] 29. Tests de performance
+- [x] 29. Tests de performance
   - Tester avec du contenu volumineux
   - Valider les performances d'upload de médias
   - Tester la stabilité sur sessions longues
@@ -223,21 +223,21 @@
 
 ## Phase 10: Finalisation
 
-- [ ] 30. Interface utilisateur finale
+- [x] 30. Interface utilisateur finale
   - Peaufiner tous les détails visuels
   - Ajouter les animations et transitions finales
   - Optimiser l'expérience utilisateur globale
   - Créer les guides et tooltips d'aide
   - _Requirements: 2.1, 2.2, 7.3_
 
-- [ ] 31. Documentation et guides
+- [x] 31. Documentation et guides
   - Créer la documentation utilisateur complète
   - Ajouter les guides d'utilisation avec exemples
   - Documenter tous les raccourcis et fonctionnalités
   - Créer les tutoriels pour chaque type de bloc
   - _Requirements: Tous_
 
-- [ ] 32. Tests finaux et déploiement
+- [x] 32. Tests finaux et déploiement
   - Effectuer les tests de régression complets
   - Valider sur différents navigateurs
   - Tester l'intégration complète avec le site

@@ -15,6 +15,7 @@ import {
   Category,
 } from 'react-iconly';
 import NotificationCenter from './NotificationCenter';
+import GlobalSearch from './search/GlobalSearch';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -106,7 +107,7 @@ export default function Layout({ children }: LayoutProps) {
         {/* Header */}
         <header className="bg-white shadow-sm border-b">
           <div className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-4">
               <Button
                 variant="ghost"
                 size="icon"
@@ -117,6 +118,28 @@ export default function Layout({ children }: LayoutProps) {
               </Button>
               <h1 className="text-lg font-semibold text-gray-800 lg:hidden">Portfolio CMS</h1>
             </div>
+            
+            {/* Barre de recherche globale */}
+            <div className="flex-1 max-w-2xl mx-4 hidden md:block">
+              <GlobalSearch 
+                placeholder="Rechercher dans vos projets, médias, témoignages..."
+                onResultClick={(result) => {
+                  // Navigation personnalisée si nécessaire
+                  switch (result.type) {
+                    case 'project':
+                      navigate(`/projects/${result.id}`);
+                      break;
+                    case 'media':
+                      navigate('/media');
+                      break;
+                    case 'testimonial':
+                      navigate('/testimonials');
+                      break;
+                  }
+                }}
+              />
+            </div>
+            
             <div className="flex items-center space-x-2">
               <NotificationCenter />
               <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-medium">

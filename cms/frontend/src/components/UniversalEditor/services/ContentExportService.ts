@@ -7,8 +7,8 @@ export interface ExportOptions {
   cleanupEditorClasses?: boolean;
   optimizeImages?: boolean;
   minifyHtml?: boolean;
-  templateType?: string;
   validateContent?: boolean;
+  templateName?: string;
 }
 
 export interface ValidationResult {
@@ -19,91 +19,164 @@ export interface ValidationResult {
 
 export class ContentExportService {
   /**
-   * Exporte le contenu de l'éditeur vers le format HTML final
+   * Exporte le contenu HTML de l'éditeur vers un format compatible avec le site
    */
-  static exportToHtml(content: string, options: ExportOptions = {}): string {
-    let result = content;
+  static exportToSiteFormat(content: string, options: ExportOptions = {}): string {
+    const {
+      cleanupEditorClasses = true,
+      optimizeImages = true,
+      minifyHtml = false,
+      validateContent = true
+    } = options;
     
-    // Nettoyer les classes d'édition si demandé
-    if (options.cleanupEditorClasses) {
-      result = this.cleanupEditorClasses(result);
+    // Nettoyer les classes spécifiques à l'éditeur
+    let processedContent = content;
+    
+    if (cleanupEditorClasses) {
+      processedContent = this.cleanupEditorClasses(processedContent);
     }
     
-    // Optimiser les images si demandé
-    if (options.optimizeImages) {
-      result = this.optimizeImages(result);
+    // Optimiser les images
+    if (optimizeImages) {
+      processedContent = this.optimizeImages(processedContent);
     }
     
-    // Appliquer les transformations spécifiques au template
-    if (options.templateType) {
-      result = this.applyTemplateTransformations(result, options.templateType);
+    // Valider le contenu
+    if (validateContent) {
+      const validationResult = this.validateContent(processedContent);
+      if (!validationResult.isValid) {
+        console.warn('Validation warnings:', validationResult.warnings);
+        console.error('Validation errors:', validationResult.errors);
+      }
     }
     
     // Minifier le HTML si demandé
-    if (options.minifyHtml) {
-      result = this.minifyHtml(result);
+    if (minifyHtml) {
+      processedContent = this.minifyHtml(processedContent);
     }
+    
+    return processedContent;
+  }
+  
+  /**
+   * Intègre le contenu dans un template spécifique
+   */
+  static integrateWithTemplate(content: string, templateName: string, metadata: Record<string, any> = {}): string {
+    // Charger le template
+    const template = this.getTemplate(templateName);
+    
+    // Remplacer les placeholders dans le template
+    let result = template;
+    
+    // Injecter le contenu principal
+    result = result.replace('{{content}}', content);
+    
+    // Injecter les métadonnées
+    Object.entries(metadata).forEach(([key, value]) => {
+      result = result.replace(new RegExp(`{{${key}}}`, 'g'), String(value));
+    });
+    
+    // Ajouter l'année courante
+    result = result.replace(/{{currentYear}}/g, new Date().getFullYear().toString());
     
     return result;
   }
   
   /**
-   * Exporte le contenu de l'éditeur vers le format JSON
+   * Exporte le contenu au format JSON pour l'API
    */
-  static exportToJson(content: string, options: ExportOptions = {}): any {
-    // Extraire les sections du contenu
-    const sections = this.extractSections(content);
-    
-    // Convertir en structure JSON
-    const blocks = this.convertToBlocks(sections);
-    
-    // Appliquer les transformations spécifiques au template
-    if (options.templateType) {
-      this.applyTemplateTransformationsToJson(blocks, options.templateType);
-    }
-    
-    return {
-      version: '1.0',
-      templateType: options.templateType || 'default',
-      blocks,
-      metadata: {
-        exportedAt: new Date().toISOString()
-      }
+  static exportToJson(content: string, metadata: Record<string, any> = {}): string {
+    const exportData = {
+      content,
+      metadata,
+      exportedAt: new Date().toISOString()
     };
+    
+    return JSON.stringify(exportData);
+  }
+  
+  /**
+   * Nettoie les classes spécifiques à l'éditeur
+   */
+  private static cleanupEditorClasses(content: string): string {
+    // Supprimer les classes liées à l'éditeur
+    let result = content;
+    
+    // Remplacer les classes d'éditeur
+    const editorClassPatterns = [
+      /\bProseMirror-\w+\b/g,
+      /\btiptap-\w+\b/g,
+      /\buniversal-editor-\w+\b/g,
+      /\beditable-\w+\b/g,
+      /\bnode-\w+\b/g,
+      /\bselected\b/g
+    ];
+    
+    editorClassPatterns.forEach(pattern => {
+      result = result.replace(pattern, '');
+    });
+    
+    // Nettoyer les attributs data spécifiques à l'éditeur
+    result = result
+      .replace(/\sdata-node-view="[^"]*"/g, '')
+      .replace(/\scontenteditable="[^"]*"/g, '');
+    
+    // Nettoyer les classes vides
+    result = result.replace(/\sclass="\s*"/g, '');
+    
+    return result;
+  }
+  
+  /**
+   * Optimise les images pour le site
+   */
+  private static optimizeImages(content: string): string {
+    let result = content;
+    
+    // Ajouter l'attribut loading="lazy" aux images
+    result = result.replace(/<img([^>]*)>/g, '<img$1 loading="lazy">');
+    
+    // Ajouter la classe fade-in aux images qui ne l'ont pas déjà
+    result = result.replace(/<img([^>]*class="[^"]*)"([^>]*)>/g, (match, before, after) => {
+      if (!match.includes('fade-in')) {
+        return `<img${before} fade-in"${after}>`;
+      }
+      return match;
+    });
+    
+    // Ajouter un alt vide aux images qui n'en ont pas
+    result = result.replace(/<img(?![^>]*alt=)([^>]*)>/g, '<img alt=""$1>');
+    
+    // Optimiser les vidéos
+    result = result.replace(/<video([^>]*)>/g, '<video preload="metadata"$1>');
+    result = result.replace(/<video(?![^>]*controls)([^>]*)>/g, '<video controls$1>');
+    
+    return result;
   }
   
   /**
    * Valide le contenu avant export
    */
-  static validateContent(content: string, templateType?: string): ValidationResult {
+  private static validateContent(content: string): ValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
     
-    // Analyser le HTML
-    const root = parse(content);
-    
     // Vérifier les images sans alt text
-    const imagesWithoutAlt = root.querySelectorAll('img:not([alt])');
-    if (imagesWithoutAlt.length > 0) {
-      warnings.push(`${imagesWithoutAlt.length} image(s) sans texte alternatif`);
+    const imgWithoutAlt = (content.match(/<img(?![^>]*alt=)[^>]*>/g) || []).length;
+    if (imgWithoutAlt > 0) {
+      warnings.push(`${imgWithoutAlt} image(s) sans attribut alt`);
     }
     
-    // Vérifier les liens sans texte
-    const emptyLinks = root.querySelectorAll('a:empty');
-    if (emptyLinks.length > 0) {
-      warnings.push(`${emptyLinks.length} lien(s) sans texte`);
+    // Vérifier les liens sans href
+    const linksWithoutHref = (content.match(/<a(?![^>]*href=)[^>]*>/g) || []).length;
+    if (linksWithoutHref > 0) {
+      errors.push(`${linksWithoutHref} lien(s) sans attribut href`);
     }
     
-    // Vérifier les vidéos sans contrôles
-    const videosWithoutControls = root.querySelectorAll('video:not([controls])');
-    if (videosWithoutControls.length > 0) {
-      warnings.push(`${videosWithoutControls.length} vidéo(s) sans contrôles`);
-    }
-    
-    // Vérifications spécifiques au template
-    if (templateType) {
-      const templateErrors = this.validateTemplateSpecificContent(root, templateType);
-      errors.push(...templateErrors);
+    // Vérifier les vidéos sans source
+    const videosWithoutSrc = (content.match(/<video(?![^>]*src=)[^>]*>(?![\s\S]*<source[^>]*>)/g) || []).length;
+    if (videosWithoutSrc > 0) {
+      errors.push(`${videosWithoutSrc} vidéo(s) sans source`);
     }
     
     return {
@@ -114,286 +187,110 @@ export class ContentExportService {
   }
   
   /**
-   * Intègre le contenu dans un template
-   */
-  static integrateWithTemplate(content: string, templateHtml: string, placeholderId: string): string {
-    const templateRoot = parse(templateHtml);
-    const placeholder = templateRoot.querySelector(`#${placeholderId}`);
-    
-    if (!placeholder) {
-      throw new Error(`Placeholder #${placeholderId} non trouvé dans le template`);
-    }
-    
-    // Remplacer le contenu du placeholder
-    placeholder.set_content(content);
-    
-    return templateRoot.toString();
-  }
-  
-  /**
-   * Nettoie les classes utilisées uniquement pour l'édition
-   */
-  private static cleanupEditorClasses(root: HTMLElement): void {
-    // Supprimer les classes d'édition
-    const editorClasses = [
-      'ProseMirror',
-      'ProseMirror-focused',
-      'selected',
-      'editing',
-      'drag-over',
-      'dragging',
-      'universal-editor-content'
-    ];
-    
-    editorClasses.forEach(className => {
-      root.querySelectorAll(`.${className}`).forEach(element => {
-        element.classList.remove(className);
-      });
-    });
-    
-    // Supprimer les attributs data spécifiques à l'éditeur
-    root.querySelectorAll('[data-drag-handle]').forEach(element => {
-      element.removeAttribute('data-drag-handle');
-    });
-    
-    root.querySelectorAll('[contenteditable]').forEach(element => {
-      element.removeAttribute('contenteditable');
-    });
-  }
-  
-  /**
-   * Optimise les images pour le site
-   */
-  private static optimizeImages(root: HTMLElement): void {
-    // Ajouter les attributs de chargement paresseux
-    root.querySelectorAll('img').forEach(img => {
-      img.setAttribute('loading', 'lazy');
-      
-      // Ajouter des classes pour les effets de transition
-      img.classList.add('fade-in');
-      
-      // Vérifier si l'image a un alt text
-      if (!img.hasAttribute('alt') || img.getAttribute('alt') === '') {
-        img.setAttribute('alt', 'Image');
-      }
-    });
-    
-    // Optimiser les vidéos
-    root.querySelectorAll('video').forEach(video => {
-      video.setAttribute('preload', 'metadata');
-      
-      // S'assurer que les vidéos ont des contrôles
-      if (!video.hasAttribute('controls')) {
-        video.setAttribute('controls', 'true');
-      }
-    });
-  }
-  
-  /**
-   * Applique des transformations spécifiques au template
-   */
-  private static applyTemplateTransformations(root: HTMLElement, templateType: string): void {
-    switch (templateType.toLowerCase()) {
-      case 'poesial':
-        // Transformations spécifiques à Poesial
-        root.querySelectorAll('.section').forEach(section => {
-          section.classList.add('poesial-section');
-        });
-        break;
-        
-      case 'zesty':
-        // Transformations spécifiques à Zesty
-        root.querySelectorAll('.section').forEach(section => {
-          section.classList.add('zesty-section');
-        });
-        break;
-        
-      case 'ordine':
-        // Transformations spécifiques à Ordine
-        root.querySelectorAll('.section').forEach(section => {
-          section.classList.add('ordine-section');
-        });
-        break;
-        
-      case 'nobe':
-        // Transformations spécifiques à Nobe
-        root.querySelectorAll('.section').forEach(section => {
-          section.classList.add('nobe-section');
-        });
-        break;
-        
-      default:
-        // Transformations par défaut
-        break;
-    }
-  }
-  
-  /**
-   * Applique des transformations spécifiques au template pour le format JSON
-   */
-  private static applyTemplateTransformationsToJson(blocks: any[], templateType: string): void {
-    // Ajouter des métadonnées spécifiques au template
-    blocks.forEach(block => {
-      block.templateType = templateType;
-    });
-  }
-  
-  /**
-   * Convertit le HTML en structure de blocs JSON
-   */
-  private static convertToBlocks(root: HTMLElement): any[] {
-    const blocks: any[] = [];
-    
-    // Parcourir les sections
-    root.querySelectorAll('.section').forEach((section, index) => {
-      const blockType = this.determineBlockType(section);
-      
-      const block: any = {
-        id: `block-${index}`,
-        type: blockType,
-        content: section.toString(),
-        position: index
-      };
-      
-      // Extraire les attributs spécifiques selon le type de bloc
-      switch (blockType) {
-        case 'image':
-          const img = section.querySelector('img');
-          if (img) {
-            block.attributes = {
-              src: img.getAttribute('src'),
-              alt: img.getAttribute('alt'),
-              variant: section.getAttribute('data-wf--template-section-image--variant') || 'auto'
-            };
-          }
-          break;
-          
-        case 'video':
-          const video = section.querySelector('video');
-          if (video) {
-            block.attributes = {
-              src: video.getAttribute('src'),
-              controls: video.hasAttribute('controls'),
-              autoplay: video.hasAttribute('autoplay'),
-              loop: video.hasAttribute('loop'),
-              muted: video.hasAttribute('muted')
-            };
-          }
-          break;
-          
-        case 'text':
-          const textContainer = section.querySelector('.temp-rich, .temp-comp-text');
-          if (textContainer) {
-            block.attributes = {
-              variant: textContainer.classList.contains('temp-rich') ? 'rich' : 'simple',
-              content: textContainer.innerHTML
-            };
-          }
-          break;
-          
-        case 'testimony':
-          const quote = section.querySelector('.testimony');
-          const authorName = section.querySelector('.testimony-profile-name');
-          const authorRole = section.querySelector('.testimony-profile-role');
-          const authorImage = section.querySelector('.testimonial-img-item');
-          
-          block.attributes = {
-            quote: quote ? quote.innerHTML : '',
-            authorName: authorName ? authorName.innerHTML : '',
-            authorRole: authorRole ? authorRole.innerHTML : '',
-            authorImage: authorImage ? authorImage.getAttribute('src') : null
-          };
-          break;
-          
-        case 'imageGrid':
-          const images = section.querySelectorAll('img');
-          block.attributes = {
-            images: Array.from(images).map(img => ({
-              src: img.getAttribute('src'),
-              alt: img.getAttribute('alt')
-            })),
-            layout: '2-columns'
-          };
-          break;
-      }
-      
-      blocks.push(block);
-    });
-    
-    return blocks;
-  }
-  
-  /**
-   * Détermine le type de bloc à partir d'une section
-   */
-  private static determineBlockType(section: HTMLElement): string {
-    if (section.querySelector('.temp-img')) {
-      return 'image';
-    }
-    
-    if (section.querySelector('video')) {
-      return 'video';
-    }
-    
-    if (section.querySelector('.temp-comp-img_grid')) {
-      return 'imageGrid';
-    }
-    
-    if (section.querySelector('.temp-comp-testimony')) {
-      return 'testimony';
-    }
-    
-    if (section.querySelector('.temp-rich, .temp-comp-text')) {
-      return 'text';
-    }
-    
-    if (section.querySelector('.temp-about_container')) {
-      return 'about';
-    }
-    
-    return 'unknown';
-  }
-  
-  /**
-   * Valide le contenu spécifique à un template
-   */
-  private static validateTemplateSpecificContent(root: HTMLElement, templateType: string): string[] {
-    const errors: string[] = [];
-    
-    switch (templateType.toLowerCase()) {
-      case 'poesial':
-        // Vérifications spécifiques à Poesial
-        if (!root.querySelector('.temp-about_container')) {
-          errors.push('Le template Poesial nécessite une section "À propos"');
-        }
-        break;
-        
-      case 'zesty':
-        // Vérifications spécifiques à Zesty
-        if (!root.querySelector('.temp-comp-testimony')) {
-          errors.push('Le template Zesty nécessite au moins un témoignage');
-        }
-        break;
-        
-      case 'ordine':
-        // Vérifications spécifiques à Ordine
-        break;
-        
-      case 'nobe':
-        // Vérifications spécifiques à Nobe
-        break;
-    }
-    
-    return errors;
-  }
-  
-  /**
    * Minifie le HTML
    */
   private static minifyHtml(html: string): string {
     return html
+      .replace(/\n\s*/g, ' ')
       .replace(/\s{2,}/g, ' ')
-      .replace(/>\s+</g, '><')
+      .replace(/\s*</g, '<')
+      .replace(/>\s*/g, '>')
       .trim();
+  }
+  
+  /**
+   * Récupère un template par son nom
+   */
+  private static getTemplate(templateName: string): string {
+    // Dans une implémentation réelle, ces templates seraient chargés depuis des fichiers
+    // ou une base de données. Pour cet exemple, nous utilisons des templates simplifiés.
+    const templates: Record<string, string> = {
+      'poesial': `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} - Victor Berbel</title>
+  <meta name="description" content="{{description}}">
+  <link rel="stylesheet" href="/styles/poesial.css">
+</head>
+<body class="poesial-template">
+  <header class="site-header"><!-- Header content --></header>
+  <main class="site-main">
+    <div class="project-header">
+      <div class="u-container">
+        <h1 class="project-title">{{title}}</h1>
+        <!-- Project metadata -->
+      </div>
+    </div>
+    <div class="project-content">
+      {{content}}
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="u-container">
+      <p>&copy; {{currentYear}} Victor Berbel</p>
+    </div>
+  </footer>
+</body>
+</html>`,
+      'zesty': `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} - Victor Berbel</title>
+  <link rel="stylesheet" href="/styles/zesty.css">
+</head>
+<body class="zesty-template">
+  <header class="site-header"><!-- Header content --></header>
+  <main class="site-main">
+    <div class="project-header zesty-header">
+      <div class="u-container">
+        <h1 class="project-title">{{title}}</h1>
+      </div>
+    </div>
+    <div class="project-content">
+      {{content}}
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="u-container">
+      <p>&copy; {{currentYear}} Victor Berbel</p>
+    </div>
+  </footer>
+</body>
+</html>`,
+      'nobe': `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} - Victor Berbel</title>
+  <link rel="stylesheet" href="/styles/nobe.css">
+</head>
+<body class="nobe-template">
+  <header class="site-header"><!-- Header content --></header>
+  <main class="site-main">
+    <div class="project-header nobe-header">
+      <div class="u-container">
+        <h1 class="project-title">{{title}}</h1>
+      </div>
+    </div>
+    <div class="project-content">
+      {{content}}
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="u-container">
+      <p>&copy; {{currentYear}} Victor Berbel</p>
+    </div>
+  </footer>
+</body>
+</html>`
+    };
+    
+    // Récupérer le template demandé ou utiliser un template par défaut
+    return templates[templateName] || templates['poesial'];
   }
 }
