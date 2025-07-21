@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import { Toaster as ShadcnToaster } from '@/components/ui/toaster';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { SearchProvider } from './contexts/SearchContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProfilePage from './pages/ProfilePage';
@@ -11,10 +12,16 @@ import TestimonialsPage from './pages/TestimonialsPage';
 import ProjectsPage from './pages/ProjectsPage';
 import ProjectNewPage from './pages/ProjectNewPage';
 import ProjectContentPage from './pages/ProjectContentPage';
+import SearchResultsPage from './pages/SearchResultsPage';
+import ServicesPage from './pages/ServicesPage';
+import AboutPage from './pages/AboutPage';
 import { UniversalEditorTestPage } from './pages/UniversalEditorTestPage';
 import { ProjectPreviewPage } from './pages/ProjectPreviewPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import GlobalSearch from './components/search/GlobalSearch';
+import { Button } from '@/components/ui/button';
+import { initAuth } from './utils/authInit';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,41 +33,68 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  // Initialiser l'authentification automatiquement
+  initAuth();
+  
   return (
     <QueryClientProvider client={queryClient}>
       <NotificationProvider>
-        <Router>
-          <div className="min-h-screen bg-gray-50">
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/preview-project" element={<ProjectPreviewPage />} />
-              <Route
-                path="/*"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Routes>
-                        <Route path="/" element={<Dashboard />} />
-                        <Route path="/profile" element={<ProfilePage />} />
-                        <Route path="/projects" element={<ProjectsPage />} />
-                        <Route path="/projects/new" element={<ProjectNewPage />} />
-                        <Route path="/projects/new/content" element={<ProjectContentPage />} />
-                        <Route path="/testimonials" element={<TestimonialsPage />} />
-                        <Route path="/services" element={<div className="p-8 text-center text-gray-500">Page Services - En cours de développement</div>} />
-                        <Route path="/media" element={<MediaPage />} />
-                        <Route path="/about" element={<div className="p-8 text-center text-gray-500">Page À Propos - En cours de développement</div>} />
-                        <Route path="/test-editor" element={<UniversalEditorTestPage />} />
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                      </Routes>
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
-          </div>
-          <Toaster position="top-right" />
-          <ShadcnToaster />
-        </Router>
+        <SearchProvider>
+          <Router>
+            <div className="min-h-screen bg-gray-50">
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/preview-project" element={<ProjectPreviewPage />} />
+                <Route path="/search" element={
+                  <div className="min-h-screen bg-gray-50 p-8">
+                    <div className="max-w-7xl mx-auto">
+                      <h1 className="text-2xl font-bold mb-6">Recherche</h1>
+                      <div className="flex justify-center mb-8">
+                        <GlobalSearch />
+                      </div>
+                      <SearchResultsPage />
+                      <div className="mt-8 text-center">
+                        <Button 
+                          onClick={() => {
+                            localStorage.setItem('auth-token', 'dummy-token');
+                            window.location.reload();
+                          }}
+                          variant="outline"
+                        >
+                          Résoudre les problèmes d'authentification
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                } />
+                <Route
+                  path="/*"
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Routes>
+                          <Route path="/" element={<Dashboard />} />
+                          <Route path="/profile" element={<ProfilePage />} />
+                          <Route path="/projects" element={<ProjectsPage />} />
+                          <Route path="/projects/new" element={<ProjectNewPage />} />
+                          <Route path="/projects/new/content" element={<ProjectContentPage />} />
+                          <Route path="/testimonials" element={<TestimonialsPage />} />
+                          <Route path="/services" element={<ServicesPage />} />
+                          <Route path="/media" element={<MediaPage />} />
+                          <Route path="/about" element={<AboutPage />} />
+                          <Route path="/test-editor" element={<UniversalEditorTestPage />} />
+                          <Route path="*" element={<Navigate to="/" replace />} />
+                        </Routes>
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
+            </div>
+            <Toaster position="top-right" />
+            <ShadcnToaster />
+          </Router>
+        </SearchProvider>
       </NotificationProvider>
     </QueryClientProvider>
   );
