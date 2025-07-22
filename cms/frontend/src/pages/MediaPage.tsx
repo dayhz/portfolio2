@@ -100,7 +100,7 @@ export default function MediaPage() {
         });
         
         // Vérifier les doublons de noms et ajouter un suffixe si nécessaire
-        const nameCount = {};
+        const nameCount: Record<string, number> = {};
         mediaWithFixedUrls.forEach(media => {
           if (!nameCount[media.name]) {
             nameCount[media.name] = 0;
@@ -112,7 +112,7 @@ export default function MediaPage() {
         mediaWithFixedUrls.forEach(media => {
           if (nameCount[media.name] > 1) {
             // Extraire l'extension du nom de fichier original
-            const getExtension = (filename) => {
+            const getExtension = (filename: string) => {
               const lastDotIndex = filename.lastIndexOf('.');
               return lastDotIndex !== -1 ? filename.substring(lastDotIndex) : '';
             };

@@ -44,20 +44,48 @@ export function ImageUpload({
     const imageFile = files.find(file => file.type.startsWith('image/'));
     
     if (imageFile) {
-      // Pour l'instant, on simule l'upload avec un URL temporaire
-      const url = URL.createObjectURL(imageFile);
-      onChange(url);
+      uploadFile(imageFile);
     }
   }, [disabled, onChange]);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      // Pour l'instant, on simule l'upload avec un URL temporaire
-      const url = URL.createObjectURL(file);
-      onChange(url);
+      uploadFile(file);
     }
   }, [onChange]);
+  
+  const uploadFile = async (file: File) => {
+    try {
+      // Créer une URL temporaire pour l'aperçu immédiat
+      const tempUrl = URL.createObjectURL(file);
+      onChange(tempUrl);
+      
+      // Créer un FormData pour l'upload
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('alt', '');
+      
+      // Importer axiosInstance dynamiquement pour éviter les problèmes de dépendances circulaires
+      const { default: axiosInstance } = await import('@/utils/axiosConfig');
+      
+      // Envoyer le fichier au serveur avec axios qui inclut automatiquement le token
+      const response = await axiosInstance.post('/media', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      // Mettre à jour l'URL avec celle retournée par le serveur
+      onChange(response.data.url);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      // En cas d'erreur, supprimer l'image
+      onRemove();
+      // Afficher une alerte
+      alert('Erreur lors de l\'upload de l\'image. Veuillez réessayer.');
+    }
+  };
 
   if (value) {
     return (

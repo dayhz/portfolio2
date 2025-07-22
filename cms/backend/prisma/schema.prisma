@@ -80,6 +80,7 @@ model Service {
 
 model MediaFile {
   id           String   @id @default(cuid())
+  name         String   @default("")
   filename     String
   originalName String
   mimeType     String
@@ -87,6 +88,8 @@ model MediaFile {
   url          String
   thumbnailUrl String?
   alt          String?
+  description  String?
+  type         String   @default("other")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
