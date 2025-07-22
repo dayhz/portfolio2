@@ -171,4 +171,31 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Synchroniser les fichiers entre le backend et le frontend
+router.post('/sync', async (req, res) => {
+  try {
+    // Exécuter le script de synchronisation
+    const { exec } = require('child_process');
+    const scriptPath = path.join(process.cwd(), 'copy-uploads-to-public.js');
+    
+    exec(`node ${scriptPath}`, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Exec error: ${error}`);
+        return res.status(500).json({ error: 'Failed to sync files', details: error.message });
+      }
+      
+      console.log(`Sync output: ${stdout}`);
+      
+      if (stderr) {
+        console.error(`Sync stderr: ${stderr}`);
+      }
+      
+      res.json({ message: 'Files synchronized successfully', output: stdout });
+    });
+  } catch (error) {
+    console.error('Error syncing files:', error);
+    res.status(500).json({ error: 'Failed to sync files' });
+  }
+});
+
 export default router;

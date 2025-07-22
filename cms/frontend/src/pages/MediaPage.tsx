@@ -242,6 +242,11 @@ export default function MediaPage() {
     navigator.clipboard.writeText(url);
     toast.success('URL copiée dans le presse-papiers');
   };
+  
+  // Fonction pour ouvrir l'image dans un nouvel onglet
+  const handleOpenImage = (url: string) => {
+    window.open(url, '_blank');
+  };
 
   const filteredMedia = mediaList.filter(media =>
     media.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -334,6 +339,27 @@ export default function MediaPage() {
               }}
             >
               Tester fichiers publics
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-2"
+              onClick={async () => {
+                try {
+                  // Utiliser axios pour exécuter le script de synchronisation
+                  const { default: axiosInstance } = await import('@/utils/axiosConfig');
+                  await axiosInstance.post('/media/sync');
+                  toast.success('Synchronisation des fichiers réussie');
+                  // Rafraîchir la liste des médias
+                  fetchMedia();
+                } catch (error) {
+                  console.error('Error syncing files:', error);
+                  toast.error('Erreur lors de la synchronisation des fichiers');
+                }
+              }}
+            >
+              Synchroniser les fichiers
             </Button>
           </div>
         </div>
@@ -580,9 +606,16 @@ export default function MediaPage() {
                   <div className="mt-2 space-y-1">
                     <p className="text-sm font-medium truncate">{media.name}</p>
                     <div className="flex items-center justify-between">
-                      <Badge variant="secondary" className="text-xs">
-                        {media.type}
-                      </Badge>
+                      <div className="flex items-center gap-1">
+                        <Badge variant="secondary" className="text-xs">
+                          {media.type}
+                        </Badge>
+                        {media.thumbnailUrl && (
+                          <Badge variant="outline" className="text-xs">
+                            Miniature
+                          </Badge>
+                        )}
+                      </div>
                       <span className="text-xs text-gray-500">{formatFileSize(media.size)}</span>
                     </div>
                   </div>
@@ -620,7 +653,36 @@ export default function MediaPage() {
                       }}
                     />
                   </div>
-                  <p className="text-sm text-gray-600">URL: {selectedMedia.url}</p>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h3 className="text-sm font-medium mb-2">Image originale</h3>
+                      <p className="text-xs text-gray-600 mb-1">URL: {selectedMedia.url}</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => handleCopyUrl(selectedMedia.url)}
+                      >
+                        📋 Copier l'URL originale
+                      </Button>
+                    </div>
+                    
+                    {selectedMedia.thumbnailUrl && (
+                      <div>
+                        <h3 className="text-sm font-medium mb-2">Miniature</h3>
+                        <p className="text-xs text-gray-600 mb-1">URL: {selectedMedia.thumbnailUrl}</p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full"
+                          onClick={() => handleCopyUrl(selectedMedia.thumbnailUrl || '')}
+                        >
+                          📋 Copier l'URL de la miniature
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </>
               )}
               <div className="flex items-center justify-between">
@@ -629,13 +691,15 @@ export default function MediaPage() {
                   <p className="text-sm text-gray-600">Uploadé le: {formatDate(selectedMedia.createdAt)}</p>
                   <p className="text-sm text-gray-600">Type: {selectedMedia.mimeType}</p>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => handleCopyUrl(selectedMedia.url)}>
-                    📋 <span className="ml-2">Copier l'URL</span>
+                <div className="flex flex-wrap gap-2">
+                  <Button onClick={() => handleOpenImage(selectedMedia.url)}>
+                    💾 <span className="ml-2">Voir en taille réelle</span>
                   </Button>
-                  <Button onClick={() => window.open(selectedMedia.url, '_blank')}>
-                    💾 <span className="ml-2">Télécharger</span>
-                  </Button>
+                  {selectedMedia.thumbnailUrl && (
+                    <Button variant="outline" onClick={() => handleOpenImage(selectedMedia.thumbnailUrl || '')}>
+                      🔍 <span className="ml-2">Voir la miniature</span>
+                    </Button>
+                  )}
                   <Button 
                     variant="destructive"
                     onClick={() => {
