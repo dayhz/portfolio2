@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Home } from 'react-iconly';
 import { toast } from 'sonner';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -12,22 +13,41 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const { login, isAuthenticated } = useAuth();
+  
   const from = location.state?.from || '/';
+
+  // Vérifier si l'utilisateur est déjà authentifié
+  useEffect(() => {
+    console.log('Login - État d\'authentification:', isAuthenticated);
+    
+    if (isAuthenticated) {
+      console.log('Déjà authentifié, redirection vers la page d\'accueil');
+      navigate('/');
+    }
+    
+    // Vérifier si la session a expiré
+    const sessionStatus = searchParams.get('session');
+    if (sessionStatus === 'expired') {
+      toast.error('Votre session a expiré. Veuillez vous reconnecter.');
+    }
+  }, [isAuthenticated, navigate, searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    console.log('Tentative de connexion avec:', { email, password });
 
     try {
-      if (email === 'admin@portfolio.com' && password === 'admin123') {
-        localStorage.setItem('auth-token', 'dummy-token');
-        toast.success('Connexion réussie');
-        navigate(from);
-      } else {
-        toast.error('Identifiants invalides');
-      }
+      await login(email, password);
+      console.log('Connexion réussie, redirection vers:', from);
+      navigate(from);
     } catch (error) {
-      toast.error('Erreur de connexion');
+      // L'erreur est déjà gérée dans le contexte d'authentification
+      console.error('Erreur de connexion:', error);
+      // Réinitialiser le mot de passe en cas d'erreur
+      setPassword('');
     } finally {
       setIsLoading(false);
     }

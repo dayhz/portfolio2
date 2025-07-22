@@ -5,6 +5,7 @@ import { Toaster as ShadcnToaster } from '@/components/ui/toaster';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { SearchProvider } from './contexts/SearchContext';
 import { PreviewProvider } from './contexts/PreviewContext';
+import { AuthProvider } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProfilePage from './pages/ProfilePage';
@@ -22,7 +23,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import GlobalSearch from './components/search/GlobalSearch';
 import { Button } from '@/components/ui/button';
-import { initAuth } from './utils/authInit';
 import UnifiedPreview from './components/preview/UnifiedPreview';
 
 const queryClient = new QueryClient({
@@ -35,15 +35,13 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  // Initialiser l'authentification automatiquement
-  initAuth();
-  
   return (
     <QueryClientProvider client={queryClient}>
       <NotificationProvider>
         <SearchProvider>
           <PreviewProvider>
-            <Router>
+            <AuthProvider>
+              <Router>
               <div className="min-h-screen bg-gray-50">
                 <Routes>
                   <Route path="/login" element={<Login />} />
@@ -56,17 +54,6 @@ function App() {
                         <GlobalSearch />
                       </div>
                       <SearchResultsPage />
-                      <div className="mt-8 text-center">
-                        <Button 
-                          onClick={() => {
-                            localStorage.setItem('auth-token', 'dummy-token');
-                            window.location.reload();
-                          }}
-                          variant="outline"
-                        >
-                          Résoudre les problèmes d'authentification
-                        </Button>
-                      </div>
                     </div>
                   </div>
                 } />
@@ -98,6 +85,7 @@ function App() {
             <ShadcnToaster />
             <UnifiedPreview />
           </Router>
+            </AuthProvider>
           </PreviewProvider>
         </SearchProvider>
       </NotificationProvider>

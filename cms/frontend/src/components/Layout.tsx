@@ -16,6 +16,7 @@ import {
 } from 'react-iconly';
 import NotificationCenter from './NotificationCenter';
 import GlobalSearch from './search/GlobalSearch';
+import { useAuth } from '../contexts/AuthContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -36,10 +37,10 @@ export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem('auth-token');
-    toast.success('Déconnexion réussie');
+    logout();
     navigate('/login');
   };
 
@@ -143,7 +144,7 @@ export default function Layout({ children }: LayoutProps) {
             <div className="flex items-center space-x-2">
               <NotificationCenter />
               <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-medium">
-                VB
+                {user?.name ? user.name.substring(0, 2).toUpperCase() : 'VB'}
               </div>
             </div>
           </div>

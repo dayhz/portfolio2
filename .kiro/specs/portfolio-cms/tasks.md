@@ -39,13 +39,13 @@
   - _Requirements: 2.1, 2.2, 2.4_
 
 - [ ] 5. Système d'authentification complet
-- [ ] 5.1 Créer les endpoints d'authentification côté backend
+- [x] 5.1 Créer les endpoints d'authentification côté backend
   - Créer les endpoints d'authentification (/api/auth/login, /api/auth/logout, /api/auth/verify)
   - Implémenter la gestion des tokens JWT
   - Créer le middleware de protection des routes
   - _Requirements: 1.1, 1.2, 1.3_
 
-- [ ] 5.2 Finaliser l'authentification côté frontend
+- [x] 5.2 Finaliser l'authentification côté frontend
   - Remplacer l'authentification dummy par les vrais appels API
   - Ajouter la gestion de la session et auto-déconnexion
   - Implémenter la gestion d'erreurs d'authentification
