@@ -15,7 +15,7 @@
   - Tester la connexion à la base de données
   - _Requirements: 1.1, 1.2_
 
-- [ ] 2.2 Configurer l'authentification JWT côté backend
+- [x] 2.2 Configurer l'authentification JWT côté backend
   - Configurer l'authentification JWT avec bcrypt
   - Créer le middleware d'authentification
   - Configurer Multer pour l'upload de fichiers

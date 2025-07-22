@@ -36,7 +36,7 @@ model Project {
   id          String    @id @default(cuid())
   title       String
   description String
-  category    Category
+  category    String    // "WEBSITE", "PRODUCT", "MOBILE"
   thumbnail   String
   images      String    // JSON array
   year        Int
@@ -51,12 +51,6 @@ model Project {
   order       Int       @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-}
-
-enum Category {
-  WEBSITE
-  PRODUCT
-  MOBILE
 }
 
 model Testimonial {
