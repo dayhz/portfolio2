@@ -164,20 +164,23 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Afficher un toast
   const showToast = useCallback((type: NotificationType, message: string, options?: ToastOptions) => {
-    switch (type) {
-      case 'info':
-        toast.info(message, options);
-        break;
-      case 'success':
-        toast.success(message, options);
-        break;
-      case 'warning':
-        toast.warning(message, options);
-        break;
-      case 'error':
-        toast.error(message, options);
-        break;
-    }
+    // Utiliser setTimeout pour éviter les problèmes de rendu
+    setTimeout(() => {
+      switch (type) {
+        case 'info':
+          toast.info(message, options);
+          break;
+        case 'success':
+          toast.success(message, options);
+          break;
+        case 'warning':
+          toast.warning(message, options);
+          break;
+        case 'error':
+          toast.error(message, options);
+          break;
+      }
+    }, 0);
   }, []);
 
   return (

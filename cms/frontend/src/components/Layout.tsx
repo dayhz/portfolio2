@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Toaster } from 'sonner';
 import {
   Home,
   User,
@@ -164,8 +163,7 @@ export default function Layout({ children }: LayoutProps) {
         />
       )}
       
-      {/* Toast notifications */}
-      <Toaster position="top-right" />
+      {/* Toast notifications are now handled in App.tsx */}
     </div>
   );
 }
