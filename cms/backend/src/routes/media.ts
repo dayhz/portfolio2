@@ -86,8 +86,8 @@ router.post('/', uploadMedia.single('file'), async (req, res) => {
 
     // Générer les URLs
     const uploadDir = process.env.UPLOAD_DIR || 'uploads';
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const url = `${baseUrl}/${uploadDir}/${file.filename}`;
+    // Utiliser des URLs relatives pour éviter les problèmes CORS
+    const url = `/${uploadDir}/${file.filename}`;
     
     console.log(`URL générée: ${url}`);
     

@@ -71,8 +71,8 @@ export default function MediaPage() {
         
         // S'assurer que les URLs sont absolues et que les noms sont uniques
         const mediaWithFixedUrls = response.data.map(media => {
-          // Si l'URL n'est pas absolue, la convertir en URL absolue et pointer vers le répertoire public
-          if (media.url && !media.url.startsWith('http')) {
+          // Toujours utiliser les URLs relatives pour éviter les problèmes CORS
+          if (media.url) {
             // Extraire juste le nom du fichier de l'URL
             const filename = media.url.split('/').pop()?.trim();
             if (filename) {
@@ -82,7 +82,7 @@ export default function MediaPage() {
           }
           
           // Faire de même pour la miniature
-          if (media.thumbnailUrl && !media.thumbnailUrl.startsWith('http')) {
+          if (media.thumbnailUrl) {
             // Extraire juste le nom du fichier de l'URL
             const filename = media.thumbnailUrl.split('/').pop()?.trim();
             if (filename) {

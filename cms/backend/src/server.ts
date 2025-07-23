@@ -15,7 +15,9 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://your-domain.com'] 
@@ -28,7 +30,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Static files for uploads
 const uploadDir = process.env.UPLOAD_DIR || 'uploads';
-app.use(`/${uploadDir}`, express.static(path.join(__dirname, `../${uploadDir}`)));
+app.use(`/${uploadDir}`, (req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.join(__dirname, `../${uploadDir}`)));
 
 // Routes
 app.get('/api/health', (req, res) => {
