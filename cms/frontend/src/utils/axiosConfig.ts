@@ -17,6 +17,9 @@ axiosInstance.interceptors.request.use(
     const token = AuthService.getToken();
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
+      console.log('Token ajouté à la requête:', token);
+    } else {
+      console.log('Aucun token disponible pour la requête');
     }
     return config;
   },

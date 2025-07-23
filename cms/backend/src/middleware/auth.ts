@@ -28,6 +28,17 @@ export const authenticateToken = async (
       });
     }
 
+    // Accepter le token de test en mode développement
+    if (token === 'dummy-token-for-testing' && process.env.NODE_ENV !== 'production') {
+      console.log('Utilisation du token de test pour le développement');
+      req.user = {
+        id: '1',
+        email: 'admin@portfolio.com',
+        name: 'Admin'
+      };
+      return next();
+    }
+
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       throw new Error('JWT_SECRET not configured');
