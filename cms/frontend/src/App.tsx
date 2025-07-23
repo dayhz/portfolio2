@@ -1,4 +1,12 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { 
+  BrowserRouter as Router, 
+  Routes, 
+  Route, 
+  Navigate,
+  createBrowserRouter,
+  RouterProvider,
+  createRoutesFromElements
+} from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import { Toaster as ShadcnToaster } from '@/components/ui/toaster';
@@ -41,7 +49,7 @@ function App() {
         <SearchProvider>
           <PreviewProvider>
             <AuthProvider>
-              <Router>
+              <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <div className="min-h-screen bg-gray-50">
                 <Routes>
                   <Route path="/login" element={<Login />} />
