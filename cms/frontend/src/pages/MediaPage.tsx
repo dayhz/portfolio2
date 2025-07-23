@@ -88,6 +88,17 @@ export default function MediaPage() {
             if (filename) {
               // Utiliser le répertoire public du frontend
               media.thumbnailUrl = `/uploads/${filename}`;
+              console.log(`URL de miniature corrigée pour ${media.name}: ${media.thumbnailUrl}`);
+            }
+          } else if (media.type === 'image' && !media.thumbnailUrl) {
+            // Si c'est une image sans miniature, essayer de générer une URL de miniature
+            if (media.url) {
+              const originalFilename = media.url.split('/').pop()?.trim();
+              if (originalFilename) {
+                const thumbnailFilename = originalFilename.replace(/\.[^/.]+$/, '-thumb.webp');
+                media.thumbnailUrl = `/uploads/${thumbnailFilename}`;
+                console.log(`URL de miniature générée pour ${media.name}: ${media.thumbnailUrl}`);
+              }
             }
           }
           
@@ -247,6 +258,29 @@ export default function MediaPage() {
   const handleOpenImage = (url: string) => {
     window.open(url, '_blank');
   };
+  
+  // Fonction pour régénérer les miniatures
+  const regenerateThumbnails = async () => {
+    try {
+      toast.info('Régénération des miniatures en cours...');
+      
+      const { default: axiosInstance } = await import('@/utils/axiosConfig');
+      const response = await axiosInstance.post('/media/regenerate-thumbnails');
+      const data = response.data;
+      
+      toast.success(`Miniatures régénérées: ${data.success}/${data.total}`);
+      console.log('Résultats de la régénération des miniatures:', data);
+      
+      // Synchroniser les fichiers
+      await axiosInstance.post('/media/sync');
+      
+      // Rafraîchir la liste des médias
+      fetchMedia();
+    } catch (error) {
+      console.error('Error regenerating thumbnails:', error);
+      toast.error('Erreur lors de la régénération des miniatures');
+    }
+  };
 
   const filteredMedia = mediaList.filter(media =>
     media.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -360,6 +394,45 @@ export default function MediaPage() {
               }}
             >
               Synchroniser les fichiers
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-2"
+              onClick={async () => {
+                try {
+                  // Vérifier les miniatures
+                  const { default: axiosInstance } = await import('@/utils/axiosConfig');
+                  const response = await axiosInstance.get('/media/check-thumbnails');
+                  const data = response.data;
+                  
+                  toast.success(`Vérification des miniatures: ${data.total - data.missing}/${data.total} trouvées`);
+                  console.log('Résultats de la vérification des miniatures:', data);
+                  
+                  if (data.missing > 0) {
+                    toast.error(`${data.missing} miniatures manquantes`);
+                    
+                    if (confirm(`${data.missing} miniatures sont manquantes. Voulez-vous les régénérer ?`)) {
+                      await regenerateThumbnails();
+                    }
+                  }
+                } catch (error) {
+                  console.error('Error checking thumbnails:', error);
+                  toast.error('Erreur lors de la vérification des miniatures');
+                }
+              }}
+            >
+              Vérifier les miniatures
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-2"
+              onClick={regenerateThumbnails}
+            >
+              Régénérer les miniatures
             </Button>
           </div>
         </div>
@@ -547,24 +620,32 @@ export default function MediaPage() {
               {filteredMedia.map((media) => (
                 <div key={media.id} className="group relative">
                   <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border">
-                    {media.type === 'image' && (media.thumbnailUrl || media.url) ? (
+                    {media.type === 'image' && media.url ? (
                       <>
                         <div className="w-full h-full flex items-center justify-center">
                           <img
-                            src={media.thumbnailUrl || media.url}
+                            src={media.url}
                             alt={media.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform cursor-pointer"
                             onClick={() => setSelectedMedia(media)}
+                            onLoad={() => {
+                              console.log(`Image chargée avec succès: ${media.name}`);
+                            }}
                             onError={(e) => {
-                              // Essayer l'URL principale si la miniature échoue
-                              if (media.thumbnailUrl && e.currentTarget.src === media.thumbnailUrl) {
-                                e.currentTarget.src = media.url;
-                              } else if (media.url.includes('/uploads/')) {
-                                // Essayer avec le chemin direct
+                              console.log(`Erreur de chargement d'image: ${e.currentTarget.src}`);
+                              
+                              // Essayer avec le chemin direct
+                              if (media.url.includes('/uploads/')) {
                                 const filename = media.url.split('/').pop();
-                                const directUrl = `/uploads/${filename}`;
-                                e.currentTarget.src = directUrl;
+                                if (filename) {
+                                  const directUrl = `/uploads/${filename}`;
+                                  console.log(`Tentative avec chemin direct: ${directUrl}`);
+                                  e.currentTarget.src = directUrl;
+                                } else {
+                                  e.currentTarget.src = 'https://via.placeholder.com/150?text=Image+Error';
+                                }
                               } else {
+                                console.log(`Utilisation de l'image de placeholder`);
                                 e.currentTarget.src = 'https://via.placeholder.com/150?text=Image+Error';
                               }
                             }}
@@ -654,34 +735,17 @@ export default function MediaPage() {
                     />
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="text-sm font-medium mb-2">Image originale</h3>
-                      <p className="text-xs text-gray-600 mb-1">URL: {selectedMedia.url}</p>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full"
-                        onClick={() => handleCopyUrl(selectedMedia.url)}
-                      >
-                        📋 Copier l'URL originale
-                      </Button>
-                    </div>
-                    
-                    {selectedMedia.thumbnailUrl && (
-                      <div>
-                        <h3 className="text-sm font-medium mb-2">Miniature</h3>
-                        <p className="text-xs text-gray-600 mb-1">URL: {selectedMedia.thumbnailUrl}</p>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="w-full"
-                          onClick={() => handleCopyUrl(selectedMedia.thumbnailUrl || '')}
-                        >
-                          📋 Copier l'URL de la miniature
-                        </Button>
-                      </div>
-                    )}
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Image</h3>
+                    <p className="text-xs text-gray-600 mb-1">URL: {selectedMedia.url}</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={() => handleCopyUrl(selectedMedia.url)}
+                    >
+                      📋 Copier l'URL
+                    </Button>
                   </div>
                 </>
               )}
@@ -695,11 +759,7 @@ export default function MediaPage() {
                   <Button onClick={() => handleOpenImage(selectedMedia.url)}>
                     💾 <span className="ml-2">Voir en taille réelle</span>
                   </Button>
-                  {selectedMedia.thumbnailUrl && (
-                    <Button variant="outline" onClick={() => handleOpenImage(selectedMedia.thumbnailUrl || '')}>
-                      🔍 <span className="ml-2">Voir la miniature</span>
-                    </Button>
-                  )}
+
                   <Button 
                     variant="destructive"
                     onClick={() => {

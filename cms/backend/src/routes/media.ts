@@ -4,6 +4,8 @@ import { uploadMedia, optimizeImage, generateFileUrls } from '../middleware/uplo
 import { authenticateToken } from '../middleware/auth';
 import path from 'path';
 import fs from 'fs/promises';
+import * as fsSync from 'fs';
+import sharp from 'sharp';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -59,12 +61,16 @@ router.get('/:id', async (req, res) => {
 });
 
 // Uploader un nouveau média
-router.post('/', uploadMedia.single('file'), optimizeImage, async (req, res) => {
+router.post('/', uploadMedia.single('file'), async (req, res) => {
   try {
+    console.log('Début de la route d\'upload');
+    
     if (!req.file) {
+      console.log('Aucun fichier trouvé dans la requête');
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
+    console.log('Fichier reçu:', req.file.originalname, req.file.mimetype, req.file.size);
     const file = req.file;
     const { name, alt, description } = req.body;
 
@@ -79,29 +85,61 @@ router.post('/', uploadMedia.single('file'), optimizeImage, async (req, res) => 
     }
 
     // Générer les URLs
-    const thumbnailFilename = file.mimetype.startsWith('image/') 
-      ? path.basename(file.path).replace(/\.[^/.]+$/, '-thumb.webp')
-      : undefined;
+    const uploadDir = process.env.UPLOAD_DIR || 'uploads';
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const url = `${baseUrl}/${uploadDir}/${file.filename}`;
     
-    const { url, thumbnailUrl } = generateFileUrls(req, file.filename, thumbnailFilename);
-
+    console.log(`URL générée: ${url}`);
+    
     // Créer l'entrée dans la base de données
     const media = await prisma.mediaFile.create({
       data: {
+        name: name || file.originalname,
         filename: file.filename,
         originalName: file.originalname,
         mimeType: file.mimetype,
         size: file.size,
         url,
-        thumbnailUrl,
-        alt: alt || ''
+        thumbnailUrl: undefined,
+        alt: alt || '',
+        description: description || '',
+        type
       }
     });
+
+    // Copier le fichier vers le répertoire public
+    try {
+      const sourceDir = path.join(process.cwd(), uploadDir);
+      const targetDir = path.join(process.cwd(), '../frontend/public/uploads');
+      
+      // Créer le répertoire cible s'il n'existe pas
+      if (!fsSync.existsSync(targetDir)) {
+        await fs.mkdir(targetDir, { recursive: true });
+        console.log(`Répertoire créé: ${targetDir}`);
+      }
+      
+      // Copier le fichier
+      const sourcePath = path.join(sourceDir, file.filename);
+      const targetPath = path.join(targetDir, file.filename);
+      
+      await fs.copyFile(sourcePath, targetPath);
+      console.log(`Fichier copié: ${file.filename}`);
+    } catch (syncError) {
+      console.error('Error copying file:', syncError);
+      // Ne pas bloquer la réponse en cas d'erreur de copie
+    }
 
     res.status(201).json(media);
   } catch (error) {
     console.error('Error uploading media:', error);
-    res.status(500).json({ error: 'Failed to upload media' });
+    
+    // Afficher plus de détails sur l'erreur
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    
+    res.status(500).json({ error: 'Failed to upload media', details: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -168,6 +206,128 @@ router.delete('/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting media:', error);
     res.status(500).json({ error: 'Failed to delete media' });
+  }
+});
+
+// Régénérer les miniatures manquantes
+router.post('/regenerate-thumbnails', async (req, res) => {
+  try {
+    const uploadDir = process.env.UPLOAD_DIR || 'uploads';
+    const mediaFiles = await prisma.mediaFile.findMany({
+      where: {
+        type: 'image'
+      }
+    });
+    
+    const results = [];
+    
+    for (const media of mediaFiles) {
+      if (!media.url) continue;
+      
+      const filename = path.basename(media.url);
+      const filePath = path.join(process.cwd(), uploadDir, filename);
+      
+      // Vérifier si le fichier original existe
+      const fileExists = await fs.access(filePath).then(() => true).catch(() => false);
+      if (!fileExists) {
+        results.push({
+          id: media.id,
+          filename,
+          status: 'skipped',
+          reason: 'original file not found'
+        });
+        continue;
+      }
+      
+      // Générer le nom de la miniature
+      const thumbnailFilename = filename.replace(/\.[^/.]+$/, '-thumb.webp');
+      const thumbnailPath = path.join(process.cwd(), uploadDir, thumbnailFilename);
+      
+      try {
+        // Créer une miniature
+        await sharp(filePath)
+          .resize(300, 300, { 
+            fit: 'inside',
+            withoutEnlargement: true 
+          })
+          .webp({ quality: 80 })
+          .toFile(thumbnailPath);
+        
+        // Mettre à jour l'URL de la miniature dans la base de données
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const thumbnailUrl = `${baseUrl}/${uploadDir}/${thumbnailFilename}`;
+        
+        await prisma.mediaFile.update({
+          where: { id: media.id },
+          data: { thumbnailUrl }
+        });
+        
+        results.push({
+          id: media.id,
+          filename: thumbnailFilename,
+          status: 'success',
+          url: thumbnailUrl
+        });
+      } catch (error) {
+        console.error(`Error generating thumbnail for ${filename}:`, error);
+        results.push({
+          id: media.id,
+          filename,
+          status: 'error',
+          error: error.message
+        });
+      }
+    }
+    
+    res.json({
+      total: mediaFiles.length,
+      processed: results.length,
+      success: results.filter(r => r.status === 'success').length,
+      results
+    });
+  } catch (error) {
+    console.error('Error regenerating thumbnails:', error);
+    res.status(500).json({ error: 'Failed to regenerate thumbnails' });
+  }
+});
+
+// Vérifier l'existence des fichiers de miniatures
+router.get('/check-thumbnails', async (req, res) => {
+  try {
+    const uploadDir = process.env.UPLOAD_DIR || 'uploads';
+    const mediaFiles = await prisma.mediaFile.findMany({
+      where: {
+        type: 'image',
+        thumbnailUrl: { not: null }
+      }
+    });
+    
+    const results = [];
+    
+    for (const media of mediaFiles) {
+      if (!media.thumbnailUrl) continue;
+      
+      const thumbnailFilename = path.basename(media.thumbnailUrl);
+      const thumbnailPath = path.join(process.cwd(), uploadDir, thumbnailFilename);
+      
+      const exists = await fs.access(thumbnailPath).then(() => true).catch(() => false);
+      
+      results.push({
+        id: media.id,
+        filename: thumbnailFilename,
+        exists,
+        url: media.thumbnailUrl
+      });
+    }
+    
+    res.json({
+      total: results.length,
+      missing: results.filter(r => !r.exists).length,
+      thumbnails: results
+    });
+  } catch (error) {
+    console.error('Error checking thumbnails:', error);
+    res.status(500).json({ error: 'Failed to check thumbnails' });
   }
 });
 
