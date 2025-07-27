@@ -15,6 +15,7 @@ export interface Project {
   challenge?: string;
   approach?: string;
   testimonial?: string;
+  content?: string; // Rich text content
   isPublished: boolean;
   order: number;
   createdAt: string;
@@ -35,6 +36,7 @@ export interface ProjectFormData {
   challenge?: string;
   approach?: string;
   testimonial?: string;
+  content?: string; // Rich text content
   isPublished?: boolean;
 }
 
@@ -81,8 +83,15 @@ class ProjectService {
    * Récupère un projet par son ID
    */
   async getProject(id: string): Promise<Project> {
-    const response = await axiosInstance.get(`/projects/${id}`);
-    return response.data;
+    console.log('ProjectService.getProject - Récupération du projet avec ID:', id);
+    try {
+      const response = await axiosInstance.get(`/projects/${id}`);
+      console.log('ProjectService.getProject - Projet récupéré:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('ProjectService.getProject - Erreur lors de la récupération du projet:', error);
+      throw error;
+    }
   }
 
   /**
@@ -172,6 +181,61 @@ class ProjectService {
       images: JSON.stringify(project.images),
       scope: project.scope ? JSON.stringify(project.scope) : undefined
     };
+  }
+
+  /**
+   * Récupère le contenu d'un projet
+   */
+  async getProjectContent(id: string): Promise<string> {
+    try {
+      console.log('ProjectService.getProjectContent - Récupération du contenu pour le projet ID:', id);
+      
+      // Essayer d'abord l'endpoint dédié au contenu
+      try {
+        const response = await axiosInstance.get(`/projects/${id}/content`);
+        console.log('ProjectService.getProjectContent - Réponse de l\'API:', response.data);
+        
+        if (response.data && typeof response.data.content === 'string') {
+          console.log('ProjectService.getProjectContent - Contenu récupéré de l\'endpoint dédié');
+          return response.data.content;
+        } else {
+          console.log('ProjectService.getProjectContent - Format de réponse inattendu de l\'endpoint dédié');
+          throw new Error('Format de réponse inattendu');
+        }
+      } catch (contentError) {
+        console.error('ProjectService.getProjectContent - Erreur avec l\'endpoint dédié:', contentError);
+        
+        // En cas d'échec, essayer de récupérer le projet complet
+        console.log('ProjectService.getProjectContent - Tentative de récupération du projet complet');
+        const project = await this.getProject(id);
+        
+        if (project && typeof project.content === 'string') {
+          console.log('ProjectService.getProjectContent - Contenu récupéré du projet complet');
+          return project.content;
+        } else {
+          console.log('ProjectService.getProjectContent - Pas de contenu dans le projet complet');
+          return '';
+        }
+      }
+    } catch (error) {
+      console.error('ProjectService.getProjectContent - Erreur lors de la récupération du contenu:', error);
+      return '';
+    }
+  }
+
+  /**
+   * Met à jour le contenu d'un projet
+   */
+  async updateProjectContent(id: string, content: string): Promise<{ message: string; project: { id: string; content: string } }> {
+    try {
+      console.log('Mise à jour du contenu pour le projet', id);
+      const response = await axiosInstance.put(`/projects/${id}/content`, { content });
+      console.log('Réponse de mise à jour:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du contenu:', error);
+      throw error;
+    }
   }
 }
 

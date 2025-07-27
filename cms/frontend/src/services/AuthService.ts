@@ -56,7 +56,9 @@ class AuthService {
         };
         
         // Stocker un token dummy et les informations utilisateur
-        this.setToken('dummy-token-for-testing');
+        const dummyToken = 'dummy-token-for-testing';
+        console.log('Stockage du token de test:', dummyToken);
+        this.setToken(dummyToken);
         this.setUser(dummyUser);
         
         // Configurer l'expiration du token (2h par défaut)

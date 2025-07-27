@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,71 +13,76 @@ import { useNavigate } from 'react-router-dom';
 import PreviewButton from '@/components/preview/PreviewButton';
 import { AdvancedProject } from '@/components/ProjectFormAdvanced';
 import { usePreviewMode } from '@/hooks/usePreviewMode';
+import ProjectService from '@/services/ProjectService';
+import { AuthDebugger } from '@/components/AuthDebugger';
 
 // Utilisation du type AdvancedProject
 type Project = AdvancedProject;
 
-// Données mock pour les projets (format avancé)
-const mockProjects: Project[] = [
-  {
-    id: '1',
-    title: 'A growing community of authors and readers',
-    subtitle: 'Complete redesign of Booksprout platform with modern UI/UX principles and improved user experience.',
-    heroImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800',
-    category: 'website',
-    status: 'published',
-    client: 'Booksprout',
-    year: 2024,
-    duration: '2 months',
-    industry: 'Publishing',
-    scope: ['UI/UX', 'Wireframe', 'Digital Design', 'Icon Design'],
-    projectUrl: 'https://booksprout.co',
-    challenge: 'The old Booksprout website felt outdated and didn\'t communicate the right message. With Booksprout SaaS v.2 launching soon, it was the perfect time for a redesign.',
-    approach: 'We created a custom design for Booksprout that better aligned with their brand and goals. The team rewrote the entire content, narrowing the scope of the website to focus on the key elements.',
-    contentBlocks: [
-      {
-        id: '1',
-        type: 'paragraph' as const,
-        content: 'The Booksprout community knew the website well but with the old look, the website was lacking a professional aspect to bring new users to the community.'
-      }
-    ],
-    testimonial: {
-      quote: 'Lawson produced some really cool designs and he always made sure I was happy with everything before we finished the project.',
-      clientName: 'Chris Leippi',
-      clientRole: 'Founder, Booksprout'
-    },
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-15T10:00:00Z'
-  },
-  {
-    id: '2',
-    title: 'Mobile Banking Revolution',
-    subtitle: 'Secure and user-friendly mobile banking application with biometric authentication and modern design.',
-    heroImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800',
-    category: 'mobile',
-    status: 'draft',
-    client: 'FinanceBank',
-    year: 2024,
-    duration: '4 months',
-    industry: 'Finance',
-    scope: ['UI/UX', 'Prototyping', 'User Research', 'Mobile Development'],
+// Fonction pour convertir les projets de l'API au format AdvancedProject
+const convertApiProjectToAdvancedProject = (apiProject: any): Project => {
+  console.log('Conversion du projet API:', apiProject);
+  
+  // S'assurer que toutes les propriétés sont correctement définies
+  const project = {
+    id: apiProject.id,
+    title: apiProject.title || '',
+    subtitle: apiProject.description || '',
+    description: apiProject.description || '',
+    heroImage: apiProject.thumbnail || '',
+    heroImagePreview: apiProject.thumbnail || '',
+    category: apiProject.category ? apiProject.category.toLowerCase() : 'website',
+    status: apiProject.isPublished ? 'published' : 'draft',
+    client: apiProject.client || '',
+    year: apiProject.year || new Date().getFullYear(),
+    duration: apiProject.duration || '',
+    industry: apiProject.industry || '',
+    scope: apiProject.scope ? JSON.parse(apiProject.scope) : [],
     projectUrl: '',
-    challenge: 'Traditional banking apps were complex and intimidating for users. We needed to create a simple, secure, and intuitive mobile banking experience.',
-    approach: 'We conducted extensive user research and created a design system focused on simplicity and security. The app features biometric authentication and a clean, modern interface.',
+    challenge: apiProject.challenge || '',
+    approach: apiProject.approach || '',
     contentBlocks: [],
-    createdAt: '2024-02-20T10:00:00Z',
-    updatedAt: '2024-02-20T10:00:00Z'
-  }
-];
+    content: apiProject.content || '', // Ajout du contenu du projet
+    testimonial: apiProject.testimonial ? JSON.parse(apiProject.testimonial) : undefined,
+    createdAt: apiProject.createdAt,
+    updatedAt: apiProject.updatedAt
+  };
+  
+  console.log('Projet converti:', project);
+  return project;
+};
 
 export default function ProjectsPage() {
   const navigate = useNavigate();
-  const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const { showPreview } = usePreviewMode('projects');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  // État pour la gestion des projets
+  
+  // Charger les projets depuis l'API
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        const response = await ProjectService.getProjects();
+        const convertedProjects = response.data.map(convertApiProjectToAdvancedProject);
+        setProjects(convertedProjects);
+        setError(null);
+      } catch (err) {
+        console.error('Erreur lors du chargement des projets:', err);
+        setError('Impossible de charger les projets. Veuillez réessayer plus tard.');
+        // Utiliser des données mock en cas d'erreur pour le développement
+        setProjects([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProjects();
+  }, []);
 
   // Filtrage des projets
   const filteredProjects = projects.filter(project => {
@@ -103,15 +108,57 @@ export default function ProjectsPage() {
     navigate('/projects/new');
   };
 
-  const handleEditProject = (_project: Project) => {
-    // Pour l'instant, on redirige vers la création
-    // Plus tard, on créera une page d'édition dédiée
-    toast.info('Édition de projet - En cours de développement');
+  const handleEditProject = async (project: Project) => {
+    console.log('Édition du projet:', project);
+    
+    try {
+      // Récupérer les données complètes du projet depuis l'API
+      const fullProject = await ProjectService.getProject(project.id);
+      console.log('Données complètes du projet récupérées:', fullProject);
+      
+      // Récupérer également le contenu du projet
+      const projectContent = await ProjectService.getProjectContent(project.id);
+      console.log('Contenu du projet récupéré:', projectContent ? 'Contenu présent' : 'Pas de contenu');
+      
+      // Convertir le projet API en format AdvancedProject
+      const projectForEdit = convertApiProjectToAdvancedProject(fullProject);
+      
+      // Ajouter explicitement le contenu récupéré
+      projectForEdit.content = projectContent;
+      
+      console.log('Projet converti pour édition avec contenu:', projectForEdit);
+      
+      // Sauvegarder les données du projet dans le localStorage pour l'édition
+      localStorage.setItem('projectDraft', JSON.stringify(projectForEdit));
+      console.log('Données du projet sauvegardées dans localStorage');
+      
+      // Vérifier que les données ont bien été sauvegardées
+      const savedData = localStorage.getItem('projectDraft');
+      console.log('Vérification des données sauvegardées:', savedData);
+      
+      if (!savedData) {
+        toast.error('Erreur: Les données n\'ont pas été sauvegardées dans localStorage');
+        return;
+      }
+      
+      // Rediriger vers la page de contenu du projet
+      console.log('Redirection vers /projects/content');
+      navigate('/projects/content');
+    } catch (error) {
+      console.error('Erreur lors de la récupération/sauvegarde des données:', error);
+      toast.error('Erreur lors de la préparation des données pour l\'édition');
+    }
   };
 
-  const handleDeleteProject = (projectId: string) => {
-    setProjects(prev => prev.filter(p => p.id !== projectId));
-    toast.success('Projet supprimé avec succès !');
+  const handleDeleteProject = async (projectId: string) => {
+    try {
+      await ProjectService.deleteProject(projectId);
+      setProjects(prev => prev.filter(p => p.id !== projectId));
+      toast.success('Projet supprimé avec succès !');
+    } catch (error) {
+      console.error('Erreur lors de la suppression du projet:', error);
+      toast.error('Erreur lors de la suppression du projet');
+    }
   };
 
 
@@ -242,19 +289,36 @@ export default function ProjectsPage() {
       {/* Liste des projets */}
       <Card>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Projet</TableHead>
-                <TableHead>Catégorie</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Année</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredProjects.map((project) => (
+          {loading ? (
+            <div className="flex items-center justify-center p-8">
+              <p className="text-gray-500">Chargement des projets...</p>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center p-8">
+              <p className="text-red-500">{error}</p>
+            </div>
+          ) : filteredProjects.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 space-y-4">
+              <p className="text-gray-500">Aucun projet trouvé</p>
+              <Button onClick={handleCreateProject} variant="outline" className="flex items-center space-x-2">
+                <Plus size="small" />
+                <span>Créer votre premier projet</span>
+              </Button>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Projet</TableHead>
+                  <TableHead>Catégorie</TableHead>
+                  <TableHead>Statut</TableHead>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Année</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredProjects.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell>
                     <div className="flex items-center space-x-3">
@@ -295,7 +359,7 @@ export default function ProjectsPage() {
                           onClick={() => {
                             const previewData = {
                               ...project,
-                              content: project.content || ''
+                              content: ''
                             };
                             
                             // Utiliser le système de prévisualisation unifié
@@ -324,8 +388,9 @@ export default function ProjectsPage() {
                   </TableCell>
                 </TableRow>
               ))}
-            </TableBody>
-          </Table>
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
 

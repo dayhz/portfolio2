@@ -50,7 +50,7 @@ export function VersionHistoryPanel({
   
   return (
     <div className="version-history-panel">
-      <style jsx>{`
+      <style>{`
         .version-history-panel {
           position: absolute;
           top: 0;

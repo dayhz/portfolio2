@@ -1,0 +1,407 @@
+/* Template Styles basés sur zesty.html */
+
+:root {
+  --site--margin: clamp(1rem, 0.4074074074074074rem + 2.9629629629629632vw, 3rem);
+  --size--2rem: clamp(1.75rem, 1.6759259259259258rem + 0.3703703703703704vw, 2rem);
+  --size--3rem: clamp(2.25rem, 2.0277777777777777rem + 1.1111111111111112vw, 3rem);
+  --size--4rem: clamp(2.5rem, 2.0555555555555554rem + 2.2222222222222223vw, 4rem);
+  --size--5rem: clamp(3rem, 2.4074074074074074rem + 2.9629629629629632vw, 5rem);
+  --swatch--orange: #ff6b35;
+}
+
+/* Reset et base */
+* {
+  vertical-align: bottom;
+}
+
+::before, ::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
+}
+
+/* Navigation */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 1rem 0;
+}
+
+.navbar_wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--site--margin);
+}
+
+.vb_logo {
+  color: #000;
+  text-decoration: none;
+}
+
+.navbar_links_wrp {
+  display: flex;
+  gap: 2rem;
+}
+
+.navbar_link_item {
+  color: #000;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.navbar_link_item:hover {
+  color: var(--swatch--orange);
+}
+
+/* Containers */
+.u-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--site--margin);
+}
+
+.u-container._1920px {
+  max-width: 1920px;
+}
+
+/* Sections */
+.section {
+  position: relative;
+}
+
+.main_wrap {
+  padding-top: 80px; /* Pour compenser la navbar fixe */
+}
+
+/* Hero */
+.temp-comp-hero {
+  display: grid;
+  gap: var(--size--5rem);
+  text-align: center;
+}
+
+.temp-header {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.temp-preheader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 14px;
+  color: #666;
+}
+
+.breadcrumb-link {
+  color: #666;
+  text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+  color: var(--swatch--orange);
+}
+
+.temp-preheader-link {
+  color: var(--swatch--orange);
+  font-weight: 500;
+}
+
+.temp-h1 {
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0;
+  color: #000;
+}
+
+.temp-subtitle {
+  font-size: 1.25rem;
+  color: #666;
+  margin-top: 1rem;
+  line-height: 1.5;
+}
+
+/* Images */
+.temp-img {
+  position: relative;
+}
+
+.img-wrp {
+  position: relative;
+  overflow: hidden;
+}
+
+.comp-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 16px;
+}
+
+/* About Section */
+.temp-about_container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--size--5rem);
+  align-items: start;
+}
+
+.temp-about_content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size--4rem);
+}
+
+.temp-rich {
+  line-height: 1.6;
+}
+
+.temp-rich h2 {
+  font-size: var(--size--3rem);
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  color: #000;
+}
+
+.temp-rich p {
+  font-size: 1.125rem;
+  color: #333;
+  margin: 0;
+  line-height: 1.7;
+}
+
+/* Project Info */
+.temp-about_infos {
+  display: grid;
+  gap: 2rem;
+}
+
+.temp-about_info {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.temp-about_info:last-child {
+  border-bottom: none;
+}
+
+.temp-about_info-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #666;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.temp-about_info > div:last-child {
+  color: #000;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Content Sections */
+.temp-comp-text {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.temp-comp-text > div {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: #333;
+}
+
+.temp-img_container {
+  position: relative;
+}
+
+/* Image Grid */
+.temp-comp-img_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.img_grid-container {
+  position: relative;
+}
+
+.temp-img.none-ratio {
+  aspect-ratio: auto;
+}
+
+/* Testimonial */
+.temp-comp-testimony {
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.testimony {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 300;
+  line-height: 1.4;
+  margin: 0 0 3rem 0;
+  font-style: italic;
+  color: #000;
+}
+
+.testimony-profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.testimony-profile-img {
+  flex-shrink: 0;
+}
+
+.testimonial-img-item {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.testimony-profile-name {
+  font-weight: 600;
+  color: #000;
+}
+
+.testimony-profile-role {
+  color: #666;
+  font-size: 14px;
+}
+
+/* Placeholders */
+.placeholder-image {
+  width: 100%;
+  min-height: 300px;
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.placeholder-image:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.placeholder-content {
+  text-align: center;
+  color: #6c757d;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.placeholder-avatar {
+  width: 60px;
+  height: 60px;
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Video */
+.video {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+}
+
+.video-wrp {
+  position: relative;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar_links_wrp {
+    display: none;
+  }
+  
+  .temp-about_container {
+    grid-template-columns: 1fr;
+    gap: var(--size--3rem);
+  }
+  
+  .temp-comp-img_grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .testimony-profile {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .temp-preheader {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .temp-h1 {
+    font-size: 2rem;
+  }
+  
+  .testimony {
+    font-size: 1.25rem;
+  }
+  
+  .temp-rich h2 {
+    font-size: 1.75rem;
+  }
+}
+
+/* Spacing utilities */
+.g_section_space {
+  padding-top: var(--spacing-top, 120px);
+  padding-bottom: var(--spacing-bottom, 72px);
+}
+
+/* Utilities */
+.u-color-dark {
+  color: #000;
+}
+
+.w-richtext {
+  /* Rich text styles */
+}
+
+.w-richtext h2 {
+  margin-top: 0;
+}
+
+.w-richtext p {
+  margin-bottom: 1rem;
+}
+
+.w-richtext p:last-child {
+  margin-bottom: 0;
+}

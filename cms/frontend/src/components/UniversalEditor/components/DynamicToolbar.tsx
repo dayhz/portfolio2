@@ -253,7 +253,7 @@ export function DynamicToolbar({ editor, className = '' }: DynamicToolbarProps) 
         transform: 'translateX(-50%)'
       }}
     >
-      <style jsx>{`
+      <style>{`
         .dynamic-toolbar {
           background: rgba(0, 0, 0, 0.8);
           border-radius: 6px;

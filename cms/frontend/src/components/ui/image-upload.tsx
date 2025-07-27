@@ -5,11 +5,12 @@ import { cn } from '@/lib/utils';
 
 interface ImageUploadProps {
   value?: string;
-  onChange: (value: string) => void;
+  onChange: (value: string | File) => void;
   onRemove: () => void;
   disabled?: boolean;
   className?: string;
   placeholder?: string;
+  directUpload?: boolean;
 }
 
 export function ImageUpload({
@@ -18,7 +19,8 @@ export function ImageUpload({
   onRemove,
   disabled,
   className,
-  placeholder = "Glissez une image ici ou cliquez pour parcourir"
+  placeholder = "Glissez une image ici ou cliquez pour parcourir",
+  directUpload = false
 }: ImageUploadProps) {
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -57,6 +59,12 @@ export function ImageUpload({
   
   const uploadFile = async (file: File) => {
     try {
+      // Si directUpload est true, retourner directement le fichier
+      if (directUpload) {
+        onChange(file);
+        return;
+      }
+      
       // Créer une URL temporaire pour l'aperçu immédiat
       const tempUrl = URL.createObjectURL(file);
       onChange(tempUrl);

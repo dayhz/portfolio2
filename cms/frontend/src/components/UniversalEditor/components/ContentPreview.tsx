@@ -212,7 +212,7 @@ export function ContentPreview({
   
   return (
     <div className={`content-preview ${isFullscreen ? 'fullscreen' : ''} ${className}`}>
-      <style jsx>{`
+      <style>{`
         .content-preview {
           border: 1px solid #e5e7eb;
           border-radius: 8px;

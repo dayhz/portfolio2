@@ -12,10 +12,12 @@ interface ProjectPreviewProps {
     title: string;
     category: string;
     client: string;
-    year: string;
-    duration: string;
+    year: number | string;
+    duration?: string;
     heroImage?: string;
+    heroImagePreview?: string; // Ajout pour supporter la structure de données actuelle
     description?: string;
+    subtitle?: string; // Ajout pour supporter la structure de données actuelle
   };
   content: string;
   className?: string;
@@ -23,6 +25,9 @@ interface ProjectPreviewProps {
 
 export function ProjectPreview({ projectData, content, className = '' }: ProjectPreviewProps) {
   const [isOpen, setIsOpen] = useState(false);
+  
+  console.log('ProjectPreview - content:', content ? content.substring(0, 50) + '...' : 'No content');
+  console.log('ProjectPreview - projectData:', projectData);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -57,10 +62,10 @@ export function ProjectPreview({ projectData, content, className = '' }: Project
           <div className="site-preview">
             {/* Header du projet */}
             <div className="project-header">
-              {projectData.heroImage && (
+              {(projectData.heroImage || projectData.heroImagePreview) && (
                 <div className="hero-image">
                   <img 
-                    src={projectData.heroImage} 
+                    src={projectData.heroImage || projectData.heroImagePreview} 
                     alt={projectData.title}
                     className="w-full h-64 object-cover rounded-lg"
                   />

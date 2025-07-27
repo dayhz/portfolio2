@@ -14,22 +14,30 @@ if (!fs.existsSync(targetDir)) {
 // Fonction pour copier un fichier
 function copyFile(source, target) {
   const targetFile = path.join(target, path.basename(source));
-  
+  const filename = path.basename(source);
+
+  // Vérifier si c'est une miniature
+  const isThumbnail = filename.includes('-thumb');
+
   // Vérifier si le fichier existe déjà dans la destination
   if (fs.existsSync(targetFile)) {
     const sourceStats = fs.statSync(source);
     const targetStats = fs.statSync(targetFile);
-    
+
     // Ne copier que si le fichier source est plus récent
     if (sourceStats.mtime <= targetStats.mtime) {
-      console.log(`Fichier déjà à jour: ${path.basename(source)}`);
+      console.log(`Fichier déjà à jour: ${filename}${isThumbnail ? ' (miniature)' : ''}`);
       return;
     }
   }
-  
-  // Copier le fichier
-  fs.copyFileSync(source, targetFile);
-  console.log(`Fichier copié: ${path.basename(source)}`);
+
+  try {
+    // Copier le fichier
+    fs.copyFileSync(source, targetFile);
+    console.log(`Fichier copié: ${filename}${isThumbnail ? ' (miniature)' : ''}`);
+  } catch (error) {
+    console.error(`Erreur lors de la copie du fichier ${filename}: ${error.message}`);
+  }
 }
 
 // Fonction pour synchroniser les répertoires
@@ -39,23 +47,42 @@ function syncDirectories() {
     console.log(`Le répertoire source n'existe pas: ${sourceDir}`);
     return;
   }
-  
+
   // Lire les fichiers du répertoire source
   const files = fs.readdirSync(sourceDir);
-  
+
   // Copier chaque fichier
   let count = 0;
+  let thumbnailCount = 0;
+
+  // D'abord, copier les miniatures pour s'assurer qu'elles sont disponibles en premier
   for (const file of files) {
-    const sourcePath = path.join(sourceDir, file);
-    
-    // Vérifier si c'est un fichier
-    if (fs.statSync(sourcePath).isFile()) {
-      copyFile(sourcePath, targetDir);
-      count++;
+    if (file.includes('-thumb.webp')) {
+      const sourcePath = path.join(sourceDir, file);
+
+      // Vérifier si c'est un fichier
+      if (fs.statSync(sourcePath).isFile()) {
+        copyFile(sourcePath, targetDir);
+        thumbnailCount++;
+        count++;
+      }
     }
   }
-  
-  console.log(`Synchronisation terminée. ${count} fichiers copiés.`);
+
+  // Ensuite, copier les autres fichiers
+  for (const file of files) {
+    if (!file.includes('-thumb.webp')) {
+      const sourcePath = path.join(sourceDir, file);
+
+      // Vérifier si c'est un fichier
+      if (fs.statSync(sourcePath).isFile()) {
+        copyFile(sourcePath, targetDir);
+        count++;
+      }
+    }
+  }
+
+  console.log(`Synchronisation terminée. ${count} fichiers copiés, dont ${thumbnailCount} miniatures.`);
 }
 
 // Exécuter la synchronisation
@@ -65,7 +92,7 @@ syncDirectories();
 const watcher = fs.watch(sourceDir, (eventType, filename) => {
   if (eventType === 'rename' && filename) {
     const sourcePath = path.join(sourceDir, filename);
-    
+
     // Vérifier si le fichier existe (il peut avoir été supprimé)
     if (fs.existsSync(sourcePath) && fs.statSync(sourcePath).isFile()) {
       console.log(`Nouveau fichier détecté: ${filename}`);

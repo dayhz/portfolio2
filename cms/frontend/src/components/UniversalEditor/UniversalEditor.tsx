@@ -7,6 +7,9 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 
+// Importer les styles de correction
+import './styles/editor-fixes.css';
+
 import { UniversalEditorProps } from './types';
 import { BlockMenu } from './BlockMenu';
 import { debounce } from './utils';
@@ -45,6 +48,37 @@ export function UniversalEditor({
   autoSave = true,
   templateType = 'poesial'
 }: UniversalEditorProps) {
+  // Afficher le contenu reçu pour le débogage
+  console.log('UniversalEditor - Content reçu:', content ? `${content.substring(0, 100)}...` : 'Contenu vide');
+  
+  // Si le contenu est vide, utiliser un contenu par défaut avec des blocs universels
+  const initialContent = content || `
+    <h1>Contenu du projet</h1>
+    <p>Commencez à éditer votre contenu ici...</p>
+    <div data-type="universal-text" class="section">
+      <div class="u-container">
+        <div class="temp-rich u-color-dark w-richtext">
+          <p>Voici un exemple de bloc de texte riche. Vous pouvez le modifier ou ajouter d'autres blocs.</p>
+        </div>
+      </div>
+    </div>
+    <div data-type="universal-image" class="section" data-wf--template-section-image--variant="auto">
+      <div class="u-container">
+        <div class="temp-img_container">
+          <div class="temp-img">
+            <div class="img-wrp">
+              <div class="block-placeholder" style="min-height: 200px; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                <div class="block-placeholder-icon">🖼️</div>
+                <div class="block-placeholder-text">Image standard</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  console.log('UniversalEditor - Content initial:', initialContent.substring(0, 100) + '...');
+  
   const [blockMenuState, setBlockMenuState] = useState<{
     isOpen: boolean;
     position: { x: number; y: number };
@@ -127,7 +161,8 @@ export function UniversalEditor({
     
     // Vérifier s'il y a une sauvegarde à récupérer
     const backup = loadFromBackup();
-    if (backup && backup.content !== content) {
+    if (backup && backup.content !== initialContent) {
+      console.log('UniversalEditor - Sauvegarde trouvée:', backup.content.substring(0, 100) + '...');
       setShowBackupRecovery(true);
     }
     
@@ -140,7 +175,7 @@ export function UniversalEditor({
     return () => {
       removeSiteStyles();
     };
-  }, []);
+  }, [initialContent]);
 
   const editor = useEditor({
     extensions: [
@@ -184,7 +219,7 @@ export function UniversalEditor({
       ImageGridExtension,
       VideoExtension,
     ],
-    content,
+    content: initialContent,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
       

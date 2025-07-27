@@ -48,7 +48,7 @@ const AVAILABLE_TEMPLATES: TemplateOption[] = [
 export function TemplateSelector({ selectedTemplate, onTemplateChange, className = '' }: TemplateSelectorProps) {
   return (
     <div className={`template-selector ${className}`}>
-      <style jsx>{`
+      <style>{`
         .template-selector {
           padding: 16px;
           background: #f9fafb;

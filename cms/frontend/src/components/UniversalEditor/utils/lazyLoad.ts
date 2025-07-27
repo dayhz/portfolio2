@@ -50,7 +50,7 @@ export function lazyWithFallback<T = any>(
     <div className="lazy-loading-fallback">
       <div className="loading-indicator"></div>
       <div className="loading-text">Chargement {name}...</div>
-      <style jsx>{`
+      <style>{`
         .lazy-loading-fallback {
           display: flex;
           flex-direction: column;

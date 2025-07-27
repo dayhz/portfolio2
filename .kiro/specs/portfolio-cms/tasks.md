@@ -64,10 +64,11 @@
   - Implémenter la copie d'URL et téléchargement
   - _Requirements: 7.1, 7.3, 7.4, 7.5_
 
-- [ ] 7.1 Gestion des médias et upload (backend)
+- [ ] 7.1 Gestion des médias et upload (backend) [REPORTÉ À UNE FUTURE MISE À JOUR]
   - Créer les endpoints d'upload avec validation et optimisation
   - Implémenter la recherche et filtrage des médias
   - _Requirements: 7.2, 7.3_
+  - Note: Fonctionnalité de base implémentée, améliorations reportées à une version ultérieure
 
 - [x] 8. Gestion du profil personnel (interface)
   - Créer le formulaire de profil avec Shadcn/ui (Form, Input, Textarea)

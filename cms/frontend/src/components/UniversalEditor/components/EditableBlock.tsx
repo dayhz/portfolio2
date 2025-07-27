@@ -50,7 +50,7 @@ export function EditableBlock({
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
     >
-      <style jsx>{`
+      <style>{`
         .editable-block {
           position: relative;
           margin: 1rem 0;
@@ -135,7 +135,7 @@ export function EditableContent({
 }: EditableContentProps) {
   return (
     <div className={`editable-content ${isEditing ? 'editing' : ''} ${className}`}>
-      <style jsx>{`
+      <style>{`
         .editable-content {
           position: relative;
           transition: background-color 0.2s ease;
@@ -174,7 +174,7 @@ export function EditablePlaceholder({
       className={`editable-placeholder ${className}`}
       onClick={onClick}
     >
-      <style jsx>{`
+      <style>{`
         .editable-placeholder {
           min-height: 100px;
           border: 2px dashed #d1d5db;
@@ -230,7 +230,7 @@ export function EditablePlaceholder({
       <div className="placeholder-text">{text}</div>
       <button 
         className="placeholder-button"
-        onClick={(e) => {
+        onClick={() => {
           console.log('EditablePlaceholder button clicked');
           // Ne pas arrêter la propagation pour permettre au MediaUploader de recevoir l'événement
           if (onClick) onClick();

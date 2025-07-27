@@ -224,7 +224,7 @@ export function PerformanceDiagnostics({
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .performance-diagnostics {
           position: fixed;
           bottom: 20px;

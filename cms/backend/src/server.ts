@@ -7,6 +7,9 @@ import path from 'path';
 import { initializeDatabase } from './lib/prisma';
 const authRoutes = require('./routes/auth-working');
 import mediaRoutes from './routes/media';
+import profileRoutes from './routes/profile';
+import projectRoutes from './routes/projects';
+import authDebugRoutes from './routes/auth-debug';
 
 // Load environment variables
 dotenv.config();
@@ -47,12 +50,13 @@ app.get('/api/health', (req, res) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/debug', authDebugRoutes);
 
 // TODO: Add other route handlers
-// app.use('/api/projects', projectRoutes);
+app.use('/api/projects', projectRoutes);
 // app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/media', mediaRoutes);
-// app.use('/api/profile', profileRoutes);
+app.use('/api/profile', profileRoutes);
 // app.use('/api/services', serviceRoutes);
 // app.use('/api/about', aboutRoutes);
 

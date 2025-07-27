@@ -79,46 +79,94 @@ export const optimizeImage = async (
   next: NextFunction
 ) => {
   try {
-    if (!req.file || !req.file.mimetype.startsWith('image/')) {
+    if (!req.file) {
+      console.log('Aucun fichier trouvé dans la requête');
+      return next();
+    }
+    
+    console.log(`Traitement du fichier: ${req.file.originalname}, type: ${req.file.mimetype}`);
+    
+    if (!req.file.mimetype.startsWith('image/')) {
+      console.log(`Le fichier n'est pas une image: ${req.file.mimetype}`);
       return next();
     }
 
     const inputPath = req.file.path;
+    console.log(`Chemin du fichier d'entrée: ${inputPath}`);
+    
+    // Vérifier si le fichier existe
+    try {
+      await fs.access(inputPath);
+      console.log(`Le fichier d'entrée existe: ${inputPath}`);
+    } catch (err) {
+      console.error(`Le fichier d'entrée n'existe pas: ${inputPath}`, err);
+      return next(new Error(`Le fichier d'entrée n'existe pas: ${inputPath}`));
+    }
+    
     const outputPath = inputPath.replace(/\.[^/.]+$/, '.webp');
     const thumbnailPath = inputPath.replace(/\.[^/.]+$/, '-thumb.webp');
+    
+    console.log(`Chemin du fichier de sortie: ${outputPath}`);
+    console.log(`Chemin de la miniature: ${thumbnailPath}`);
 
-    // Optimiser l'image principale
-    await sharp(inputPath)
-      .resize(1920, 1080, { 
-        fit: 'inside',
-        withoutEnlargement: true 
-      })
-      .webp({ quality: 85 })
-      .toFile(outputPath);
+    try {
+      // Optimiser l'image principale
+      console.log('Début de l\'optimisation de l\'image principale');
+      await sharp(inputPath)
+        .resize(1920, 1080, { 
+          fit: 'inside',
+          withoutEnlargement: true 
+        })
+        .webp({ quality: 85 })
+        .toFile(outputPath);
+      console.log('Image principale optimisée avec succès');
+    } catch (err) {
+      console.error('Erreur lors de l\'optimisation de l\'image principale:', err);
+      return next(err);
+    }
 
-    // Créer une miniature
-    await sharp(inputPath)
-      .resize(400, 300, { 
-        fit: 'cover' 
-      })
-      .webp({ quality: 80 })
-      .toFile(thumbnailPath);
+    try {
+      // Créer une miniature
+      console.log('Début de la création de la miniature');
+      await sharp(inputPath)
+        .resize(300, 300, { 
+          fit: 'inside',
+          withoutEnlargement: true 
+        })
+        .webp({ quality: 80 })
+        .toFile(thumbnailPath);
+      console.log(`Miniature créée avec succès: ${thumbnailPath}`);
+    } catch (err) {
+      console.error('Erreur lors de la création de la miniature:', err);
+      // Continuer même si la création de la miniature échoue
+    }
 
-    // Supprimer le fichier original
-    await fs.unlink(inputPath);
+    try {
+      // Supprimer le fichier original
+      console.log(`Suppression du fichier original: ${inputPath}`);
+      await fs.unlink(inputPath);
+      console.log('Fichier original supprimé avec succès');
+    } catch (err) {
+      console.error('Erreur lors de la suppression du fichier original:', err);
+      // Continuer même si la suppression échoue
+    }
 
     // Mettre à jour les informations du fichier
     req.file.path = outputPath;
     req.file.filename = path.basename(outputPath);
     req.file.mimetype = 'image/webp';
     
-    // Ajouter le chemin de la miniature
+    // Ajouter le chemin et le nom de fichier de la miniature
     (req.file as any).thumbnailPath = thumbnailPath;
+    (req.file as any).thumbnailFilename = path.basename(thumbnailPath);
+    
+    console.log(`Miniature générée: ${path.basename(thumbnailPath)}`);
 
     next();
   } catch (error) {
     console.error('Image optimization error:', error);
-    next(error);
+    // Ne pas propager l'erreur pour éviter de bloquer l'upload
+    next();
   }
 };
 
@@ -190,8 +238,11 @@ export const generateFileUrls = (req: Request, filename: string, thumbnailFilena
   const baseUrl = `${req.protocol}://${req.get('host')}`;
   const uploadDir = process.env.UPLOAD_DIR || 'uploads';
   
-  return {
-    url: `${baseUrl}/${uploadDir}/${filename}`,
-    thumbnailUrl: thumbnailFilename ? `${baseUrl}/${uploadDir}/${thumbnailFilename}` : undefined
-  };
+  const url = `${baseUrl}/${uploadDir}/${filename}`;
+  const thumbnailUrl = thumbnailFilename ? `${baseUrl}/${uploadDir}/${thumbnailFilename}` : undefined;
+  
+  console.log(`generateFileUrls - URL: ${url}`);
+  console.log(`generateFileUrls - Miniature URL: ${thumbnailUrl}`);
+  
+  return { url, thumbnailUrl };
 };

@@ -59,7 +59,7 @@ export function EditableBlockControls({
         pointerEvents: shouldShow ? 'auto' : 'none'
       }}
     >
-      <style jsx>{`
+      <style>{`
         .editable-block-controls {
           position: absolute;
           background: rgba(0, 0, 0, 0.8);
@@ -105,7 +105,7 @@ export function EditableControlButton({
       onClick={onClick}
       title={title}
     >
-      <style jsx>{`
+      <style>{`
         .editable-control-button {
           background: transparent;
           border: none;
@@ -146,7 +146,7 @@ export function EditableControlGroup({
 }: EditableControlGroupProps) {
   return (
     <div className={`editable-control-group ${className}`}>
-      <style jsx>{`
+      <style>{`
         .editable-control-group {
           display: flex;
           gap: 4px;

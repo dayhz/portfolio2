@@ -195,7 +195,7 @@ export function MobileEditor({
       )}
       
       {/* Styles CSS pour la version mobile */}
-      <style jsx>{`
+      <style>{`
         .mobile-editor {
           position: relative;
           width: 100%;

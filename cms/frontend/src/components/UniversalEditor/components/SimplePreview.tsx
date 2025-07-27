@@ -15,7 +15,7 @@ export function SimplePreview({ content, templateName, onClose }: SimplePreviewP
   
   return (
     <div className="simple-preview">
-      <style jsx>{`
+      <style>{`
         .simple-preview {
           border: 1px solid #e5e7eb;
           border-radius: 8px;

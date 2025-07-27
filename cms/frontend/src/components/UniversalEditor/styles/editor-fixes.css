@@ -1,0 +1,272 @@
+/**
+ * Styles de correction pour l'éditeur universel
+ * Ces styles sont nécessaires pour assurer le bon fonctionnement de l'éditeur
+ * après la suppression de l'attribut jsx des balises style
+ */
+
+/* Styles pour les blocs d'image */
+.universal-editor .editable-block {
+  position: relative;
+  margin: 1rem 0;
+  transition: outline 0.2s ease;
+}
+
+.universal-editor .editable-block.selected {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.universal-editor .editable-block.hovered:not(.selected) {
+  outline: 1px dashed #3b82f6;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.universal-editor .block-label {
+  position: absolute;
+  top: -8px;
+  left: 8px;
+  background: #3b82f6;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.universal-editor .editable-block.selected .block-label,
+.universal-editor .editable-block.hovered .block-label {
+  opacity: 1;
+}
+
+.universal-editor .editable-block.editing {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.universal-editor .editable-block.editing .block-label {
+  background: #10b981;
+}
+
+.universal-editor .editable-block.drag-over {
+  outline: 2px dashed #3b82f6;
+  outline-offset: 2px;
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.universal-editor .editable-block.dragging {
+  opacity: 0.5;
+}
+
+/* Styles pour les blocs de texte */
+.universal-editor .editable-content {
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.universal-editor .editable-content.editing {
+  background-color: rgba(16, 185, 129, 0.05);
+  border-radius: 4px;
+}
+
+/* Styles pour les placeholders */
+.universal-editor .editable-placeholder {
+  min-height: 100px;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #f9fafb;
+  padding: 2rem;
+}
+
+.universal-editor .editable-placeholder:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.universal-editor .placeholder-icon {
+  font-size: 2rem;
+  opacity: 0.5;
+}
+
+.universal-editor .placeholder-text {
+  color: #6b7280;
+  font-size: 14px;
+  text-align: center;
+}
+
+.universal-editor .placeholder-button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.universal-editor .placeholder-button:hover {
+  background: #2563eb;
+}
+
+.universal-editor .placeholder-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Styles pour les contrôles de bloc */
+.universal-editor .editable-block-controls {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 6px;
+  padding: 4px;
+  display: flex;
+  gap: 4px;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.universal-editor .editable-block-controls.vertical {
+  flex-direction: column;
+}
+
+.universal-editor .editable-block-controls.horizontal {
+  flex-direction: row;
+}
+
+.universal-editor .editable-control-button {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.universal-editor .editable-control-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.universal-editor .editable-control-button.active {
+  background: #3b82f6;
+}
+
+.universal-editor .editable-control-group {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 2px;
+}
+
+.universal-editor .control-label {
+  color: white;
+  font-size: 10px;
+  opacity: 0.8;
+  margin-right: 4px;
+}
+
+/* Styles pour la toolbar dynamique */
+.universal-editor .dynamic-toolbar {
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 6px;
+  padding: 4px;
+  display: flex;
+  gap: 8px;
+  z-index: 20;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px) translateX(-50%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(-50%);
+  }
+}
+
+.universal-editor .toolbar-group {
+  display: flex;
+  gap: 2px;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  padding-right: 8px;
+}
+
+.universal-editor .toolbar-group:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+.universal-editor .toolbar-button {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.universal-editor .toolbar-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.universal-editor .toolbar-button.active {
+  background: #3b82f6;
+}
+
+/* Styles pour les composants lazy-loaded */
+.universal-editor .lazy-loading-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  min-height: 100px;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px dashed #e5e7eb;
+}
+
+.universal-editor .loading-indicator {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 0.5rem;
+}
+
+.universal-editor .loading-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

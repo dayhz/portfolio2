@@ -1,0 +1,93 @@
+### Variables
+@baseUrl = http://localhost:8000/api
+@authToken = dummy-token-for-testing
+
+### Récupérer tous les projets
+GET {{baseUrl}}/projects
+Content-Type: application/json
+
+### Récupérer les projets publiés
+GET {{baseUrl}}/projects?isPublished=true
+Content-Type: application/json
+
+### Récupérer les projets par catégorie
+GET {{baseUrl}}/projects?category=WEBSITE
+Content-Type: application/json
+
+### Créer un nouveau projet
+POST {{baseUrl}}/projects
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "title": "Portfolio Website",
+  "description": "A responsive portfolio website for a designer",
+  "category": "WEBSITE",
+  "thumbnail": "/uploads/portfolio-thumb.jpg",
+  "images": "[\"uploads/portfolio1.jpg\", \"uploads/portfolio2.jpg\"]",
+  "year": 2023,
+  "client": "John Doe",
+  "duration": "2 months",
+  "industry": "Design",
+  "scope": "[\"UI/UX\", \"Development\", \"Deployment\"]",
+  "challenge": "Creating a unique design that stands out",
+  "approach": "Used modern web technologies and minimalist design",
+  "isPublished": true
+}
+
+### Récupérer un projet par ID (remplacer l'ID)
+GET {{baseUrl}}/projects/project-id-here
+Content-Type: application/json
+
+### Mettre à jour un projet (remplacer l'ID)
+PUT {{baseUrl}}/projects/project-id-here
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "title": "Updated Portfolio Website",
+  "description": "A responsive portfolio website for a designer with updated features",
+  "category": "WEBSITE",
+  "thumbnail": "/uploads/portfolio-thumb.jpg",
+  "images": "[\"uploads/portfolio1.jpg\", \"uploads/portfolio2.jpg\", \"uploads/portfolio3.jpg\"]",
+  "year": 2023,
+  "client": "John Doe",
+  "duration": "3 months",
+  "industry": "Design",
+  "scope": "[\"UI/UX\", \"Development\", \"Deployment\", \"SEO\"]",
+  "challenge": "Creating a unique design that stands out",
+  "approach": "Used modern web technologies and minimalist design",
+  "isPublished": true
+}
+
+### Publier/dépublier un projet (remplacer l'ID)
+PATCH {{baseUrl}}/projects/project-id-here/publish
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "isPublished": false
+}
+
+### Réorganiser les projets
+PUT {{baseUrl}}/projects/reorder
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "projectOrders": [
+    { "id": "project-id-1", "order": 0 },
+    { "id": "project-id-2", "order": 1 },
+    { "id": "project-id-3", "order": 2 }
+  ]
+}
+
+### Dupliquer un projet (remplacer l'ID)
+POST {{baseUrl}}/projects/project-id-here/duplicate
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+### Supprimer un projet (remplacer l'ID)
+DELETE {{baseUrl}}/projects/project-id-here
+Content-Type: application/json
+Authorization: Bearer {{authToken}}

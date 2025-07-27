@@ -203,7 +203,7 @@ export function BlockSelectionManager({ editor, children }: BlockSelectionManage
   
   return (
     <div className="block-selection-manager">
-      <style jsx>{`
+      <style>{`
         .block-selection-manager {
           position: relative;
         }
