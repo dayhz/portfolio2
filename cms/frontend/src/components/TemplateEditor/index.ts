@@ -3,3 +3,5 @@ export { TemplateRenderer } from './TemplateRenderer';
 export { ZestyTemplateEditor } from './ZestyTemplateEditor';
 export { ZestyTemplateRenderer } from './ZestyTemplateRenderer';
 export { ScopeSelector } from './ScopeSelector';
+export { ResponsivePreview } from './ResponsivePreview';
+export { ZestyResponsiveTest } from './ZestyResponsiveTest';
