@@ -24,13 +24,13 @@ interface LayoutProps {
 const sidebarItems = [
   { icon: Home, label: 'Dashboard', href: '/' },
   { icon: User, label: 'Profil', href: '/profile' },
-  { icon: Work, label: 'Projets', href: '/projects' },
+  { icon: Work, label: 'Projets', href: '/template-projects' },
   { icon: Chat, label: 'Témoignages', href: '/testimonials' },
   { icon: Setting, label: 'Services', href: '/services' },
   { icon: Image, label: 'Médias', href: '/media' },
   { icon: Document, label: 'À Propos', href: '/about' },
   { icon: Document, label: '🧪 Test Éditeur', href: '/test-editor' },
-  { icon: Document, label: '📝 Template Projects', href: '/template-projects' },
+
 ];
 
 export default function Layout({ children }: LayoutProps) {

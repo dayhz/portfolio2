@@ -478,35 +478,21 @@ export const ZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = ({
           </div>
 
           {/* Image 1 - Full width */}
-          <div className="g_section_space">
-            <div className="section">
-              <div className="u-container">
-                <div className="temp-img_container">
-                  <div className="temp-img">
-                    <div className="img-wrp">
-                      {projectData.image1 ? (
+          {projectData.image1 && (
+            <div className="g_section_space">
+              <div className="section">
+                <div className="u-container">
+                  <div className="temp-img_container">
+                    <div className="temp-img">
+                      <div className="img-wrp">
                         <img alt="" className="comp-img" src={projectData.image1} />
-                      ) : (
-                        <div style={{
-                          width: '100%',
-                          height: '300px',
-                          background: '#f5f5f5',
-                          border: '2px dashed #ddd',
-                          borderRadius: '16px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#666'
-                        }}>
-                          Image 1
-                        </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Text Section 1 */}
           {projectData.textSection1 && (
@@ -522,100 +508,60 @@ export const ZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = ({
           )}
 
           {/* Image 2 - Full width */}
-          <div className="g_section_space">
-            <div className="section">
-              <div className="u-container">
-                <div className="temp-img_container">
-                  <div className="temp-img">
-                    <div className="img-wrp">
-                      {projectData.image2 ? (
+          {projectData.image2 && (
+            <div className="g_section_space">
+              <div className="section">
+                <div className="u-container">
+                  <div className="temp-img_container">
+                    <div className="temp-img">
+                      <div className="img-wrp">
                         <img alt="" className="comp-img" src={projectData.image2} />
-                      ) : (
-                        <div style={{
-                          width: '100%',
-                          height: '300px',
-                          background: '#f5f5f5',
-                          border: '2px dashed #ddd',
-                          borderRadius: '16px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#666'
-                        }}>
-                          Image 2
-                        </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Image Grid - 2 images side by side */}
-          <div className="g_section_space" style={{ padding: '60px 0' }}>
-            <section className="section">
-              <div className="u-container">
-                <div className="temp-comp-img_grid">
-                  <div className="img_grid-container">
-                    <div className="temp-img">
-                      <div className="img-wrp">
-                        {projectData.image3 ? (
-                          <img alt="" className="comp-img" src={projectData.image3} />
-                        ) : (
-                          <div style={{
-                            width: '100%',
-                            height: '250px',
-                            background: '#f5f5f5',
-                            border: '2px dashed #ddd',
-                            borderRadius: '16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#666'
-                          }}>
-                            Image 3
+          {(projectData.image3 || projectData.image4) && (
+            <div className="g_section_space" style={{ padding: '60px 0' }}>
+              <section className="section">
+                <div className="u-container">
+                  <div className="temp-comp-img_grid">
+                    {projectData.image3 && (
+                      <div className="img_grid-container">
+                        <div className="temp-img">
+                          <div className="img-wrp">
+                            <img alt="" className="comp-img" src={projectData.image3} />
                           </div>
-                        )}
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="img_grid-container">
-                    <div className="temp-img">
-                      <div className="img-wrp">
-                        {projectData.image4 ? (
-                          <img alt="" className="comp-img" src={projectData.image4} />
-                        ) : (
-                          <div style={{
-                            width: '100%',
-                            height: '250px',
-                            background: '#f5f5f5',
-                            border: '2px dashed #ddd',
-                            borderRadius: '16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#666'
-                          }}>
-                            Image 4
+                    )}
+                    {projectData.image4 && (
+                      <div className="img_grid-container">
+                        <div className="temp-img">
+                          <div className="img-wrp">
+                            <img alt="" className="comp-img" src={projectData.image4} />
                           </div>
-                        )}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
-              </div>
-            </section>
-          </div>
+              </section>
+            </div>
+          )}
 
           {/* Video 1 */}
-          <div className="g_section_space" style={{ padding: '60px 0' }}>
-            <div className="section">
-              <div className="u-container">
-                <div className="temp-img_container">
-                  <div className="temp-img">
-                    <div className="img-wrp">
-                      {projectData.video1 ? (
+          {projectData.video1 && (
+            <div className="g_section_space" style={{ padding: '60px 0' }}>
+              <div className="section">
+                <div className="u-container">
+                  <div className="temp-img_container">
+                    <div className="temp-img">
+                      <div className="img-wrp">
                         <video 
                           autoPlay 
                           className="video" 
@@ -626,36 +572,22 @@ export const ZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = ({
                         >
                           <source src={projectData.video1} type="video/mp4" />
                         </video>
-                      ) : (
-                        <div style={{
-                          width: '100%',
-                          height: '300px',
-                          background: '#f5f5f5',
-                          border: '2px dashed #ddd',
-                          borderRadius: '16px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#666'
-                        }}>
-                          Vidéo 1
-                        </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Video 2 */}
-          <div className="g_section_space" style={{ padding: '60px 0' }}>
-            <div className="section">
-              <div className="u-container">
-                <div className="temp-img_container">
-                  <div className="temp-img">
-                    <div className="img-wrp">
-                      {projectData.video2 ? (
+          {projectData.video2 && (
+            <div className="g_section_space" style={{ padding: '60px 0' }}>
+              <div className="section">
+                <div className="u-container">
+                  <div className="temp-img_container">
+                    <div className="temp-img">
+                      <div className="img-wrp">
                         <video 
                           autoPlay 
                           className="video" 
@@ -666,27 +598,13 @@ export const ZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = ({
                         >
                           <source src={projectData.video2} type="video/mp4" />
                         </video>
-                      ) : (
-                        <div style={{
-                          width: '100%',
-                          height: '300px',
-                          background: '#f5f5f5',
-                          border: '2px dashed #ddd',
-                          borderRadius: '16px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#666'
-                        }}>
-                          Vidéo 2
-                        </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Testimonial Section */}
           {(projectData.testimonialQuote || projectData.testimonialAuthor) && (
@@ -763,65 +681,37 @@ export const ZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = ({
           )}
 
           {/* Final Images */}
-          <div className="g_section_space">
-            <div className="section">
-              <div className="u-container">
-                <div className="temp-img_container">
-                  <div className="temp-img">
-                    <div className="img-wrp">
-                      {projectData.finalImage1 ? (
+          {projectData.finalImage1 && (
+            <div className="g_section_space">
+              <div className="section">
+                <div className="u-container">
+                  <div className="temp-img_container">
+                    <div className="temp-img">
+                      <div className="img-wrp">
                         <img alt="" className="comp-img" src={projectData.finalImage1} />
-                      ) : (
-                        <div style={{
-                          width: '100%',
-                          height: '300px',
-                          background: '#f5f5f5',
-                          border: '2px dashed #ddd',
-                          borderRadius: '16px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#666'
-                        }}>
-                          Avant-dernière Image
-                        </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
-          <div className="g_section_space" style={{ padding: '60px 0' }}>
-            <div className="section">
-              <div className="u-container">
-                <div className="temp-img_container">
-                  <div className="temp-img">
-                    <div className="img-wrp">
-                      {projectData.finalImage2 ? (
+          {projectData.finalImage2 && (
+            <div className="g_section_space" style={{ padding: '60px 0' }}>
+              <div className="section">
+                <div className="u-container">
+                  <div className="temp-img_container">
+                    <div className="temp-img">
+                      <div className="img-wrp">
                         <img alt="" className="comp-img" src={projectData.finalImage2} />
-                      ) : (
-                        <div style={{
-                          width: '100%',
-                          height: '300px',
-                          background: '#f5f5f5',
-                          border: '2px dashed #ddd',
-                          borderRadius: '16px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#666'
-                        }}>
-                          Dernière Image
-                        </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </main>
       </div>
     </div>
