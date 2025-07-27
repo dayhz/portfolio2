@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { templateProjectService, type SavedProject } from '@/services/templateProjectService';
+import { templateProjectService, type SavedProject, type ProjectStatus } from '@/services/templateProjectService';
 import { ProjectShareService } from '@/services/projectShareService';
-import { Plus, Edit, Trash2, Copy, Download, Upload, Eye, Share } from 'lucide-react';
+import { Plus, Edit, Trash2, Copy, Download, Upload, Eye, Share, CheckCircle, Clock, Archive } from 'lucide-react';
 
 export const TemplateProjectsListPage: React.FC = () => {
   const [projects, setProjects] = useState<SavedProject[]>([]);
@@ -20,6 +20,9 @@ export const TemplateProjectsListPage: React.FC = () => {
   const loadProjects = () => {
     setIsLoading(true);
     try {
+      // Migration des projets existants pour ajouter le statut
+      templateProjectService.migrateExistingProjects();
+      
       const allProjects = templateProjectService.getAllProjects();
       setProjects(allProjects.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()));
     } catch (error) {
@@ -154,6 +157,13 @@ export const TemplateProjectsListPage: React.FC = () => {
 
   const handleShareProject = async (id: string, title: string) => {
     try {
+      // Vérifier si le projet est publié
+      const project = templateProjectService.getProject(id);
+      if (!project || project.status !== 'published') {
+        alert('⚠️ Ce projet doit être publié avant d\'être partagé.');
+        return;
+      }
+
       const shareUrl = ProjectShareService.generateProjectURL(id);
       const success = await ProjectShareService.copyToClipboard(shareUrl);
       
@@ -182,6 +192,40 @@ export const TemplateProjectsListPage: React.FC = () => {
     } catch (error) {
       console.error('Error sharing project:', error);
       alert('❌ Erreur lors de la génération du lien de partage.');
+    }
+  };
+
+  const handleStatusChange = async (id: string, newStatus: ProjectStatus, title: string) => {
+    try {
+      templateProjectService.updateProjectStatus(id, newStatus);
+      loadProjects(); // Recharger la liste
+      
+      // Notification de succès
+      const statusLabels = {
+        draft: 'brouillon',
+        published: 'publié',
+        archived: 'archivé'
+      };
+      
+      const notification = document.createElement('div');
+      notification.innerHTML = `✅ "${title}" mis en ${statusLabels[newStatus]} !`;
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        z-index: 1000;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      `;
+      document.body.appendChild(notification);
+      setTimeout(() => document.body.removeChild(notification), 3000);
+    } catch (error) {
+      console.error('Error updating project status:', error);
+      alert('❌ Erreur lors de la mise à jour du statut.');
     }
   };
 
@@ -285,6 +329,26 @@ export const TemplateProjectsListPage: React.FC = () => {
                     <div className="flex items-center gap-2 mt-2">
                       <Badge variant="secondary">{project.client || 'Client'}</Badge>
                       <Badge variant="outline">{project.year}</Badge>
+                      {/* Badge de statut */}
+                      <Badge 
+                        variant={
+                          project.status === 'published' ? 'default' : 
+                          project.status === 'draft' ? 'secondary' : 
+                          'outline'
+                        }
+                        className={
+                          project.status === 'published' ? 'bg-green-500 hover:bg-green-600' :
+                          project.status === 'draft' ? 'bg-yellow-500 hover:bg-yellow-600' :
+                          'bg-gray-500 hover:bg-gray-600'
+                        }
+                      >
+                        {project.status === 'published' && <CheckCircle className="w-3 h-3 mr-1" />}
+                        {project.status === 'draft' && <Clock className="w-3 h-3 mr-1" />}
+                        {project.status === 'archived' && <Archive className="w-3 h-3 mr-1" />}
+                        {project.status === 'published' ? 'Publié' : 
+                         project.status === 'draft' ? 'Brouillon' : 
+                         'Archivé'}
+                      </Badge>
                     </div>
                   </div>
                   {project.heroImage && (
@@ -309,6 +373,57 @@ export const TemplateProjectsListPage: React.FC = () => {
                   <div className="text-xs text-gray-500">
                     <div>Créé : {formatDate(project.createdAt)}</div>
                     <div>Modifié : {formatDate(project.updatedAt)}</div>
+                  </div>
+
+                  {/* Debug: Afficher le statut actuel */}
+                  <div className="text-xs text-blue-600 mb-1">
+                    Status: {project.status || 'undefined'}
+                  </div>
+
+                  {/* Boutons de gestion des états */}
+                  <div className="flex gap-1 pt-2 mb-2">
+                    {(!project.status || project.status === 'draft') && (
+                      <Button
+                        size="sm"
+                        onClick={() => handleStatusChange(project.id, 'published', project.title)}
+                        className="bg-green-500 hover:bg-green-600 text-white text-xs px-2 py-1"
+                      >
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Publier
+                      </Button>
+                    )}
+                    {project.status === 'published' && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleStatusChange(project.id, 'draft', project.title)}
+                        className="text-xs px-2 py-1"
+                      >
+                        <Clock className="w-3 h-3 mr-1" />
+                        Brouillon
+                      </Button>
+                    )}
+                    {(!project.status || project.status !== 'archived') && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleStatusChange(project.id, 'archived', project.title)}
+                        className="text-xs px-2 py-1"
+                      >
+                        <Archive className="w-3 h-3 mr-1" />
+                        Archiver
+                      </Button>
+                    )}
+                    {project.status === 'archived' && (
+                      <Button
+                        size="sm"
+                        onClick={() => handleStatusChange(project.id, 'draft', project.title)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1"
+                      >
+                        <Clock className="w-3 h-3 mr-1" />
+                        Restaurer
+                      </Button>
+                    )}
                   </div>
 
                   <div className="flex gap-2 pt-2">

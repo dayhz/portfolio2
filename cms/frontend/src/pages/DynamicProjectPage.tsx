@@ -29,7 +29,12 @@ export const DynamicProjectPage: React.FC = () => {
       if (id) {
         const project = templateProjectService.getProject(id);
         if (project) {
-          const { id: _, createdAt: __, updatedAt: ___, ...data } = project;
+          // Vérifier si le projet est publié
+          if (project.status !== 'published') {
+            setError('Ce projet n\'est pas encore publié');
+            return;
+          }
+          const { id: _, createdAt: __, updatedAt: ___, publishedAt: ____, ...data } = project;
           setProjectData(data);
         } else {
           setError('Projet non trouvé');

@@ -1,0 +1,40 @@
+/* CSS spécifique à la page contact */
+
+/* Styles spécifiques au formulaire de contact */
+.form .button-form {
+  transition: all 0.3s ease;
+}
+
+.form .button-form.active {
+  background-color: var(--swatch--orange);
+  color: white;
+}
+
+/* Styles pour les animations de contact */
+.charSplit {
+  display: inline-block;
+}
+
+/* Styles pour le background de contact */
+.bg_contact {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+/* Styles pour les FAQ */
+.faq {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1.5rem 0;
+}
+
+.faq:last-child {
+  border-bottom: none;
+}
+
+/* Styles pour les liens sociaux */
+.social-media_links {
+  transition: color 0.3s ease;
+}
+
+.social-media_links:hover {
+  color: var(--swatch--orange);
+}

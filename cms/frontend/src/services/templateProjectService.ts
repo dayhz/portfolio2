@@ -1,3 +1,5 @@
+type ProjectStatus = 'draft' | 'published' | 'archived';
+
 interface ZestyProjectData {
   title: string;
   heroImage: string;
@@ -26,12 +28,15 @@ interface ZestyProjectData {
   textSection2: string;
   finalImage1: string;
   finalImage2: string;
+  // Nouveau champ pour l'état
+  status: ProjectStatus;
 }
 
 interface SavedProject extends ZestyProjectData {
   id: string;
   createdAt: string;
   updatedAt: string;
+  publishedAt?: string; // Date de publication
 }
 
 class TemplateProjectService {
@@ -50,7 +55,8 @@ class TemplateProjectService {
           ...projectData,
           id,
           createdAt: projects[existingIndex].createdAt,
-          updatedAt: now
+          updatedAt: now,
+          publishedAt: projects[existingIndex].publishedAt // Conserver la date de publication
         };
         projects[existingIndex] = updatedProject;
         this.saveToStorage(projects);
@@ -63,7 +69,9 @@ class TemplateProjectService {
       ...projectData,
       id: this.generateId(),
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
+      // Nouveau projet en brouillon par défaut
+      status: projectData.status || 'draft'
     };
     
     projects.push(newProject);
@@ -147,12 +155,101 @@ class TemplateProjectService {
       }
 
       // Supprimer les métadonnées pour créer un nouveau projet
-      const { id: _, createdAt: __, updatedAt: ___, ...cleanData } = projectData;
+      const { id: _, createdAt: __, updatedAt: ___, publishedAt: ____, ...cleanData } = projectData;
+      
+      // Les projets importés sont en brouillon par défaut
+      cleanData.status = cleanData.status || 'draft';
       
       return this.saveProject(cleanData);
     } catch (error) {
       console.error('Error importing project:', error);
       throw new Error('Impossible d\'importer le projet. Vérifiez le format des données.');
+    }
+  }
+
+  // Changer le statut d'un projet
+  updateProjectStatus(id: string, status: ProjectStatus): SavedProject {
+    const projects = this.getAllProjects();
+    const projectIndex = projects.findIndex(p => p.id === id);
+    
+    if (projectIndex === -1) {
+      throw new Error('Projet non trouvé');
+    }
+
+    const now = new Date().toISOString();
+    projects[projectIndex].status = status;
+    projects[projectIndex].updatedAt = now;
+    
+    // Si on publie le projet, enregistrer la date de publication
+    if (status === 'published' && !projects[projectIndex].publishedAt) {
+      projects[projectIndex].publishedAt = now;
+    }
+
+    localStorage.setItem(this.storageKey, JSON.stringify(projects));
+    return projects[projectIndex];
+  }
+
+  // Publier un projet
+  publishProject(id: string): SavedProject {
+    return this.updateProjectStatus(id, 'published');
+  }
+
+  // Mettre en brouillon
+  draftProject(id: string): SavedProject {
+    return this.updateProjectStatus(id, 'draft');
+  }
+
+  // Archiver un projet
+  archiveProject(id: string): SavedProject {
+    return this.updateProjectStatus(id, 'archived');
+  }
+
+  // Obtenir les projets par statut
+  getProjectsByStatus(status: ProjectStatus): SavedProject[] {
+    return this.getAllProjects().filter(project => project.status === status);
+  }
+
+  // Obtenir les projets publiés uniquement
+  getPublishedProjects(): SavedProject[] {
+    return this.getProjectsByStatus('published');
+  }
+
+  // Obtenir les brouillons
+  getDraftProjects(): SavedProject[] {
+    return this.getProjectsByStatus('draft');
+  }
+
+  // Obtenir les projets archivés
+  getArchivedProjects(): SavedProject[] {
+    return this.getProjectsByStatus('archived');
+  }
+
+  // Vérifier si un projet est accessible publiquement
+  isProjectPublic(id: string): boolean {
+    const project = this.getProject(id);
+    return project ? project.status === 'published' : false;
+  }
+
+  // Migration des projets existants pour ajouter le statut
+  migrateExistingProjects(): void {
+    const projects = this.getAllProjects();
+    let hasChanges = false;
+
+    const migratedProjects = projects.map(project => {
+      // Si le projet n'a pas de statut, l'ajouter
+      if (!project.status) {
+        hasChanges = true;
+        return {
+          ...project,
+          status: 'draft' as ProjectStatus // Projets existants en brouillon par défaut
+        };
+      }
+      return project;
+    });
+
+    if (hasChanges) {
+      localStorage.setItem(this.storageKey, JSON.stringify(migratedProjects));
+      console.log('Migration completed: Added status to existing projects');
     }
   }
 
@@ -163,4 +260,4 @@ class TemplateProjectService {
 }
 
 export const templateProjectService = new TemplateProjectService();
-export type { ZestyProjectData, SavedProject };
+export type { ZestyProjectData, SavedProject, ProjectStatus };

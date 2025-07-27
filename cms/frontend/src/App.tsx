@@ -36,6 +36,9 @@ import Layout from './components/Layout';
 import GlobalSearch from './components/search/GlobalSearch';
 import { Button } from '@/components/ui/button';
 import UnifiedPreview from './components/preview/UnifiedPreview';
+// Importer les services d'intégration
+import './services/publicProjectsService';
+import './api/projects';
 
 const queryClient = new QueryClient({
   defaultOptions: {

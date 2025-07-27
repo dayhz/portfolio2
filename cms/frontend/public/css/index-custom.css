@@ -1,0 +1,24 @@
+/* CSS spécifique à la page index */
+
+/* Corrections de visibilité pour les sections */
+.work_main_wrap,
+.work_main_grid_group *,
+.work_card,
+.work_main_title_group h2,
+.work_main_title_group p,
+.work_card_img,
+.brands_main_wrap,
+.brands_main_contain,
+.brands_main_group,
+.brands_main_group-item,
+.brands_main_group-img,
+.brands_hover_wrp,
+.brands_hover_group,
+[data-w-id="827198b6-df77-fff4-3db1-990da6656560"],
+.footer_main_wrap,
+.footer-text-group,
+[data-w-id="15828fe9-b698-9ed3-3a55-9a383fb763b2"],
+[fade-in] {
+  opacity: 1 !important;
+  visibility: visible !important;
+}

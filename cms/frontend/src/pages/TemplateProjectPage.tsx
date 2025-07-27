@@ -69,7 +69,8 @@ export const TemplateProjectPage: React.FC = () => {
     finalImage: '',
     textSection2: '',
     finalImage1: '',
-    finalImage2: ''
+    finalImage2: '',
+    status: 'draft' // Nouveau projet en brouillon par défaut
   });
 
   useEffect(() => {
