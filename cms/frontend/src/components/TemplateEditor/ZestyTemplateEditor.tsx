@@ -5,8 +5,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ImageUpload } from '@/components/ui/image-upload';
 import { templateProjectService, type ZestyProjectData } from '@/services/templateProjectService';
+import { ProjectShareService } from '@/services/projectShareService';
 import { ScopeSelector } from './ScopeSelector';
-import { Plus, Save, Eye, Upload } from 'lucide-react';
+import { Plus, Save, Eye, Upload, Share, ExternalLink } from 'lucide-react';
 
 
 
@@ -14,12 +15,14 @@ interface ZestyTemplateEditorProps {
   projectData: ZestyProjectData;
   onDataChange: (data: ZestyProjectData) => void;
   projectId?: string;
+  onPreview?: () => void;
 }
 
 export const ZestyTemplateEditor: React.FC<ZestyTemplateEditorProps> = ({ 
   projectData, 
   onDataChange,
-  projectId 
+  projectId,
+  onPreview 
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
@@ -38,26 +41,121 @@ export const ZestyTemplateEditor: React.FC<ZestyTemplateEditorProps> = ({
   };
 
   const saveProject = async () => {
+    // Validation des champs obligatoires
     if (!projectData.title.trim()) {
-      alert('Veuillez saisir un titre pour le projet.');
+      alert('⚠️ Veuillez saisir un titre pour le projet.');
       return;
     }
 
     if (!projectData.client.trim()) {
-      alert('Veuillez saisir le nom du client.');
+      alert('⚠️ Veuillez saisir le nom du client.');
       return;
     }
 
     setIsLoading(true);
     try {
+      console.log('Saving project data:', projectData);
       const savedProject = await templateProjectService.saveProject(projectData, projectId);
-      setLastSaved(new Date().toLocaleTimeString());
-      alert(`Projet "${savedProject.title}" sauvegardé avec succès !`);
+      setLastSaved(new Date().toLocaleTimeString('fr-FR'));
+      
+      // Notification de succès plus discrète
+      const notification = document.createElement('div');
+      notification.innerHTML = `✅ Projet "${savedProject.title}" sauvegardé !`;
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        z-index: 1000;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      `;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 3000);
+      
     } catch (error) {
       console.error('Error saving project:', error);
-      alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
+      alert('❌ Erreur lors de la sauvegarde. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const shareProject = async () => {
+    if (!projectData.title.trim()) {
+      alert('⚠️ Veuillez saisir un titre avant de partager.');
+      return;
+    }
+
+    try {
+      let shareUrl: string;
+      
+      // Si le projet est sauvegardé, utiliser l'ID
+      if (projectId) {
+        shareUrl = ProjectShareService.generateProjectURL(projectId);
+      } else {
+        // Sinon, encoder les données dans l'URL
+        shareUrl = ProjectShareService.generateDataURL(projectData);
+      }
+
+      // Copier dans le presse-papiers
+      const success = await ProjectShareService.copyToClipboard(shareUrl);
+      
+      if (success) {
+        // Notification de succès
+        const notification = document.createElement('div');
+        notification.innerHTML = `🔗 Lien de partage copié dans le presse-papiers !`;
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: #3b82f6;
+          color: white;
+          padding: 12px 20px;
+          border-radius: 8px;
+          z-index: 1000;
+          font-weight: 500;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => document.body.removeChild(notification), 3000);
+        
+        console.log('Share URL:', shareUrl);
+      } else {
+        // Fallback: afficher l'URL dans une modal
+        prompt('Copiez ce lien pour partager votre projet:', shareUrl);
+      }
+    } catch (error) {
+      console.error('Error sharing project:', error);
+      alert('❌ Erreur lors de la génération du lien de partage.');
+    }
+  };
+
+  const openInNewTab = () => {
+    if (!projectData.title.trim()) {
+      alert('⚠️ Veuillez saisir un titre avant d\'ouvrir l\'aperçu.');
+      return;
+    }
+
+    try {
+      let url: string;
+      
+      if (projectId) {
+        url = ProjectShareService.generateProjectURL(projectId);
+      } else {
+        url = ProjectShareService.generateDataURL(projectData);
+      }
+      
+      window.open(url, '_blank');
+    } catch (error) {
+      console.error('Error opening project:', error);
+      alert('❌ Erreur lors de l\'ouverture de l\'aperçu.');
     }
   };
 
@@ -78,9 +176,25 @@ export const ZestyTemplateEditor: React.FC<ZestyTemplateEditorProps> = ({
             <Save className="w-4 h-4 mr-2" />
             {isLoading ? 'Sauvegarde...' : 'Sauvegarder'}
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={onPreview}>
             <Eye className="w-4 h-4 mr-2" />
             Aperçu
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={shareProject}
+            title="Copier le lien de partage du projet"
+          >
+            <Share className="w-4 h-4 mr-2" />
+            Partager
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={openInNewTab}
+            title="Ouvrir le projet dans un nouvel onglet"
+          >
+            <ExternalLink className="w-4 h-4 mr-2" />
+            Ouvrir
           </Button>
         </div>
       </div>
@@ -455,6 +569,7 @@ const ImageUploadZone: React.FC<{
         )}
       </div>
       <ImageUpload
+        key={value || 'empty'} // Force re-render when value changes
         value={value}
         onChange={(value) => {
           if (typeof value === 'string') {

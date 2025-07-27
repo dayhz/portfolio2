@@ -149,6 +149,7 @@ export const TemplateProjectPage: React.FC = () => {
                 projectData={projectData}
                 onDataChange={setProjectData}
                 projectId={id !== 'new' ? id : undefined}
+                onPreview={() => setActiveTab('preview')}
               />
             </div>
           </TabsContent>

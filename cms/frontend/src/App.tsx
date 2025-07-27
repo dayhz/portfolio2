@@ -29,6 +29,8 @@ import { UniversalEditorTestPage } from './pages/UniversalEditorTestPage';
 import { ProjectPreviewPage } from './pages/ProjectPreviewPage';
 import { TemplateProjectPage } from './pages/TemplateProjectPage';
 import { TemplateProjectsListPage } from './pages/TemplateProjectsListPage';
+import { TemplatePreviewPage } from './pages/TemplatePreviewPage';
+import { DynamicProjectPage } from './pages/DynamicProjectPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import GlobalSearch from './components/search/GlobalSearch';
@@ -56,6 +58,9 @@ function App() {
                 <Routes>
                   <Route path="/login" element={<Login />} />
                   <Route path="/preview-project" element={<ProjectPreviewPage />} />
+                  {/* Routes publiques - SANS Layout CMS */}
+                  <Route path="/project/:id" element={<DynamicProjectPage />} />
+                  <Route path="/project" element={<DynamicProjectPage />} />
                   <Route path="/search" element={
                   <div className="min-h-screen bg-gray-50 p-8">
                     <div className="max-w-7xl mx-auto">
@@ -88,6 +93,7 @@ function App() {
                           <Route path="/template-projects" element={<TemplateProjectsListPage />} />
                           <Route path="/template-editor/new" element={<TemplateProjectPage />} />
                           <Route path="/template-editor/:id" element={<TemplateProjectPage />} />
+                          <Route path="/template-preview/:id" element={<TemplatePreviewPage />} />
                           <Route path="*" element={<Navigate to="/" replace />} />
                         </Routes>
                       </Layout>

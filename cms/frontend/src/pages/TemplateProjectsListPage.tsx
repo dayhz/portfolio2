@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { templateProjectService, type SavedProject } from '@/services/templateProjectService';
-import { Plus, Edit, Trash2, Copy, Download, Upload, Eye } from 'lucide-react';
+import { ProjectShareService } from '@/services/projectShareService';
+import { Plus, Edit, Trash2, Copy, Download, Upload, Eye, Share } from 'lucide-react';
 
 export const TemplateProjectsListPage: React.FC = () => {
   const [projects, setProjects] = useState<SavedProject[]>([]);
@@ -78,15 +79,33 @@ export const TemplateProjectsListPage: React.FC = () => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+        a.download = `projet_${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${new Date().toISOString().split('T')[0]}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        
+        // Notification de succès
+        const notification = document.createElement('div');
+        notification.innerHTML = `📥 Projet "${title}" exporté avec succès !`;
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: #3b82f6;
+          color: white;
+          padding: 12px 20px;
+          border-radius: 8px;
+          z-index: 1000;
+          font-weight: 500;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => document.body.removeChild(notification), 3000);
       }
     } catch (error) {
       console.error('Error exporting project:', error);
-      alert('Erreur lors de l\'export du projet.');
+      alert('❌ Erreur lors de l\'export du projet.');
     }
   };
 
@@ -103,16 +122,67 @@ export const TemplateProjectsListPage: React.FC = () => {
             const jsonData = e.target?.result as string;
             const importedProject = templateProjectService.importProject(jsonData);
             loadProjects();
-            alert(`Projet "${importedProject.title}" importé avec succès !`);
+            
+            // Notification de succès
+            const notification = document.createElement('div');
+            notification.innerHTML = `📤 Projet "${importedProject.title}" importé avec succès !`;
+            notification.style.cssText = `
+              position: fixed;
+              top: 20px;
+              right: 20px;
+              background: #10b981;
+              color: white;
+              padding: 12px 20px;
+              border-radius: 8px;
+              z-index: 1000;
+              font-weight: 500;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => document.body.removeChild(notification), 3000);
+            
           } catch (error) {
             console.error('Error importing project:', error);
-            alert('Erreur lors de l\'import du projet. Vérifiez le format du fichier.');
+            alert('❌ Erreur lors de l\'import du projet. Vérifiez le format du fichier.');
           }
         };
         reader.readAsText(file);
       }
     };
     input.click();
+  };
+
+  const handleShareProject = async (id: string, title: string) => {
+    try {
+      const shareUrl = ProjectShareService.generateProjectURL(id);
+      const success = await ProjectShareService.copyToClipboard(shareUrl);
+      
+      if (success) {
+        // Notification de succès
+        const notification = document.createElement('div');
+        notification.innerHTML = `🔗 Lien de partage pour "${title}" copié !`;
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: #3b82f6;
+          color: white;
+          padding: 12px 20px;
+          border-radius: 8px;
+          z-index: 1000;
+          font-weight: 500;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        `;
+        document.body.appendChild(notification);
+        setTimeout(() => document.body.removeChild(notification), 3000);
+      } else {
+        // Fallback
+        prompt('Copiez ce lien pour partager le projet:', shareUrl);
+      }
+    } catch (error) {
+      console.error('Error sharing project:', error);
+      alert('❌ Erreur lors de la génération du lien de partage.');
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -144,7 +214,11 @@ export const TemplateProjectsListPage: React.FC = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleImportProject}>
+          <Button 
+            variant="outline" 
+            onClick={handleImportProject}
+            title="Importer un projet depuis un fichier JSON"
+          >
             <Upload className="w-4 h-4 mr-2" />
             Importer
           </Button>
@@ -250,6 +324,7 @@ export const TemplateProjectsListPage: React.FC = () => {
                       size="sm"
                       variant="outline"
                       onClick={() => handlePreviewProject(project.id)}
+                      title="Voir l'aperçu du projet"
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
@@ -257,6 +332,7 @@ export const TemplateProjectsListPage: React.FC = () => {
                       size="sm"
                       variant="outline"
                       onClick={() => handleDuplicateProject(project.id)}
+                      title="Dupliquer ce projet"
                     >
                       <Copy className="w-4 h-4" />
                     </Button>
@@ -264,8 +340,17 @@ export const TemplateProjectsListPage: React.FC = () => {
                       size="sm"
                       variant="outline"
                       onClick={() => handleExportProject(project.id, project.title)}
+                      title="Télécharger le projet en JSON"
                     >
                       <Download className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleShareProject(project.id, project.title)}
+                      title="Partager le projet"
+                    >
+                      <Share className="w-4 h-4" />
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
