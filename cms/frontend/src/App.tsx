@@ -28,6 +28,7 @@ import AboutPage from './pages/AboutPage';
 import { UniversalEditorTestPage } from './pages/UniversalEditorTestPage';
 import { ProjectPreviewPage } from './pages/ProjectPreviewPage';
 import { TemplateProjectPage } from './pages/TemplateProjectPage';
+import { TemplateProjectsListPage } from './pages/TemplateProjectsListPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import GlobalSearch from './components/search/GlobalSearch';
@@ -84,7 +85,8 @@ function App() {
                           <Route path="/media" element={<MediaPage />} />
                           <Route path="/about" element={<AboutPage />} />
                           <Route path="/test-editor" element={<UniversalEditorTestPage />} />
-                          <Route path="/template-editor" element={<TemplateProjectPage />} />
+                          <Route path="/template-projects" element={<TemplateProjectsListPage />} />
+                          <Route path="/template-editor/new" element={<TemplateProjectPage />} />
                           <Route path="/template-editor/:id" element={<TemplateProjectPage />} />
                           <Route path="*" element={<Navigate to="/" replace />} />
                         </Routes>

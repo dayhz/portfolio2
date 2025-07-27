@@ -3,111 +3,79 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ImageUpload } from '@/components/ui/image-upload';
+import { templateProjectService, type ZestyProjectData } from '@/services/templateProjectService';
 import { Plus, Save, Eye, Upload } from 'lucide-react';
 
-interface ZestyProjectData {
-  // Header section
-  title: string;
-  heroImage: string;
-  
-  // About section
-  challenge: string;
-  approach: string;
-  
-  // Project info
-  client: string;
-  year: string;
-  duration: string;
-  type: string;
-  industry: string;
-  scope: string[];
-  
-  // Content images (exact positions from template)
-  image1: string; // First full-width image
-  textSection1: string; // Text between images
-  image2: string; // Second full-width image
-  image3: string; // First image in grid
-  image4: string; // Second image in grid
-  video1: string; // First video
-  video1Poster: string;
-  video2: string; // Second video
-  video2Poster: string;
-  
-  // Testimonial
-  testimonialQuote: string;
-  testimonialAuthor: string;
-  testimonialRole: string;
-  testimonialImage: string;
-  
-  // Final images
-  finalImage: string; // Big final image
-  textSection2: string; // Final text section
-  finalImage1: string; // Last section image 1
-  finalImage2: string; // Last section image 2
+
+
+interface ZestyTemplateEditorProps {
+  projectData: ZestyProjectData;
+  onDataChange: (data: ZestyProjectData) => void;
+  projectId?: string;
 }
 
-export const ZestyTemplateEditor: React.FC = () => {
-  const [projectData, setProjectData] = useState<ZestyProjectData>({
-    title: '',
-    heroImage: '',
-    challenge: '',
-    approach: '',
-    client: '',
-    year: new Date().getFullYear().toString(),
-    duration: '',
-    type: '',
-    industry: '',
-    scope: [],
-    image1: '',
-    textSection1: '',
-    image2: '',
-    image3: '',
-    image4: '',
-    video1: '',
-    video1Poster: '',
-    video2: '',
-    video2Poster: '',
-    testimonialQuote: '',
-    testimonialAuthor: '',
-    testimonialRole: '',
-    testimonialImage: '',
-    finalImage: '',
-    textSection2: '',
-    finalImage1: '',
-    finalImage2: ''
-  });
-
+export const ZestyTemplateEditor: React.FC<ZestyTemplateEditorProps> = ({ 
+  projectData, 
+  onDataChange,
+  projectId 
+}) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [lastSaved, setLastSaved] = useState<string | null>(null);
 
   const updateField = (field: keyof ZestyProjectData, value: string) => {
-    setProjectData(prev => ({ ...prev, [field]: value }));
+    const newData = { ...projectData, [field]: value };
+    onDataChange(newData);
   };
 
   const updateScope = (scopeText: string) => {
-    setProjectData(prev => ({ 
-      ...prev, 
+    const newData = { 
+      ...projectData, 
       scope: scopeText.split('\n').filter(s => s.trim()) 
-    }));
+    };
+    onDataChange(newData);
   };
 
   const saveProject = async () => {
+    if (!projectData.title.trim()) {
+      alert('Veuillez saisir un titre pour le projet.');
+      return;
+    }
+
+    if (!projectData.client.trim()) {
+      alert('Veuillez saisir le nom du client.');
+      return;
+    }
+
     setIsLoading(true);
-    // Simulate save
-    setTimeout(() => {
+    try {
+      const savedProject = await templateProjectService.saveProject(projectData, projectId);
+      setLastSaved(new Date().toLocaleTimeString());
+      alert(`Projet "${savedProject.title}" sauvegardé avec succès !`);
+    } catch (error) {
+      console.error('Error saving project:', error);
+      alert('Erreur lors de la sauvegarde. Veuillez réessayer.');
+    } finally {
       setIsLoading(false);
-      alert('Projet sauvegardé !');
-    }, 1000);
+    }
   };
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Éditeur Template Zesty</h1>
+        <div>
+          <h1 className="text-2xl font-bold">Éditeur Template Zesty</h1>
+          {lastSaved && (
+            <p className="text-sm text-gray-500 mt-1">
+              Dernière sauvegarde : {lastSaved}
+            </p>
+          )}
+        </div>
         <div className="flex gap-2">
           <Button onClick={saveProject} disabled={isLoading}>
             <Save className="w-4 h-4 mr-2" />
-            Sauvegarder
+            {isLoading ? 'Sauvegarde...' : 'Sauvegarder'}
           </Button>
           <Button variant="outline">
             <Eye className="w-4 h-4 mr-2" />
@@ -464,7 +432,7 @@ export const ZestyTemplateEditor: React.FC = () => {
   );
 };
 
-// Composant pour l'upload d'images
+// Composant pour l'upload d'images utilisant le système existant
 const ImageUploadZone: React.FC<{
   value: string;
   onChange: (src: string) => void;
@@ -472,58 +440,35 @@ const ImageUploadZone: React.FC<{
   dimensions?: string;
   format?: string;
 }> = ({ value, onChange, label, dimensions, format }) => {
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      onChange(url);
-    }
+  const handleRemove = () => {
+    onChange('');
   };
 
   return (
-    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[200px]">
-      {value ? (
-        <div className="relative">
-          <img src={value} alt={label} className="max-h-48 mx-auto rounded" />
-          <div className="flex gap-2 mt-2 justify-center">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onChange('')}
-            >
-              Supprimer
-            </Button>
-            <label htmlFor={`upload-${label}`} className="cursor-pointer">
-              <Button variant="outline" size="sm" type="button">
-                Remplacer
-              </Button>
-            </label>
-          </div>
-        </div>
-      ) : (
-        <div className="text-center flex flex-col items-center justify-center h-full">
-          <Plus className="w-12 h-12 text-gray-400 mb-2" />
-          <p className="text-gray-500 mb-2 font-medium">{label}</p>
-          {dimensions && (
-            <p className="text-xs text-gray-400 mb-1">📐 {dimensions}</p>
-          )}
-          {format && (
-            <p className="text-xs text-gray-400 mb-3">📄 {format}</p>
-          )}
-          <label htmlFor={`upload-${label}`} className="cursor-pointer">
-            <Button variant="outline" type="button">
-              <Upload className="w-4 h-4 mr-2" />
-              Ajouter Image
-            </Button>
-          </label>
-        </div>
-      )}
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleFileUpload}
-        className="hidden"
-        id={`upload-${label}`}
+    <div className="space-y-2">
+      <div className="text-center">
+        <p className="text-sm font-medium text-gray-700 mb-1">{label}</p>
+        {dimensions && (
+          <p className="text-xs text-gray-500 mb-1">📐 {dimensions}</p>
+        )}
+        {format && (
+          <p className="text-xs text-gray-500 mb-2">📄 {format}</p>
+        )}
+      </div>
+      <ImageUpload
+        value={value}
+        onChange={(value) => {
+          if (typeof value === 'string') {
+            onChange(value);
+          } else {
+            // Si c'est un File, créer une URL temporaire
+            const url = URL.createObjectURL(value);
+            onChange(url);
+          }
+        }}
+        onRemove={handleRemove}
+        placeholder={`Glissez ${label.toLowerCase()} ici ou cliquez pour parcourir`}
+        className="min-h-[200px]"
       />
     </div>
   );
@@ -541,88 +486,152 @@ const VideoUploadZone: React.FC<{
   videoFormat?: string;
   posterFormat?: string;
 }> = ({ videoSrc, posterSrc, onVideoChange, onPosterChange, label, videoDimensions, posterDimensions, videoFormat, posterFormat }) => {
-  const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      onVideoChange(url);
+  const handleVideoUpload = async (file: File) => {
+    try {
+      // Créer une URL temporaire pour l'aperçu immédiat
+      const tempUrl = URL.createObjectURL(file);
+      onVideoChange(tempUrl);
+      
+      // TODO: Implémenter l'upload vers le serveur
+      // const formData = new FormData();
+      // formData.append('file', file);
+      // const response = await axiosInstance.post('/media/video', formData);
+      // onVideoChange(response.data.url);
+    } catch (error) {
+      console.error('Error uploading video:', error);
+      alert('Erreur lors de l\'upload de la vidéo. Veuillez réessayer.');
     }
   };
 
-  const handlePosterUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePosterUpload = async (file: File) => {
+    try {
+      // Créer une URL temporaire pour l'aperçu immédiat
+      const tempUrl = URL.createObjectURL(file);
+      onPosterChange(tempUrl);
+      
+      // TODO: Implémenter l'upload vers le serveur
+      // const formData = new FormData();
+      // formData.append('file', file);
+      // const response = await axiosInstance.post('/media', formData);
+      // onPosterChange(response.data.url);
+    } catch (error) {
+      console.error('Error uploading poster:', error);
+      alert('Erreur lors de l\'upload du poster. Veuillez réessayer.');
+    }
+  };
+
+  const handleVideoFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      onPosterChange(url);
+    if (file && file.type.startsWith('video/')) {
+      handleVideoUpload(file);
+    }
+  };
+
+  const handlePosterFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      handlePosterUpload(file);
     }
   };
 
   return (
-    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[200px]">
-      {videoSrc ? (
-        <div className="relative">
-          <video 
-            src={videoSrc} 
-            poster={posterSrc}
-            className="max-h-48 mx-auto rounded"
-            controls
-          />
-          <div className="flex gap-2 mt-2 justify-center">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onVideoChange('')}
-            >
-              Supprimer
-            </Button>
+    <div className="space-y-4">
+      <div className="text-center">
+        <p className="text-sm font-medium text-gray-700 mb-1">{label}</p>
+        {videoDimensions && (
+          <div className="text-xs text-gray-500 mb-2">
+            <p>🎥 Vidéo: {videoDimensions}</p>
+            <p>🖼️ Poster: {posterDimensions}</p>
           </div>
-        </div>
-      ) : (
-        <div className="text-center flex flex-col items-center justify-center h-full">
-          <Plus className="w-12 h-12 text-gray-400 mb-2" />
-          <p className="text-gray-500 mb-2 font-medium">{label}</p>
-          {videoDimensions && (
-            <div className="text-xs text-gray-400 mb-2">
-              <p>🎥 Vidéo: {videoDimensions}</p>
-              <p>🖼️ Poster: {posterDimensions}</p>
+        )}
+        {videoFormat && (
+          <div className="text-xs text-gray-500 mb-2">
+            <p>📄 Vidéo: {videoFormat}</p>
+            <p>📄 Poster: {posterFormat}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Video Upload */}
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[200px]">
+        {videoSrc ? (
+          <div className="relative">
+            <video 
+              src={videoSrc} 
+              poster={posterSrc}
+              className="max-h-48 mx-auto rounded"
+              controls
+            />
+            <div className="flex gap-2 mt-2 justify-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onVideoChange('')}
+              >
+                Supprimer Vidéo
+              </Button>
             </div>
-          )}
-          {videoFormat && (
-            <div className="text-xs text-gray-400 mb-3">
-              <p>📄 Vidéo: {videoFormat}</p>
-              <p>📄 Poster: {posterFormat}</p>
-            </div>
-          )}
-          <div className="flex gap-2">
+          </div>
+        ) : (
+          <div className="text-center flex flex-col items-center justify-center h-full">
+            <Plus className="w-12 h-12 text-gray-400 mb-2" />
+            <p className="text-gray-500 mb-2 font-medium">Vidéo</p>
             <label htmlFor={`upload-video-${label}`} className="cursor-pointer">
               <Button variant="outline" type="button">
                 <Upload className="w-4 h-4 mr-2" />
-                Vidéo
-              </Button>
-            </label>
-            <label htmlFor={`upload-poster-${label}`} className="cursor-pointer">
-              <Button variant="outline" type="button">
-                <Upload className="w-4 h-4 mr-2" />
-                Poster
+                Ajouter Vidéo
               </Button>
             </label>
           </div>
-        </div>
-      )}
-      <input
-        type="file"
-        accept="video/*"
-        onChange={handleVideoUpload}
-        className="hidden"
-        id={`upload-video-${label}`}
-      />
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handlePosterUpload}
-        className="hidden"
-        id={`upload-poster-${label}`}
-      />
+        )}
+        <input
+          type="file"
+          accept="video/*"
+          onChange={handleVideoFileSelect}
+          className="hidden"
+          id={`upload-video-${label}`}
+        />
+      </div>
+
+      {/* Poster Upload */}
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[150px]">
+        {posterSrc ? (
+          <div className="relative">
+            <img 
+              src={posterSrc} 
+              alt="Poster"
+              className="max-h-32 mx-auto rounded"
+            />
+            <div className="flex gap-2 mt-2 justify-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPosterChange('')}
+              >
+                Supprimer Poster
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center flex flex-col items-center justify-center h-full">
+            <Plus className="w-8 h-8 text-gray-400 mb-2" />
+            <p className="text-gray-500 mb-2 text-sm">Poster (optionnel)</p>
+            <label htmlFor={`upload-poster-${label}`} className="cursor-pointer">
+              <Button variant="outline" size="sm" type="button">
+                <Upload className="w-4 h-4 mr-2" />
+                Ajouter Poster
+              </Button>
+            </label>
+          </div>
+        )}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handlePosterFileSelect}
+          className="hidden"
+          id={`upload-poster-${label}`}
+        />
+      </div>
     </div>
   );
 };
