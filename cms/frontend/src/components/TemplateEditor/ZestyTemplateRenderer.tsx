@@ -253,7 +253,7 @@ const VideoWithFallback: React.FC<{
   const [hasPosterError, setHasPosterError] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [isVideoLoading, setIsVideoLoading] = useState(true);
+  const [isVideoLoading, setIsVideoLoading] = useState(Boolean(src || fallbackSrc));
   const [videoRetryCount, setVideoRetryCount] = useState(0);
   const [posterRetryCount, setPosterRetryCount] = useState(0);
   const maxRetries = 2;
@@ -902,19 +902,21 @@ const SafeZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = memo(({
             {/* First Video Section */}
             <div className="section" data-wf-template-section-image-variant="16-9">
               <div className="u-container">
-                <div className="temp-img_container">
-                  <div className="temp-img">
-                    <div className="img-wrp">
-                      <VideoWithFallback
-                        src={getContent('video1')}
-                        fallbackSrc={defaultContent.video1}
-                        posterSrc={getContent('video1Poster')}
-                        fallbackPosterSrc={defaultContent.video1Poster}
-                        className="video"
-                      />
+                {getContent('video1') && (
+                  <div className="temp-img_container">
+                    <div className="temp-img">
+                      <div className="img-wrp">
+                        <VideoWithFallback
+                          src={getContent('video1')}
+                          fallbackSrc={defaultContent.video1}
+                          posterSrc={getContent('video1Poster')}
+                          fallbackPosterSrc={defaultContent.video1Poster}
+                          className="video"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
 
@@ -922,23 +924,25 @@ const SafeZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = memo(({
             <div className="g_section_space w-variant-41fc0c0a-cac3-53c9-9802-6a916e3fb342" data-wf-global-section-space-section-space="even" />
             
             {/* Second Video Section */}
-            <div className="section" data-wf-template-section-image-variant="16-9">
-              <div className="u-container">
-                <div className="temp-img_container">
-                  <div className="temp-img">
-                    <div className="img-wrp">
-                      <VideoWithFallback
-                        src={getContent('video2')}
-                        fallbackSrc={defaultContent.video2}
-                        posterSrc={getContent('video2Poster')}
-                        fallbackPosterSrc={defaultContent.video2Poster}
-                        className="video"
-                      />
+            {getContent('video2') && (
+              <div className="section" data-wf-template-section-image-variant="16-9">
+                <div className="u-container">
+                  <div className="temp-img_container">
+                    <div className="temp-img">
+                      <div className="img-wrp">
+                        <VideoWithFallback
+                          src={getContent('video2')}
+                          fallbackSrc={defaultContent.video2}
+                          posterSrc={getContent('video2Poster')}
+                          fallbackPosterSrc={defaultContent.video2Poster}
+                          className="video"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Section Spacing */}
             <div className="g_section_space w-variant-79f7fa3e-4b02-eadb-022d-938b45476c54" data-wf-global-section-space-section-space="200-128" />
@@ -1009,24 +1013,7 @@ const SafeZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = memo(({
             {/* Section Spacing */}
             <div className="g_section_space w-variant-8cc18b30-4618-8767-0111-f6abfe45aaa3" data-wf-global-section-space-section-space="120-72" />
             
-            {/* Third Video Section */}
-            <div className="section" data-wf-template-section-image-variant="16-9">
-              <div className="u-container">
-                <div className="temp-img_container">
-                  <div className="temp-img">
-                    <div className="img-wrp">
-                      <VideoWithFallback
-                        src={getContent('video3')}
-                        fallbackSrc={defaultContent.video3}
-                        posterSrc={getContent('video3Poster')}
-                        fallbackPosterSrc={defaultContent.video3Poster}
-                        className="video"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+
 
             {/* Section Spacing */}
             <div className="g_section_space w-variant-41fc0c0a-cac3-53c9-9802-6a916e3fb342" data-wf-global-section-space-section-space="even" />
