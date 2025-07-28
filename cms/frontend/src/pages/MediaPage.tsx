@@ -50,6 +50,7 @@ export default function MediaPage() {
   const [imageCount, setImageCount] = useState(0);
   const [videoCount, setVideoCount] = useState(0);
   const [totalSize, setTotalSize] = useState(0);
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   
   const { get, delete: deleteRequest } = useApi();
   
@@ -166,14 +167,23 @@ export default function MediaPage() {
   };
 
   const handleUpload = () => {
+    console.log('handleUpload called');
+    
     // Créer un élément input de type file invisible
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*,video/*';
     input.multiple = false;
+    input.style.display = 'none';
+    
+    // Ajouter l'input au DOM pour Safari
+    document.body.appendChild(input);
+    
+    console.log('Input created, setting up onchange handler');
     
     // Gérer la sélection de fichier
     input.onchange = async (e) => {
+      console.log('File input changed, files:', (e.target as HTMLInputElement).files);
       const files = (e.target as HTMLInputElement).files;
       if (files && files.length > 0) {
         const file = files[0];
@@ -214,6 +224,9 @@ export default function MediaPage() {
             id: `upload-${file.name}` // Identifiant unique pour éviter les doublons
           });
           
+          // Fermer la boîte de dialogue
+          setIsUploadDialogOpen(false);
+          
           // Attendre un peu plus longtemps avant de rafraîchir la liste
           setTimeout(() => {
             fetchMedia();
@@ -224,11 +237,17 @@ export default function MediaPage() {
         } finally {
           setIsUploading(false);
           setSelectedFile(null);
+          // Nettoyer l'input du DOM
+          document.body.removeChild(input);
         }
+      } else {
+        // Nettoyer l'input du DOM si aucun fichier sélectionné
+        document.body.removeChild(input);
       }
     };
     
     // Déclencher le clic sur l'input
+    console.log('Triggering input click');
     input.click();
   };
   
@@ -436,7 +455,7 @@ export default function MediaPage() {
             </Button>
           </div>
         </div>
-        <Dialog>
+        <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
           <DialogTrigger asChild>
             <Button>
               <Upload size="small" primaryColor="#ffffff" />
@@ -583,7 +602,7 @@ export default function MediaPage() {
                 {searchTerm ? 'Aucun résultat pour votre recherche.' : 'Commencez par uploader des fichiers.'}
               </p>
               <div className="mt-6">
-                <Dialog>
+                <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
                   <DialogTrigger asChild>
                     <Button>
                       <Upload size="small" primaryColor="#ffffff" />
