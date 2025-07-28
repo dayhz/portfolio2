@@ -86,7 +86,7 @@ router.post('/', uploadMedia.single('file'), async (req, res) => {
 
     // Générer les URLs
     const uploadDir = process.env.UPLOAD_DIR || 'uploads';
-    // Utiliser des URLs relatives pour éviter les problèmes CORS
+    // Utiliser une URL relative qui sera accessible via le proxy Vite
     const url = `/${uploadDir}/${file.filename}`;
     
     console.log(`URL générée: ${url}`);
@@ -107,27 +107,7 @@ router.post('/', uploadMedia.single('file'), async (req, res) => {
       }
     });
 
-    // Copier le fichier vers le répertoire public
-    try {
-      const sourceDir = path.join(process.cwd(), uploadDir);
-      const targetDir = path.join(process.cwd(), '../frontend/public/uploads');
-      
-      // Créer le répertoire cible s'il n'existe pas
-      if (!fsSync.existsSync(targetDir)) {
-        await fs.mkdir(targetDir, { recursive: true });
-        console.log(`Répertoire créé: ${targetDir}`);
-      }
-      
-      // Copier le fichier
-      const sourcePath = path.join(sourceDir, file.filename);
-      const targetPath = path.join(targetDir, file.filename);
-      
-      await fs.copyFile(sourcePath, targetPath);
-      console.log(`Fichier copié: ${file.filename}`);
-    } catch (syncError) {
-      console.error('Error copying file:', syncError);
-      // Ne pas bloquer la réponse en cas d'erreur de copie
-    }
+    console.log(`Fichier sauvegardé: ${file.filename} -> ${url}`);
 
     res.status(201).json(media);
   } catch (error) {

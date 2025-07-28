@@ -7,35 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { templateProjectService, type ZestyProjectData } from '@/services/templateProjectService';
 import { ArrowLeft } from 'lucide-react';
 
-interface ZestyProjectData {
-  title: string;
-  heroImage: string;
-  challenge: string;
-  approach: string;
-  client: string;
-  year: string;
-  duration: string;
-  type: string;
-  industry: string;
-  scope: string[];
-  image1: string;
-  textSection1: string;
-  image2: string;
-  image3: string;
-  image4: string;
-  video1: string;
-  video1Poster: string;
-  video2: string;
-  video2Poster: string;
-  testimonialQuote: string;
-  testimonialAuthor: string;
-  testimonialRole: string;
-  testimonialImage: string;
-  finalImage: string;
-  textSection2: string;
-  finalImage1: string;
-  finalImage2: string;
-}
+
 
 export const TemplateProjectPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -70,7 +42,7 @@ export const TemplateProjectPage: React.FC = () => {
     textSection2: '',
     finalImage1: '',
     finalImage2: '',
-    status: 'draft' // Nouveau projet en brouillon par défaut
+    status: 'draft' as const // Nouveau projet en brouillon par défaut
   });
 
   useEffect(() => {
@@ -84,7 +56,7 @@ export const TemplateProjectPage: React.FC = () => {
   const loadProject = async (projectId: string) => {
     try {
       setIsLoading(true);
-      const project = templateProjectService.getProject(projectId);
+      const project = await templateProjectService.getProject(projectId);
       if (project) {
         const { id: _, createdAt: __, updatedAt: ___, ...projectData } = project;
         setProjectData(projectData);

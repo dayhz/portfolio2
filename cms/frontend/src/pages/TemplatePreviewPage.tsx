@@ -20,7 +20,7 @@ export const TemplatePreviewPage: React.FC = () => {
   const loadProject = async (projectId: string) => {
     try {
       setIsLoading(true);
-      const project = templateProjectService.getProject(projectId);
+      const project = await templateProjectService.getProject(projectId);
       if (project) {
         const { id: _, createdAt: __, updatedAt: ___, ...projectData } = project;
         setProjectData(projectData);
@@ -46,30 +46,10 @@ export const TemplatePreviewPage: React.FC = () => {
   };
 
   const handleOpenInNewTab = () => {
-    // Ouvrir l'aperçu dans un nouvel onglet (pour une vue plein écran)
-    const newWindow = window.open('', '_blank');
-    if (newWindow && projectData) {
-      newWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>${projectData.title} - Aperçu</title>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <style>
-              body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-            </style>
-          </head>
-          <body>
-            <div id="preview-content">Chargement de l'aperçu...</div>
-            <script>
-              // Ici on pourrait injecter le HTML généré du template
-              document.getElementById('preview-content').innerHTML = 'Aperçu du projet: ${projectData.title}';
-            </script>
-          </body>
-        </html>
-      `);
-      newWindow.document.close();
+    // Ouvrir l'aperçu dans un nouvel onglet via la route dynamique
+    if (id) {
+      const url = `/project/${id}`;
+      window.open(url, '_blank');
     }
   };
 

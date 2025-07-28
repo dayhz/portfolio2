@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,10 +26,68 @@ export const ZestyTemplateEditor: React.FC<ZestyTemplateEditorProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sauvegarde automatique toutes les 30 secondes si il y a des changements
+  useEffect(() => {
+    if (hasUnsavedChanges && projectId) {
+      // Annuler le timeout précédent
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+      
+      // Programmer une sauvegarde automatique dans 30 secondes
+      autoSaveTimeoutRef.current = setTimeout(() => {
+        autoSave();
+      }, 30000); // 30 secondes
+    }
+
+    return () => {
+      if (autoSaveTimeoutRef.current) {
+        clearTimeout(autoSaveTimeoutRef.current);
+      }
+    };
+  }, [hasUnsavedChanges, projectData, projectId]);
+
+  const autoSave = async () => {
+    if (!hasUnsavedChanges || !projectId) return;
+    
+    try {
+      await templateProjectService.saveProject(projectData, projectId);
+      setLastSaved(new Date().toLocaleTimeString('fr-FR'));
+      setHasUnsavedChanges(false);
+      
+      // Notification discrète de sauvegarde automatique
+      const notification = document.createElement('div');
+      notification.innerHTML = `💾 Sauvegarde automatique effectuée`;
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #6b7280;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        z-index: 1000;
+        font-size: 14px;
+        opacity: 0.9;
+      `;
+      document.body.appendChild(notification);
+      setTimeout(() => {
+        if (document.body.contains(notification)) {
+          document.body.removeChild(notification);
+        }
+      }, 2000);
+    } catch (error) {
+      console.error('Auto-save failed:', error);
+    }
+  };
 
   const updateField = (field: keyof ZestyProjectData, value: string) => {
     const newData = { ...projectData, [field]: value };
     onDataChange(newData);
+    setHasUnsavedChanges(true); // Marquer comme ayant des changements non sauvegardés
   };
 
   const updateScope = (scopes: string[]) => {
@@ -57,6 +115,7 @@ export const ZestyTemplateEditor: React.FC<ZestyTemplateEditorProps> = ({
       console.log('Saving project data:', projectData);
       const savedProject = await templateProjectService.saveProject(projectData, projectId);
       setLastSaved(new Date().toLocaleTimeString('fr-FR'));
+      setHasUnsavedChanges(false); // Réinitialiser le flag de changements
       
       // Notification de succès plus discrète
       const notification = document.createElement('div');
@@ -168,6 +227,9 @@ export const ZestyTemplateEditor: React.FC<ZestyTemplateEditorProps> = ({
           {lastSaved && (
             <p className="text-sm text-gray-500 mt-1">
               Dernière sauvegarde : {lastSaved}
+              {hasUnsavedChanges && (
+                <span className="ml-2 text-orange-500">• Modifications non sauvegardées</span>
+              )}
             </p>
           )}
         </div>
@@ -604,7 +666,7 @@ const VideoUploadZone: React.FC<{
   const videoInputRef = React.useRef<HTMLInputElement>(null);
   const posterInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVideoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       console.log('Video file selected:', file.name, file.type, file.size);
@@ -620,17 +682,46 @@ const VideoUploadZone: React.FC<{
       }
       
       try {
-        const url = URL.createObjectURL(file);
-        console.log('Video URL created:', url);
-        onVideoChange(url);
+        // Créer une URL temporaire pour l'aperçu immédiat
+        const tempUrl = URL.createObjectURL(file);
+        onVideoChange(tempUrl);
+        
+        // Uploader le fichier vers l'API media
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('name', file.name);
+        formData.append('description', `Vidéo pour ${label}`);
+        
+        console.log('Uploading video to media API...');
+        const response = await fetch('/api/media', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Upload failed: ${response.statusText}`);
+        }
+        
+        const mediaFile = await response.json();
+        console.log('Video uploaded successfully:', mediaFile);
+        
+        // Remplacer l'URL temporaire par l'URL permanente
+        // Ne pas révoquer immédiatement pour éviter les problèmes d'affichage
+        onVideoChange(mediaFile.url);
+        
+        // Révoquer l'URL temporaire après un délai pour laisser le temps au navigateur
+        setTimeout(() => {
+          URL.revokeObjectURL(tempUrl);
+        }, 1000);
+        
       } catch (error) {
-        console.error('Error creating video URL:', error);
-        alert('Erreur lors du chargement de la vidéo');
+        console.error('Error uploading video:', error);
+        alert('Erreur lors de l\'upload de la vidéo');
       }
     }
   };
 
-  const handlePosterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePosterChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       console.log('Poster file selected:', file.name, file.type);
@@ -641,11 +732,41 @@ const VideoUploadZone: React.FC<{
       }
       
       try {
-        const url = URL.createObjectURL(file);
-        onPosterChange(url);
+        // Créer une URL temporaire pour l'aperçu immédiat
+        const tempUrl = URL.createObjectURL(file);
+        onPosterChange(tempUrl);
+        
+        // Uploader le fichier vers l'API media
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('name', file.name);
+        formData.append('description', `Poster pour ${label}`);
+        
+        console.log('Uploading poster to media API...');
+        const response = await fetch('/api/media', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Upload failed: ${response.statusText}`);
+        }
+        
+        const mediaFile = await response.json();
+        console.log('Poster uploaded successfully:', mediaFile);
+        
+        // Remplacer l'URL temporaire par l'URL permanente
+        // Ne pas révoquer immédiatement pour éviter les problèmes d'affichage
+        onPosterChange(mediaFile.url);
+        
+        // Révoquer l'URL temporaire après un délai pour laisser le temps au navigateur
+        setTimeout(() => {
+          URL.revokeObjectURL(tempUrl);
+        }, 1000);
+        
       } catch (error) {
-        console.error('Error creating poster URL:', error);
-        alert('Erreur lors du chargement du poster');
+        console.error('Error uploading poster:', error);
+        alert('Erreur lors de l\'upload du poster');
       }
     }
   };

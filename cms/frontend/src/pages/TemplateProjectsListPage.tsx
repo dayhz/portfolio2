@@ -11,20 +11,60 @@ import { Plus, Edit, Trash2, Copy, Download, Upload, Eye, Share, CheckCircle, Cl
 export const TemplateProjectsListPage: React.FC = () => {
   const [projects, setProjects] = useState<SavedProject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUsingLocalStorage, setIsUsingLocalStorage] = useState(false);
   const navigate = useNavigate();
+
+  // Fonction utilitaire pour afficher les notifications
+  const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    // Supprimer les notifications existantes
+    const existingNotifications = document.querySelectorAll('.project-notification');
+    existingNotifications.forEach(notif => {
+      if (document.body.contains(notif)) {
+        document.body.removeChild(notif);
+      }
+    });
+
+    const colors = {
+      success: '#10b981',
+      error: '#ef4444',
+      info: '#3b82f6'
+    };
+
+    const notification = document.createElement('div');
+    notification.className = 'project-notification';
+    notification.innerHTML = message;
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${colors[type]};
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      z-index: 1000;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+    document.body.appendChild(notification);
+    setTimeout(() => {
+      if (document.body.contains(notification)) {
+        document.body.removeChild(notification);
+      }
+    }, 3000);
+  };
 
   useEffect(() => {
     loadProjects();
   }, []);
 
-  const loadProjects = () => {
+  const loadProjects = async () => {
     setIsLoading(true);
     try {
-      // Migration des projets existants pour ajouter le statut
-      templateProjectService.migrateExistingProjects();
-      
-      const allProjects = templateProjectService.getAllProjects();
+      const allProjects = await templateProjectService.getAllProjects();
       setProjects(allProjects.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()));
+      
+      // Vérifier si on utilise localStorage
+      setIsUsingLocalStorage((templateProjectService as any).useLocalStorage);
     } catch (error) {
       console.error('Error loading projects:', error);
     } finally {
@@ -46,37 +86,37 @@ export const TemplateProjectsListPage: React.FC = () => {
 
   const handleDeleteProject = async (id: string) => {
     try {
-      const success = templateProjectService.deleteProject(id);
+      const success = await templateProjectService.deleteProject(id);
       if (success) {
         loadProjects();
-        alert('Projet supprimé avec succès !');
+        showNotification('🗑️ Projet supprimé avec succès !', 'success');
       } else {
-        alert('Erreur lors de la suppression du projet.');
+        showNotification('❌ Erreur lors de la suppression du projet.', 'error');
       }
     } catch (error) {
       console.error('Error deleting project:', error);
-      alert('Erreur lors de la suppression du projet.');
+      showNotification('❌ Erreur lors de la suppression du projet.', 'error');
     }
   };
 
   const handleDuplicateProject = async (id: string) => {
     try {
-      const duplicatedProject = templateProjectService.duplicateProject(id);
+      const duplicatedProject = await templateProjectService.duplicateProject(id);
       if (duplicatedProject) {
         loadProjects();
-        alert(`Projet "${duplicatedProject.title}" dupliqué avec succès !`);
+        showNotification(`📋 Projet "${duplicatedProject.title}" dupliqué avec succès !`, 'success');
       } else {
-        alert('Erreur lors de la duplication du projet.');
+        showNotification('❌ Erreur lors de la duplication du projet.', 'error');
       }
     } catch (error) {
       console.error('Error duplicating project:', error);
-      alert('Erreur lors de la duplication du projet.');
+      showNotification('❌ Erreur lors de la duplication du projet.', 'error');
     }
   };
 
-  const handleExportProject = (id: string, title: string) => {
+  const handleExportProject = async (id: string, title: string) => {
     try {
-      const jsonData = templateProjectService.exportProject(id);
+      const jsonData = await templateProjectService.exportProject(id);
       if (jsonData) {
         const blob = new Blob([jsonData], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -88,27 +128,11 @@ export const TemplateProjectsListPage: React.FC = () => {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        // Notification de succès
-        const notification = document.createElement('div');
-        notification.innerHTML = `📥 Projet "${title}" exporté avec succès !`;
-        notification.style.cssText = `
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          background: #3b82f6;
-          color: white;
-          padding: 12px 20px;
-          border-radius: 8px;
-          z-index: 1000;
-          font-weight: 500;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        `;
-        document.body.appendChild(notification);
-        setTimeout(() => document.body.removeChild(notification), 3000);
+        showNotification(`📥 Projet "${title}" exporté avec succès !`, 'info');
       }
     } catch (error) {
       console.error('Error exporting project:', error);
-      alert('❌ Erreur lors de l\'export du projet.');
+      showNotification('❌ Erreur lors de l\'export du projet.', 'error');
     }
   };
 
@@ -120,33 +144,17 @@ export const TemplateProjectsListPage: React.FC = () => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           try {
             const jsonData = e.target?.result as string;
-            const importedProject = templateProjectService.importProject(jsonData);
+            const importedProject = await templateProjectService.importProject(jsonData);
             loadProjects();
             
-            // Notification de succès
-            const notification = document.createElement('div');
-            notification.innerHTML = `📤 Projet "${importedProject.title}" importé avec succès !`;
-            notification.style.cssText = `
-              position: fixed;
-              top: 20px;
-              right: 20px;
-              background: #10b981;
-              color: white;
-              padding: 12px 20px;
-              border-radius: 8px;
-              z-index: 1000;
-              font-weight: 500;
-              box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            `;
-            document.body.appendChild(notification);
-            setTimeout(() => document.body.removeChild(notification), 3000);
+            showNotification(`📤 Projet "${importedProject.title}" importé avec succès !`, 'success');
             
           } catch (error) {
             console.error('Error importing project:', error);
-            alert('❌ Erreur lors de l\'import du projet. Vérifiez le format du fichier.');
+            showNotification('❌ Erreur lors de l\'import du projet. Vérifiez le format du fichier.', 'error');
           }
         };
         reader.readAsText(file);
@@ -158,9 +166,9 @@ export const TemplateProjectsListPage: React.FC = () => {
   const handleShareProject = async (id: string, title: string) => {
     try {
       // Vérifier si le projet est publié
-      const project = templateProjectService.getProject(id);
+      const project = await templateProjectService.getProject(id);
       if (!project || project.status !== 'published') {
-        alert('⚠️ Ce projet doit être publié avant d\'être partagé.');
+        showNotification('⚠️ Ce projet doit être publié avant d\'être partagé.', 'error');
         return;
       }
 
@@ -168,36 +176,20 @@ export const TemplateProjectsListPage: React.FC = () => {
       const success = await ProjectShareService.copyToClipboard(shareUrl);
       
       if (success) {
-        // Notification de succès
-        const notification = document.createElement('div');
-        notification.innerHTML = `🔗 Lien de partage pour "${title}" copié !`;
-        notification.style.cssText = `
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          background: #3b82f6;
-          color: white;
-          padding: 12px 20px;
-          border-radius: 8px;
-          z-index: 1000;
-          font-weight: 500;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        `;
-        document.body.appendChild(notification);
-        setTimeout(() => document.body.removeChild(notification), 3000);
+        showNotification(`🔗 Lien de partage pour "${title}" copié !`, 'info');
       } else {
         // Fallback
         prompt('Copiez ce lien pour partager le projet:', shareUrl);
       }
     } catch (error) {
       console.error('Error sharing project:', error);
-      alert('❌ Erreur lors de la génération du lien de partage.');
+      showNotification('❌ Erreur lors de la génération du lien de partage.', 'error');
     }
   };
 
   const handleStatusChange = async (id: string, newStatus: ProjectStatus, title: string) => {
     try {
-      templateProjectService.updateProjectStatus(id, newStatus);
+      await templateProjectService.updateProjectStatus(id, newStatus);
       loadProjects(); // Recharger la liste
       
       // Notification de succès
@@ -207,25 +199,10 @@ export const TemplateProjectsListPage: React.FC = () => {
         archived: 'archivé'
       };
       
-      const notification = document.createElement('div');
-      notification.innerHTML = `✅ "${title}" mis en ${statusLabels[newStatus]} !`;
-      notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #10b981;
-        color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        z-index: 1000;
-        font-weight: 500;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      `;
-      document.body.appendChild(notification);
-      setTimeout(() => document.body.removeChild(notification), 3000);
+      showNotification(`✅ "${title}" mis en ${statusLabels[newStatus]} !`, 'success');
     } catch (error) {
       console.error('Error updating project status:', error);
-      alert('❌ Erreur lors de la mise à jour du statut.');
+      showNotification('❌ Erreur lors de la mise à jour du statut.', 'error');
     }
   };
 

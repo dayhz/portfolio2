@@ -9,6 +9,7 @@ const authRoutes = require('./routes/auth-working');
 import mediaRoutes from './routes/media';
 import profileRoutes from './routes/profile';
 import projectRoutes from './routes/projects';
+import templateProjectRoutes from './routes/template-projects';
 import authDebugRoutes from './routes/auth-debug';
 
 // Load environment variables
@@ -54,6 +55,7 @@ app.use('/api/debug', authDebugRoutes);
 
 // TODO: Add other route handlers
 app.use('/api/projects', projectRoutes);
+app.use('/api/template-projects', templateProjectRoutes);
 // app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/profile', profileRoutes);

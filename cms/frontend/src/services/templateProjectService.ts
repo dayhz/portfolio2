@@ -40,11 +40,98 @@ interface SavedProject extends ZestyProjectData {
 }
 
 class TemplateProjectService {
+  private apiUrl = '/api/template-projects';
   private storageKey = 'zesty-template-projects';
+  private useLocalStorage = false;
+
+  // Vérifier si l'API est disponible
+  private async checkAPIAvailability(): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.apiUrl}?limit=1`, {
+        method: 'GET',
+        signal: AbortSignal.timeout(5000) // Timeout de 5 secondes
+      });
+      return response.ok;
+    } catch (error) {
+      console.warn('API not available, falling back to localStorage:', error);
+      this.useLocalStorage = true;
+      return false;
+    }
+  }
+
+  // Méthodes localStorage (fallback)
+  private saveToStorage(projects: SavedProject[]): void {
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(projects));
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+      throw new Error('Impossible de sauvegarder le projet. Vérifiez l\'espace de stockage disponible.');
+    }
+  }
+
+  private getFromStorage(): SavedProject[] {
+    try {
+      const stored = localStorage.getItem(this.storageKey);
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error('Error loading from localStorage:', error);
+      return [];
+    }
+  }
+
+  private generateId(): string {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
 
   // Sauvegarder un projet
   async saveProject(projectData: ZestyProjectData, id?: string): Promise<SavedProject> {
-    const projects = this.getAllProjects();
+    // Vérifier la disponibilité de l'API
+    const apiAvailable = await this.checkAPIAvailability();
+
+    if (apiAvailable && !this.useLocalStorage) {
+      try {
+        if (id) {
+          // Mise à jour d'un projet existant
+          const response = await fetch(`${this.apiUrl}/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(projectData),
+          });
+
+          if (!response.ok) {
+            throw new Error(`Failed to update project: ${response.statusText}`);
+          }
+
+          return await response.json();
+        } else {
+          // Nouveau projet
+          const response = await fetch(this.apiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              ...projectData,
+              status: projectData.status || 'draft'
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`Failed to create project: ${response.statusText}`);
+          }
+
+          return await response.json();
+        }
+      } catch (error) {
+        console.error('API error, falling back to localStorage:', error);
+        this.useLocalStorage = true;
+      }
+    }
+
+    // Fallback vers localStorage
+    const projects = this.getFromStorage();
     const now = new Date().toISOString();
     
     if (id) {
@@ -56,7 +143,7 @@ class TemplateProjectService {
           id,
           createdAt: projects[existingIndex].createdAt,
           updatedAt: now,
-          publishedAt: projects[existingIndex].publishedAt // Conserver la date de publication
+          publishedAt: projects[existingIndex].publishedAt
         };
         projects[existingIndex] = updatedProject;
         this.saveToStorage(projects);
@@ -70,7 +157,6 @@ class TemplateProjectService {
       id: this.generateId(),
       createdAt: now,
       updatedAt: now,
-      // Nouveau projet en brouillon par défaut
       status: projectData.status || 'draft'
     };
     
@@ -80,25 +166,89 @@ class TemplateProjectService {
   }
 
   // Récupérer tous les projets
-  getAllProjects(): SavedProject[] {
-    try {
-      const stored = localStorage.getItem(this.storageKey);
-      return stored ? JSON.parse(stored) : [];
-    } catch (error) {
-      console.error('Error loading projects:', error);
-      return [];
+  async getAllProjects(): Promise<SavedProject[]> {
+    // Vérifier la disponibilité de l'API
+    const apiAvailable = await this.checkAPIAvailability();
+
+    if (apiAvailable && !this.useLocalStorage) {
+      try {
+        const response = await fetch(this.apiUrl);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch projects: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        return result.data.map((project: any) => ({
+          ...project,
+          scope: JSON.parse(project.scope || '[]') // Parser le JSON scope
+        }));
+      } catch (error) {
+        console.error('API error, falling back to localStorage:', error);
+        this.useLocalStorage = true;
+      }
     }
+
+    // Fallback vers localStorage
+    return this.getFromStorage();
   }
 
   // Récupérer un projet par ID
-  getProject(id: string): SavedProject | null {
-    const projects = this.getAllProjects();
+  async getProject(id: string): Promise<SavedProject | null> {
+    // Vérifier la disponibilité de l'API
+    const apiAvailable = await this.checkAPIAvailability();
+
+    if (apiAvailable && !this.useLocalStorage) {
+      try {
+        const response = await fetch(`${this.apiUrl}/${id}`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            return null;
+          }
+          throw new Error(`Failed to fetch project: ${response.statusText}`);
+        }
+
+        const project = await response.json();
+        return {
+          ...project,
+          scope: JSON.parse(project.scope || '[]') // Parser le JSON scope
+        };
+      } catch (error) {
+        console.error('API error, falling back to localStorage:', error);
+        this.useLocalStorage = true;
+      }
+    }
+
+    // Fallback vers localStorage
+    const projects = this.getFromStorage();
     return projects.find(p => p.id === id) || null;
   }
 
   // Supprimer un projet
-  deleteProject(id: string): boolean {
-    const projects = this.getAllProjects();
+  async deleteProject(id: string): Promise<boolean> {
+    // Vérifier la disponibilité de l'API
+    const apiAvailable = await this.checkAPIAvailability();
+
+    if (apiAvailable && !this.useLocalStorage) {
+      try {
+        const response = await fetch(`${this.apiUrl}/${id}`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to delete project: ${response.statusText}`);
+        }
+
+        return true;
+      } catch (error) {
+        console.error('API error, falling back to localStorage:', error);
+        this.useLocalStorage = true;
+      }
+    }
+
+    // Fallback vers localStorage
+    const projects = this.getFromStorage();
     const filteredProjects = projects.filter(p => p.id !== id);
     
     if (filteredProjects.length !== projects.length) {
@@ -109,8 +259,33 @@ class TemplateProjectService {
   }
 
   // Dupliquer un projet
-  duplicateProject(id: string): SavedProject | null {
-    const project = this.getProject(id);
+  async duplicateProject(id: string): Promise<SavedProject | null> {
+    // Vérifier la disponibilité de l'API
+    const apiAvailable = await this.checkAPIAvailability();
+
+    if (apiAvailable && !this.useLocalStorage) {
+      try {
+        const response = await fetch(`${this.apiUrl}/${id}/duplicate`, {
+          method: 'POST',
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to duplicate project: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        return {
+          ...result.project,
+          scope: JSON.parse(result.project.scope || '[]')
+        };
+      } catch (error) {
+        console.error('API error, falling back to localStorage:', error);
+        this.useLocalStorage = true;
+      }
+    }
+
+    // Fallback vers localStorage
+    const project = await this.getProject(id);
     if (!project) return null;
 
     const { id: _, createdAt: __, updatedAt: ___, ...projectData } = project;
@@ -123,29 +298,18 @@ class TemplateProjectService {
     return this.saveProject(duplicatedProject);
   }
 
-  private generateId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-  }
 
-  private saveToStorage(projects: SavedProject[]): void {
-    try {
-      localStorage.setItem(this.storageKey, JSON.stringify(projects));
-    } catch (error) {
-      console.error('Error saving projects:', error);
-      throw new Error('Impossible de sauvegarder le projet. Vérifiez l\'espace de stockage disponible.');
-    }
-  }
 
   // Exporter un projet en JSON
-  exportProject(id: string): string | null {
-    const project = this.getProject(id);
+  async exportProject(id: string): Promise<string | null> {
+    const project = await this.getProject(id);
     if (!project) return null;
     
     return JSON.stringify(project, null, 2);
   }
 
   // Importer un projet depuis JSON
-  importProject(jsonData: string): SavedProject {
+  async importProject(jsonData: string): Promise<SavedProject> {
     try {
       const projectData = JSON.parse(jsonData);
       
@@ -167,9 +331,43 @@ class TemplateProjectService {
     }
   }
 
+  private isValidProjectData(data: any): data is ZestyProjectData {
+    const requiredFields = ['title', 'client', 'year'];
+    return requiredFields.every(field => typeof data[field] === 'string');
+  }
+
   // Changer le statut d'un projet
-  updateProjectStatus(id: string, status: ProjectStatus): SavedProject {
-    const projects = this.getAllProjects();
+  async updateProjectStatus(id: string, status: ProjectStatus): Promise<SavedProject> {
+    // Vérifier la disponibilité de l'API
+    const apiAvailable = await this.checkAPIAvailability();
+
+    if (apiAvailable && !this.useLocalStorage) {
+      try {
+        const response = await fetch(`${this.apiUrl}/${id}/status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to update project status: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        return {
+          ...result.project,
+          scope: JSON.parse(result.project.scope || '[]')
+        };
+      } catch (error) {
+        console.error('API error, falling back to localStorage:', error);
+        this.useLocalStorage = true;
+      }
+    }
+
+    // Fallback vers localStorage
+    const projects = this.getFromStorage();
     const projectIndex = projects.findIndex(p => p.id === id);
     
     if (projectIndex === -1) {
@@ -185,73 +383,76 @@ class TemplateProjectService {
       projects[projectIndex].publishedAt = now;
     }
 
-    localStorage.setItem(this.storageKey, JSON.stringify(projects));
+    this.saveToStorage(projects);
     return projects[projectIndex];
   }
 
   // Publier un projet
-  publishProject(id: string): SavedProject {
+  async publishProject(id: string): Promise<SavedProject> {
     return this.updateProjectStatus(id, 'published');
   }
 
   // Mettre en brouillon
-  draftProject(id: string): SavedProject {
+  async draftProject(id: string): Promise<SavedProject> {
     return this.updateProjectStatus(id, 'draft');
   }
 
   // Archiver un projet
-  archiveProject(id: string): SavedProject {
+  async archiveProject(id: string): Promise<SavedProject> {
     return this.updateProjectStatus(id, 'archived');
   }
 
   // Obtenir les projets par statut
-  getProjectsByStatus(status: ProjectStatus): SavedProject[] {
-    return this.getAllProjects().filter(project => project.status === status);
+  async getProjectsByStatus(status: ProjectStatus): Promise<SavedProject[]> {
+    // Vérifier la disponibilité de l'API
+    const apiAvailable = await this.checkAPIAvailability();
+
+    if (apiAvailable && !this.useLocalStorage) {
+      try {
+        const response = await fetch(`${this.apiUrl}?status=${status}`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch projects: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        return result.data.map((project: any) => ({
+          ...project,
+          scope: JSON.parse(project.scope || '[]')
+        }));
+      } catch (error) {
+        console.error('API error, falling back to localStorage:', error);
+        this.useLocalStorage = true;
+      }
+    }
+
+    // Fallback vers localStorage
+    const allProjects = this.getFromStorage();
+    return allProjects.filter(project => project.status === status);
   }
 
   // Obtenir les projets publiés uniquement
-  getPublishedProjects(): SavedProject[] {
+  async getPublishedProjects(): Promise<SavedProject[]> {
     return this.getProjectsByStatus('published');
   }
 
   // Obtenir les brouillons
-  getDraftProjects(): SavedProject[] {
+  async getDraftProjects(): Promise<SavedProject[]> {
     return this.getProjectsByStatus('draft');
   }
 
   // Obtenir les projets archivés
-  getArchivedProjects(): SavedProject[] {
+  async getArchivedProjects(): Promise<SavedProject[]> {
     return this.getProjectsByStatus('archived');
   }
 
   // Vérifier si un projet est accessible publiquement
-  isProjectPublic(id: string): boolean {
-    const project = this.getProject(id);
+  async isProjectPublic(id: string): Promise<boolean> {
+    const project = await this.getProject(id);
     return project ? project.status === 'published' : false;
   }
 
-  // Migration des projets existants pour ajouter le statut
-  migrateExistingProjects(): void {
-    const projects = this.getAllProjects();
-    let hasChanges = false;
 
-    const migratedProjects = projects.map(project => {
-      // Si le projet n'a pas de statut, l'ajouter
-      if (!project.status) {
-        hasChanges = true;
-        return {
-          ...project,
-          status: 'draft' as ProjectStatus // Projets existants en brouillon par défaut
-        };
-      }
-      return project;
-    });
-
-    if (hasChanges) {
-      localStorage.setItem(this.storageKey, JSON.stringify(migratedProjects));
-      console.log('Migration completed: Added status to existing projects');
-    }
-  }
 
   private isValidProjectData(data: any): data is ZestyProjectData {
     const requiredFields = ['title', 'client', 'year'];

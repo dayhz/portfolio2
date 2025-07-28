@@ -106,6 +106,41 @@ model About {
   updatedAt   DateTime @updatedAt
 }
 
+model TemplateProject {
+  id                String    @id @default(cuid())
+  title             String
+  heroImage         String    @default("")
+  challenge         String    @default("")
+  approach          String    @default("")
+  client            String
+  year              String
+  duration          String    @default("")
+  type              String    @default("")
+  industry          String    @default("")
+  scope             String    @default("[]") // JSON array
+  image1            String    @default("")
+  textSection1      String    @default("")
+  image2            String    @default("")
+  image3            String    @default("")
+  image4            String    @default("")
+  video1            String    @default("")
+  video1Poster      String    @default("")
+  video2            String    @default("")
+  video2Poster      String    @default("")
+  testimonialQuote  String    @default("")
+  testimonialAuthor String    @default("")
+  testimonialRole   String    @default("")
+  testimonialImage  String    @default("")
+  finalImage        String    @default("")
+  textSection2      String    @default("")
+  finalImage1       String    @default("")
+  finalImage2       String    @default("")
+  status            String    @default("draft") // "draft", "published", "archived"
+  publishedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
 model SiteBackup {
   id          String   @id @default(cuid())
   description String

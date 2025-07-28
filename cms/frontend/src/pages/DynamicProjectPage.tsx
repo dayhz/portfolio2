@@ -27,7 +27,7 @@ export const DynamicProjectPage: React.FC = () => {
 
       // Method 1: Load from ID (saved projects)
       if (id) {
-        const project = templateProjectService.getProject(id);
+        const project = await templateProjectService.getProject(id);
         if (project) {
           // Vérifier si le projet est publié
           if (project.status !== 'published') {
