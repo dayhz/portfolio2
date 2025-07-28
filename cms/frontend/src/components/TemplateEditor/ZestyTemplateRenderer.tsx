@@ -247,29 +247,33 @@ const VideoWithFallback: React.FC<{
   fallbackPosterSrc: string;
   className: string;
 }> = memo(({ src, fallbackSrc, posterSrc, fallbackPosterSrc, className }) => {
+
   const [videoSrc, setVideoSrc] = useState(src || fallbackSrc);
   const [posterImgSrc, setPosterImgSrc] = useState(posterSrc || fallbackPosterSrc);
   const [hasVideoError, setHasVideoError] = useState(false);
   const [hasPosterError, setHasPosterError] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [isVideoLoading, setIsVideoLoading] = useState(Boolean(src || fallbackSrc));
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [videoRetryCount, setVideoRetryCount] = useState(0);
   const [posterRetryCount, setPosterRetryCount] = useState(0);
   const maxRetries = 2;
   const videoRef = React.useRef<HTMLVideoElement>(null);
 
-  const handleVideoError = useCallback(() => {
-    console.warn(`Video failed to load: ${videoSrc}`);
+  const handleVideoError = useCallback((e: any) => {
+    console.error(`Video failed to load: ${videoSrc}`, e);
+    console.error('Video error details:', e.target?.error);
     
-    if (videoRetryCount < maxRetries && videoSrc !== fallbackSrc) {
+    if (videoRetryCount < maxRetries && videoSrc !== fallbackSrc && fallbackSrc) {
       // Try fallback video
+      console.log(`Retrying with fallback: ${fallbackSrc}`);
       setHasVideoError(true);
       setVideoSrc(fallbackSrc);
       setVideoRetryCount(prev => prev + 1);
       setIsVideoLoading(true);
     } else {
       // All attempts failed
+      console.error('All video loading attempts failed');
       setIsVideoLoading(false);
       setHasVideoError(true);
     }
@@ -290,9 +294,22 @@ const VideoWithFallback: React.FC<{
   }, [posterImgSrc, fallbackPosterSrc, posterRetryCount, maxRetries]);
 
   const handleVideoLoadedData = useCallback(() => {
+    console.log('Video loaded data:', videoSrc);
     setIsVideoLoaded(true);
     setIsVideoLoading(false);
-  }, []);
+  }, [videoSrc]);
+
+  const handleVideoCanPlay = useCallback(() => {
+    console.log('Video can play:', videoSrc);
+    setIsVideoLoaded(true);
+    setIsVideoLoading(false);
+  }, [videoSrc]);
+
+  const handleVideoLoadedMetadata = useCallback(() => {
+    console.log('Video metadata loaded:', videoSrc);
+    setIsVideoLoaded(true);
+    setIsVideoLoading(false);
+  }, [videoSrc]);
 
   const handleVideoPlay = useCallback(() => {
     setIsVideoPlaying(true);
@@ -303,8 +320,16 @@ const VideoWithFallback: React.FC<{
   }, []);
 
   const handleVideoLoadStart = useCallback(() => {
+    console.log('Video load start:', videoSrc);
     setIsVideoLoading(true);
-  }, []);
+    
+    // Timeout de sécurité : arrêter le loading après 5 secondes
+    setTimeout(() => {
+      console.log('Video loading timeout for:', videoSrc);
+      setIsVideoLoading(false);
+      setIsVideoLoaded(true); // Forcer le loaded state
+    }, 5000);
+  }, [videoSrc]);
 
   // Enhanced autoplay functionality with intersection observer
   React.useEffect(() => {
@@ -346,26 +371,9 @@ const VideoWithFallback: React.FC<{
     };
   }, [videoSrc, isVideoLoaded, hasVideoError]);
 
-  // Show loading state while video is loading
-  if (isVideoLoading && !hasVideoError) {
-    return (
-      <div 
-        className="video-loading-placeholder"
-        style={{
-          backgroundColor: '#f0f0f0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '300px',
-          color: '#666',
-          fontSize: '14px',
-          borderRadius: '16px'
-        }}
-      >
-        <div>Loading video...</div>
-      </div>
-    );
-  }
+
+
+  // Pas de placeholder de chargement - afficher directement la vidéo
 
   // Show error state if video failed to load
   if (hasVideoError && videoRetryCount >= maxRetries) {
@@ -443,11 +451,14 @@ const VideoWithFallback: React.FC<{
           autoPlay
           onError={handleVideoError}
           onLoadedData={handleVideoLoadedData}
+          onLoadedMetadata={handleVideoLoadedMetadata}
+          onCanPlay={handleVideoCanPlay}
           onLoadStart={handleVideoLoadStart}
           onPlay={handleVideoPlay}
           onPause={handleVideoPause}
           style={{
-            display: isVideoLoaded && !hasVideoError ? 'block' : 'none'
+            display: hasVideoError ? 'none' : 'block',
+            opacity: isVideoLoaded ? 1 : 0
           }}
         >
           <source src={videoSrc} type="video/mp4" />
@@ -902,15 +913,15 @@ const SafeZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = memo(({
             {/* First Video Section */}
             <div className="section" data-wf-template-section-image-variant="16-9">
               <div className="u-container">
-                {getContent('video1') && (
+                {projectData?.video1 && projectData.video1.trim() !== '' && (
                   <div className="temp-img_container">
                     <div className="temp-img">
                       <div className="img-wrp">
                         <VideoWithFallback
-                          src={getContent('video1')}
-                          fallbackSrc={defaultContent.video1}
-                          posterSrc={getContent('video1Poster')}
-                          fallbackPosterSrc={defaultContent.video1Poster}
+                          src={projectData?.video1 || ''}
+                          fallbackSrc=""
+                          posterSrc={projectData?.video1Poster || ''}
+                          fallbackPosterSrc=""
                           className="video"
                         />
                       </div>
@@ -924,17 +935,17 @@ const SafeZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = memo(({
             <div className="g_section_space w-variant-41fc0c0a-cac3-53c9-9802-6a916e3fb342" data-wf-global-section-space-section-space="even" />
             
             {/* Second Video Section */}
-            {getContent('video2') && (
+            {projectData?.video2 && projectData.video2.trim() !== '' && (
               <div className="section" data-wf-template-section-image-variant="16-9">
                 <div className="u-container">
                   <div className="temp-img_container">
                     <div className="temp-img">
                       <div className="img-wrp">
                         <VideoWithFallback
-                          src={getContent('video2')}
-                          fallbackSrc={defaultContent.video2}
-                          posterSrc={getContent('video2Poster')}
-                          fallbackPosterSrc={defaultContent.video2Poster}
+                          src={projectData?.video2 || ''}
+                          fallbackSrc=""
+                          posterSrc={projectData?.video2Poster || ''}
+                          fallbackPosterSrc=""
                           className="video"
                         />
                       </div>

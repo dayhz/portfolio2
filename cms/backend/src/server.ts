@@ -34,10 +34,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Static files for uploads
 const uploadDir = process.env.UPLOAD_DIR || 'uploads';
+const uploadsPath = path.join(process.cwd(), uploadDir);
+console.log(`Serving static files from: ${uploadsPath}`);
 app.use(`/${uploadDir}`, (req, res, next) => {
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   next();
-}, express.static(path.join(__dirname, `../${uploadDir}`)));
+}, express.static(uploadsPath));
 
 // Routes
 app.get('/api/health', (req, res) => {
