@@ -37,6 +37,7 @@ router.get('/', async (req, res) => {
     const category = req.query.category as string;
     const isPublished = req.query.isPublished === 'true' ? true : 
                         req.query.isPublished === 'false' ? false : undefined;
+    const format = req.query.format as string; // Pour différencier les appels CMS vs Portfolio
     
     // Construire les filtres
     const where: any = {};
@@ -57,6 +58,34 @@ router.get('/', async (req, res) => {
       prisma.project.count({ where })
     ]);
 
+    // Si c'est un appel depuis le portfolio (pas de format spécifié), retourner le format simple
+    if (!format || format === 'portfolio') {
+      // Mapper les projets au format attendu par le portfolio
+      const portfolioProjects = projects.map(project => {
+        let images = [];
+        try {
+          images = JSON.parse(project.images || '[]');
+        } catch (e) {
+          console.warn('Failed to parse images for project:', project.id);
+        }
+
+        return {
+          id: project.id,
+          title: project.title,
+          description: project.description,
+          slug: project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, ''),
+          imageUrl: images.length > 0 ? images[0] : project.thumbnail,
+          category: project.category,
+          year: project.year,
+          client: project.client,
+          isPublished: project.isPublished
+        };
+      });
+
+      return res.json(portfolioProjects);
+    }
+
+    // Format CMS avec pagination
     res.json({
       data: projects,
       meta: {

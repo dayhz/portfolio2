@@ -10,6 +10,7 @@ import mediaRoutes from './routes/media';
 import profileRoutes from './routes/profile';
 import projectRoutes from './routes/projects';
 import templateProjectRoutes from './routes/template-projects';
+import aboutRoutes from './routes/about';
 import authDebugRoutes from './routes/auth-debug';
 
 // Load environment variables
@@ -58,11 +59,11 @@ app.use('/api/debug', authDebugRoutes);
 // TODO: Add other route handlers
 app.use('/api/projects', projectRoutes);
 app.use('/api/template-projects', templateProjectRoutes);
+app.use('/api/about', aboutRoutes);
 // app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/profile', profileRoutes);
 // app.use('/api/services', serviceRoutes);
-// app.use('/api/about', aboutRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
