@@ -254,7 +254,7 @@ const VideoWithFallback: React.FC<{
   const [hasPosterError, setHasPosterError] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [isVideoLoading, setIsVideoLoading] = useState(false);
+
   const [videoRetryCount, setVideoRetryCount] = useState(0);
   const [posterRetryCount, setPosterRetryCount] = useState(0);
   const maxRetries = 2;
@@ -262,19 +262,14 @@ const VideoWithFallback: React.FC<{
 
   const handleVideoError = useCallback((e: any) => {
     console.error(`Video failed to load: ${videoSrc}`, e);
-    console.error('Video error details:', e.target?.error);
     
     if (videoRetryCount < maxRetries && videoSrc !== fallbackSrc && fallbackSrc) {
       // Try fallback video
-      console.log(`Retrying with fallback: ${fallbackSrc}`);
       setHasVideoError(true);
       setVideoSrc(fallbackSrc);
       setVideoRetryCount(prev => prev + 1);
-      setIsVideoLoading(true);
     } else {
       // All attempts failed
-      console.error('All video loading attempts failed');
-      setIsVideoLoading(false);
       setHasVideoError(true);
     }
   }, [videoSrc, fallbackSrc, videoRetryCount, maxRetries]);
@@ -294,22 +289,16 @@ const VideoWithFallback: React.FC<{
   }, [posterImgSrc, fallbackPosterSrc, posterRetryCount, maxRetries]);
 
   const handleVideoLoadedData = useCallback(() => {
-    console.log('Video loaded data:', videoSrc);
     setIsVideoLoaded(true);
-    setIsVideoLoading(false);
-  }, [videoSrc]);
+  }, []);
 
   const handleVideoCanPlay = useCallback(() => {
-    console.log('Video can play:', videoSrc);
     setIsVideoLoaded(true);
-    setIsVideoLoading(false);
-  }, [videoSrc]);
+  }, []);
 
   const handleVideoLoadedMetadata = useCallback(() => {
-    console.log('Video metadata loaded:', videoSrc);
     setIsVideoLoaded(true);
-    setIsVideoLoading(false);
-  }, [videoSrc]);
+  }, []);
 
   const handleVideoPlay = useCallback(() => {
     setIsVideoPlaying(true);
@@ -320,16 +309,8 @@ const VideoWithFallback: React.FC<{
   }, []);
 
   const handleVideoLoadStart = useCallback(() => {
-    console.log('Video load start:', videoSrc);
-    setIsVideoLoading(true);
-    
-    // Timeout de sécurité : arrêter le loading après 5 secondes
-    setTimeout(() => {
-      console.log('Video loading timeout for:', videoSrc);
-      setIsVideoLoading(false);
-      setIsVideoLoaded(true); // Forcer le loaded state
-    }, 5000);
-  }, [videoSrc]);
+    // Pas besoin de gérer le loading state
+  }, []);
 
   // Enhanced autoplay functionality with intersection observer
   React.useEffect(() => {
@@ -457,8 +438,7 @@ const VideoWithFallback: React.FC<{
           onPlay={handleVideoPlay}
           onPause={handleVideoPause}
           style={{
-            display: hasVideoError ? 'none' : 'block',
-            opacity: isVideoLoaded ? 1 : 0
+            display: hasVideoError ? 'none' : 'block'
           }}
         >
           <source src={videoSrc} type="video/mp4" />
