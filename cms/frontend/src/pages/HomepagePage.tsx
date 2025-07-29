@@ -18,7 +18,8 @@ import {
 import { HeroEditor } from '../components/homepage/HeroEditor';
 import { BrandsEditor } from '../components/homepage/BrandsEditor';
 import { ServicesEditor } from '../components/homepage/ServicesEditorBasic';
-import { HeroSection, BrandsSection, ServicesSection } from '../../../shared/types/homepage';
+import { OfferEditor } from '../components/homepage/OfferEditor';
+import { HeroSection, BrandsSection, ServicesSection, OfferSection } from '../../../shared/types/homepage';
 
 type HomepageSection = 'dashboard' | 'hero' | 'brands' | 'services' | 'offer' | 'testimonials' | 'footer';
 
@@ -255,19 +256,7 @@ export default function HomepagePage() {
       case 'services':
         return <ServicesEditor onPreview={handlePreview} />;
       case 'offer':
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>🎯 Section Proposition de Valeur</CardTitle>
-              <CardDescription>Fonctionnalité à venir</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                L'éditeur pour la section proposition de valeur sera disponible prochainement.
-              </p>
-            </CardContent>
-          </Card>
-        );
+        return <OfferEditor onPreview={handlePreview} />;
       case 'testimonials':
         return (
           <Card>

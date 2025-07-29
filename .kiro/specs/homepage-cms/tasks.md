@@ -94,22 +94,22 @@
     - Test services updates reflect on portfolio site
     - _Requirements: 4.3_
 
-- [ ] 6. Implement Offer/Engagement section management
-  - [ ] 6.1 Create Offer section backend
+- [x] 6. Implement Offer/Engagement section management
+  - [x] 6.1 Create Offer section backend
     - Implement GET /api/homepage/offer endpoint
     - Implement PUT /api/homepage/offer endpoint
     - Support for adding/removing offer points
     - Add validation for offer point structure
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ] 6.2 Create Offer section frontend editor
+  - [x] 6.2 Create Offer section frontend editor
     - Build React component for offer points editing
     - Add functionality to add/remove points
     - Implement drag-and-drop reordering
     - Add validation with max 6 points limit
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ] 6.3 Integrate Offer content injection
+  - [x] 6.3 Integrate Offer content injection
     - Modify portfolio server to inject offer content
     - Replace static offer points with CMS content
     - Test offer updates reflect on portfolio site

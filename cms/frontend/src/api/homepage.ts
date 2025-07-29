@@ -1,4 +1,4 @@
-import { HeroSection, HomepageData, HomepageSection, BrandsSection, BrandLogo, ServicesSection, ServiceItem } from '../../../shared/types/homepage';
+import { HeroSection, HomepageData, HomepageSection, BrandsSection, BrandLogo, ServicesSection, ServiceItem, OfferSection, OfferPoint } from '../../../shared/types/homepage';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
@@ -105,6 +105,15 @@ class HomepageAPI {
 
   async updateServicesContent(data: ServicesSection): Promise<ServicesSection> {
     return this.updateSectionContent<ServicesSection>('services', data);
+  }
+
+  // Offer section specific methods
+  async getOfferContent(): Promise<OfferSection> {
+    return this.getSectionContent<OfferSection>('offer');
+  }
+
+  async updateOfferContent(data: OfferSection): Promise<OfferSection> {
+    return this.updateSectionContent<OfferSection>('offer', data);
   }
 
   // Media upload
