@@ -25,6 +25,7 @@ import ProjectContentPage from './pages/ProjectContentPage';
 import SearchResultsPage from './pages/SearchResultsPage';
 import ServicesPage from './pages/ServicesPage';
 import AboutPage from './pages/AboutPage';
+import HomepagePage from './pages/HomepagePage';
 import { UniversalEditorTestPage } from './pages/UniversalEditorTestPage';
 import { ProjectPreviewPage } from './pages/ProjectPreviewPage';
 import { TemplateProjectPage } from './pages/TemplateProjectPage';
@@ -92,6 +93,7 @@ function App() {
                           <Route path="/services" element={<ServicesPage />} />
                           <Route path="/media" element={<MediaPage />} />
                           <Route path="/about" element={<AboutPage />} />
+                          <Route path="/homepage" element={<HomepagePage />} />
                           <Route path="/test-editor" element={<UniversalEditorTestPage />} />
                           <Route path="/template-projects" element={<TemplateProjectsListPage />} />
                           <Route path="/template-editor/new" element={<TemplateProjectPage />} />

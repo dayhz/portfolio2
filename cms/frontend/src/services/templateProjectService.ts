@@ -451,13 +451,6 @@ class TemplateProjectService {
     const project = await this.getProject(id);
     return project ? project.status === 'published' : false;
   }
-
-
-
-  private isValidProjectData(data: any): data is ZestyProjectData {
-    const requiredFields = ['title', 'client', 'year'];
-    return requiredFields.every(field => typeof data[field] === 'string');
-  }
 }
 
 export const templateProjectService = new TemplateProjectService();

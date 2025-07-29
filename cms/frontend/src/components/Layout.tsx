@@ -24,6 +24,7 @@ interface LayoutProps {
 const sidebarItems = [
   { icon: Home, label: 'Dashboard', href: '/' },
   { icon: User, label: 'Profil', href: '/profile' },
+  { icon: Home, label: '🏠 Homepage CMS', href: '/homepage' },
   { icon: Work, label: 'Projets', href: '/template-projects' },
   { icon: Chat, label: 'Témoignages', href: '/testimonials' },
   { icon: Setting, label: 'Services', href: '/services' },

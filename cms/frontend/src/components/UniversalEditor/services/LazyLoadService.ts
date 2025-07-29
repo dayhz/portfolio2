@@ -226,7 +226,7 @@ export class LazyLoadService {
     }
     
     // Importer dynamiquement le module
-    return import(/* webpackChunkName: "[request]" */ `../${path}`);
+    return import(/* @vite-ignore */ `../${path}`);
   }
 
   /**

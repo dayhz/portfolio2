@@ -168,3 +168,6 @@ export interface ProfileFormData {
   phone?: string;
   location?: string;
 }
+
+// Export homepage types
+export * from './homepage';

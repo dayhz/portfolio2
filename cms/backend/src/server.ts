@@ -12,6 +12,7 @@ import projectRoutes from './routes/projects';
 import templateProjectRoutes from './routes/template-projects';
 import aboutRoutes from './routes/about';
 import authDebugRoutes from './routes/auth-debug';
+import { homepageRouter } from './routes/homepage';
 
 // Load environment variables
 dotenv.config();
@@ -56,10 +57,11 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/debug', authDebugRoutes);
 
-// TODO: Add other route handlers
+// API Routes
 app.use('/api/projects', projectRoutes);
 app.use('/api/template-projects', templateProjectRoutes);
 app.use('/api/about', aboutRoutes);
+app.use('/api/homepage', homepageRouter);
 // app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/profile', profileRoutes);
