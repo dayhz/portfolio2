@@ -1,4 +1,4 @@
-import { HeroSection, HomepageData, HomepageSection, BrandsSection, BrandLogo } from '../../../shared/types/homepage';
+import { HeroSection, HomepageData, HomepageSection, BrandsSection, BrandLogo, ServicesSection, ServiceItem } from '../../../shared/types/homepage';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
@@ -96,6 +96,15 @@ class HomepageAPI {
       method: 'PUT',
       body: JSON.stringify({ logoIds }),
     });
+  }
+
+  // Services section specific methods
+  async getServicesContent(): Promise<ServicesSection> {
+    return this.getSectionContent<ServicesSection>('services');
+  }
+
+  async updateServicesContent(data: ServicesSection): Promise<ServicesSection> {
+    return this.updateSectionContent<ServicesSection>('services', data);
   }
 
   // Media upload

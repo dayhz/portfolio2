@@ -36,7 +36,7 @@ const servicesUpdateSchema = z.object({
     title: z.string().min(1, 'Service title is required'),
     description: z.string().min(1, 'Service description is required'),
     link: z.string().min(1, 'Service link is required'),
-    colorClass: z.string().min(1, 'Color class is required')
+    colorClass: z.string()
   }))
 });
 

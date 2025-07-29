@@ -17,7 +17,8 @@ import {
 } from 'lucide-react';
 import { HeroEditor } from '../components/homepage/HeroEditor';
 import { BrandsEditor } from '../components/homepage/BrandsEditor';
-import { HeroSection, BrandsSection } from '../../../shared/types/homepage';
+import { ServicesEditor } from '../components/homepage/ServicesEditorBasic';
+import { HeroSection, BrandsSection, ServicesSection } from '../../../shared/types/homepage';
 
 type HomepageSection = 'dashboard' | 'hero' | 'brands' | 'services' | 'offer' | 'testimonials' | 'footer';
 
@@ -252,19 +253,7 @@ export default function HomepagePage() {
       case 'brands':
         return <BrandsEditor onPreview={handlePreview} />;
       case 'services':
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>🛠️ Section Services</CardTitle>
-              <CardDescription>Fonctionnalité à venir</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                L'éditeur pour la section services sera disponible prochainement.
-              </p>
-            </CardContent>
-          </Card>
-        );
+        return <ServicesEditor onPreview={handlePreview} />;
       case 'offer':
         return (
           <Card>

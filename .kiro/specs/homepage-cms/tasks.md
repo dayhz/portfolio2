@@ -73,22 +73,22 @@
     - Test brands updates reflect on portfolio site
     - _Requirements: 2.5_
 
-- [ ] 5. Implement Services section management
-  - [ ] 5.1 Create Services section backend
+- [x] 5. Implement Services section management
+  - [x] 5.1 Create Services section backend
     - Implement GET /api/homepage/services endpoint
     - Implement PUT /api/homepage/services endpoint
     - Add validation for service data structure
     - Support for reordering services
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-  - [ ] 5.2 Create Services section frontend editor
+  - [x] 5.2 Create Services section frontend editor
     - Build React component for services editing
     - Add forms for service title, description, and links
     - Implement drag-and-drop reordering
     - Add color class selection for service styling
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-  - [ ] 5.3 Integrate Services content injection
+  - [x] 5.3 Integrate Services content injection
     - Modify portfolio server to inject services content
     - Replace static services with CMS-managed content
     - Test services updates reflect on portfolio site
