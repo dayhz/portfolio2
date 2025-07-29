@@ -115,8 +115,8 @@
     - Test offer updates reflect on portfolio site
     - _Requirements: 5.5_
 
-- [ ] 7. Implement Testimonials section management
-  - [ ] 7.1 Create Testimonials section backend
+- [-] 7. Implement Testimonials section management
+  - [x] 7.1 Create Testimonials section backend
     - Implement GET /api/homepage/testimonials endpoint
     - Implement PUT /api/homepage/testimonials endpoint
     - Create POST /api/homepage/testimonials for adding testimonials
@@ -124,7 +124,7 @@
     - Add support for testimonial ordering
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
 
-  - [ ] 7.2 Create Testimonials section frontend editor
+  - [x] 7.2 Create Testimonials section frontend editor
     - Build React component for testimonials management
     - Add forms for testimonial text, client info, and photos
     - Implement photo upload functionality
@@ -132,14 +132,14 @@
     - Create add/remove testimonial functionality
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
 
-  - [ ] 7.3 Integrate Testimonials content injection
+  - [x] 7.3 Integrate Testimonials content injection
     - Modify portfolio server to inject testimonials content
     - Replace static testimonials with CMS content
     - Ensure slider functionality works with dynamic content
     - Test testimonials updates reflect on portfolio site
     - _Requirements: 6.6_
 
-- [ ] 8. Implement Footer section management
+- [-] 8. Implement Footer section management
   - [ ] 8.1 Create Footer section backend
     - Implement GET /api/homepage/footer endpoint
     - Implement PUT /api/homepage/footer endpoint

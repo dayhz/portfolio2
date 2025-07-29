@@ -1,4 +1,4 @@
-import { HeroSection, HomepageData, HomepageSection, BrandsSection, BrandLogo, ServicesSection, ServiceItem, OfferSection, OfferPoint } from '../../../shared/types/homepage';
+import { HeroSection, HomepageData, HomepageSection, BrandsSection, BrandLogo, ServicesSection, ServiceItem, OfferSection, OfferPoint, TestimonialsSection, TestimonialItem } from '../../../shared/types/homepage';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
@@ -114,6 +114,35 @@ class HomepageAPI {
 
   async updateOfferContent(data: OfferSection): Promise<OfferSection> {
     return this.updateSectionContent<OfferSection>('offer', data);
+  }
+
+  // Testimonials section specific methods
+  async getTestimonialsContent(): Promise<TestimonialsSection> {
+    return this.getSectionContent<TestimonialsSection>('testimonials');
+  }
+
+  async updateTestimonialsContent(data: TestimonialsSection): Promise<TestimonialsSection> {
+    return this.updateSectionContent<TestimonialsSection>('testimonials', data);
+  }
+
+  async addTestimonial(testimonial: Omit<TestimonialItem, 'id' | 'order'>): Promise<{ testimonial: TestimonialItem; testimonials: TestimonialsSection }> {
+    return this.request<{ testimonial: TestimonialItem; testimonials: TestimonialsSection }>('/testimonials', {
+      method: 'POST',
+      body: JSON.stringify(testimonial),
+    });
+  }
+
+  async removeTestimonial(testimonialId: number): Promise<{ removedTestimonial: TestimonialItem; testimonials: TestimonialsSection }> {
+    return this.request<{ removedTestimonial: TestimonialItem; testimonials: TestimonialsSection }>(`/testimonials/${testimonialId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async reorderTestimonials(testimonialIds: number[]): Promise<{ testimonials: TestimonialsSection; newOrder: number[] }> {
+    return this.request<{ testimonials: TestimonialsSection; newOrder: number[] }>('/testimonials/reorder', {
+      method: 'PUT',
+      body: JSON.stringify({ testimonialIds }),
+    });
   }
 
   // Media upload

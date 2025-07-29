@@ -19,7 +19,7 @@ import { HeroEditor } from '../components/homepage/HeroEditor';
 import { BrandsEditor } from '../components/homepage/BrandsEditor';
 import { ServicesEditor } from '../components/homepage/ServicesEditorBasic';
 import { OfferEditor } from '../components/homepage/OfferEditor';
-import { HeroSection, BrandsSection, ServicesSection, OfferSection } from '../../../shared/types/homepage';
+import { TestimonialsEditor } from '../components/homepage/TestimonialsEditor';
 
 type HomepageSection = 'dashboard' | 'hero' | 'brands' | 'services' | 'offer' | 'testimonials' | 'footer';
 
@@ -74,7 +74,8 @@ export default function HomepagePage() {
       title: 'Témoignages',
       description: 'Avis et retours clients',
       icon: <MessageSquare className="h-5 w-5" />,
-      status: 'empty'
+      status: 'completed',
+      lastModified: 'Il y a quelques minutes'
     },
     {
       id: 'footer',
@@ -258,19 +259,7 @@ export default function HomepagePage() {
       case 'offer':
         return <OfferEditor onPreview={handlePreview} />;
       case 'testimonials':
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>💬 Section Témoignages</CardTitle>
-              <CardDescription>Fonctionnalité à venir</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                L'éditeur pour la section témoignages sera disponible prochainement.
-              </p>
-            </CardContent>
-          </Card>
-        );
+        return <TestimonialsEditor onPreview={handlePreview} />;
       case 'footer':
         return (
           <Card>

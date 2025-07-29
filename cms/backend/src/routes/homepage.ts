@@ -790,6 +790,245 @@ router.put('/brands/reorder', async (req: express.Request, res: express.Response
   }
 });
 
+// Testimonials-specific routes
+
+// GET /api/homepage/testimonials - Get testimonials section (already handled by general section route)
+
+// POST /api/homepage/testimonials - Add a new testimonial
+router.post('/testimonials', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const { text, clientName, clientTitle, clientPhoto, projectLink, projectImage } = req.body;
+
+    // Validation
+    const validationErrors = [];
+    
+    if (!text || typeof text !== 'string' || text.trim().length === 0) {
+      validationErrors.push({ field: 'text', message: 'Testimonial text is required and must be a non-empty string' });
+    }
+    
+    if (!clientName || typeof clientName !== 'string' || clientName.trim().length === 0) {
+      validationErrors.push({ field: 'clientName', message: 'Client name is required and must be a non-empty string' });
+    }
+    
+    if (!clientTitle || typeof clientTitle !== 'string' || clientTitle.trim().length === 0) {
+      validationErrors.push({ field: 'clientTitle', message: 'Client title is required and must be a non-empty string' });
+    }
+    
+    if (!clientPhoto || typeof clientPhoto !== 'string' || !clientPhoto.match(/^https?:\/\/.+/)) {
+      validationErrors.push({ field: 'clientPhoto', message: 'Client photo URL is required and must be a valid HTTP/HTTPS URL' });
+    }
+    
+    if (!projectLink || typeof projectLink !== 'string' || !projectLink.match(/^https?:\/\/.+/)) {
+      validationErrors.push({ field: 'projectLink', message: 'Project link URL is required and must be a valid HTTP/HTTPS URL' });
+    }
+    
+    if (!projectImage || typeof projectImage !== 'string' || !projectImage.match(/^https?:\/\/.+/)) {
+      validationErrors.push({ field: 'projectImage', message: 'Project image URL is required and must be a valid HTTP/HTTPS URL' });
+    }
+
+    if (validationErrors.length > 0) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        message: 'Request data is invalid',
+        errors: validationErrors
+      });
+    }
+
+    // Get current testimonials data
+    const structuredContent = await homepageService.getStructuredContent();
+    const currentTestimonials = structuredContent.testimonials;
+
+    // Generate new ID (find max ID and add 1)
+    const maxId = currentTestimonials.testimonials.length > 0 
+      ? Math.max(...currentTestimonials.testimonials.map(testimonial => testimonial.id))
+      : 0;
+    const newId = maxId + 1;
+
+    // Generate new order (add to end)
+    const newOrder = currentTestimonials.testimonials.length > 0
+      ? Math.max(...currentTestimonials.testimonials.map(testimonial => testimonial.order)) + 1
+      : 1;
+
+    // Create new testimonial
+    const newTestimonial = {
+      id: newId,
+      text: text.trim(),
+      clientName: clientName.trim(),
+      clientTitle: clientTitle.trim(),
+      clientPhoto: clientPhoto.trim(),
+      projectLink: projectLink.trim(),
+      projectImage: projectImage.trim(),
+      order: newOrder
+    };
+
+    // Add to existing testimonials
+    const updatedTestimonials = [...currentTestimonials.testimonials, newTestimonial];
+
+    // Update the testimonials section
+    const contentUpdates = [
+      { fieldName: 'testimonials', fieldValue: JSON.stringify(updatedTestimonials), fieldType: 'json' as const, displayOrder: 1 }
+    ];
+
+    await homepageService.updateSectionContent('testimonials', contentUpdates);
+
+    // Get updated content
+    const updatedContent = await homepageService.getStructuredContent();
+
+    res.status(201).json({
+      success: true,
+      message: 'Testimonial added successfully',
+      data: {
+        testimonial: newTestimonial,
+        testimonials: updatedContent.testimonials
+      },
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    next(error);
+  }
+});
+
+// DELETE /api/homepage/testimonials/:id - Remove a testimonial
+router.delete('/testimonials/:id', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const testimonialId = parseInt(req.params.id);
+
+    if (isNaN(testimonialId)) {
+      return res.status(400).json({
+        error: 'Invalid testimonial ID',
+        message: 'Testimonial ID must be a valid number'
+      });
+    }
+
+    // Get current testimonials data
+    const structuredContent = await homepageService.getStructuredContent();
+    const currentTestimonials = structuredContent.testimonials;
+
+    // Find the testimonial to remove
+    const testimonialToRemove = currentTestimonials.testimonials.find(testimonial => testimonial.id === testimonialId);
+    if (!testimonialToRemove) {
+      return res.status(404).json({
+        error: 'Testimonial not found',
+        message: `Testimonial with ID ${testimonialId} does not exist`
+      });
+    }
+
+    // Remove the testimonial and reorder remaining testimonials
+    const updatedTestimonials = currentTestimonials.testimonials
+      .filter(testimonial => testimonial.id !== testimonialId)
+      .map((testimonial, index) => ({
+        ...testimonial,
+        order: index + 1 // Reorder starting from 1
+      }));
+
+    // Update the testimonials section
+    const contentUpdates = [
+      { fieldName: 'testimonials', fieldValue: JSON.stringify(updatedTestimonials), fieldType: 'json' as const, displayOrder: 1 }
+    ];
+
+    await homepageService.updateSectionContent('testimonials', contentUpdates);
+
+    // Get updated content
+    const updatedContent = await homepageService.getStructuredContent();
+
+    res.json({
+      success: true,
+      message: 'Testimonial removed successfully',
+      data: {
+        removedTestimonial: testimonialToRemove,
+        testimonials: updatedContent.testimonials
+      },
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PUT /api/homepage/testimonials/reorder - Reorder testimonials
+router.put('/testimonials/reorder', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const { testimonialIds } = req.body;
+
+    // Validation
+    if (!Array.isArray(testimonialIds) || testimonialIds.length === 0) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        message: 'testimonialIds must be a non-empty array of testimonial IDs'
+      });
+    }
+
+    // Validate all IDs are numbers
+    const invalidIds = testimonialIds.filter(id => typeof id !== 'number' || isNaN(id));
+    if (invalidIds.length > 0) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        message: 'All testimonial IDs must be valid numbers',
+        invalidIds
+      });
+    }
+
+    // Get current testimonials data
+    const structuredContent = await homepageService.getStructuredContent();
+    const currentTestimonials = structuredContent.testimonials;
+
+    // Validate all provided IDs exist
+    const existingIds = currentTestimonials.testimonials.map(testimonial => testimonial.id);
+    const missingIds = testimonialIds.filter(id => !existingIds.includes(id));
+    if (missingIds.length > 0) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        message: 'Some testimonial IDs do not exist',
+        missingIds
+      });
+    }
+
+    // Check if all existing testimonials are included
+    const extraIds = existingIds.filter(id => !testimonialIds.includes(id));
+    if (extraIds.length > 0) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        message: 'All existing testimonials must be included in the reorder',
+        missingFromRequest: extraIds
+      });
+    }
+
+    // Create a map of existing testimonials for quick lookup
+    const testimonialMap = new Map(currentTestimonials.testimonials.map(testimonial => [testimonial.id, testimonial]));
+
+    // Reorder testimonials according to the provided order
+    const reorderedTestimonials = testimonialIds.map((id, index) => ({
+      ...testimonialMap.get(id)!,
+      order: index + 1
+    }));
+
+    // Update the testimonials section
+    const contentUpdates = [
+      { fieldName: 'testimonials', fieldValue: JSON.stringify(reorderedTestimonials), fieldType: 'json' as const, displayOrder: 1 }
+    ];
+
+    await homepageService.updateSectionContent('testimonials', contentUpdates);
+
+    // Get updated content
+    const updatedContent = await homepageService.getStructuredContent();
+
+    res.json({
+      success: true,
+      message: 'Testimonials reordered successfully',
+      data: {
+        testimonials: updatedContent.testimonials,
+        newOrder: testimonialIds
+      },
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Apply error handling middleware to all routes
 router.use(handleHomepageError);
 
