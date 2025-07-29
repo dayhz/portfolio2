@@ -87,7 +87,10 @@ export const DynamicProjectPage: React.FC = () => {
     );
   }
 
-  const content = <ZestyTemplateRenderer projectData={projectData} isPreview={false} />;
+  // Check if preview mode is explicitly disabled
+  const isPreview = searchParams.get('preview') !== 'false';
+  
+  const content = <ZestyTemplateRenderer projectData={projectData} isPreview={isPreview} />;
 
   return (
     <div className="min-h-screen bg-white">

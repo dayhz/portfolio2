@@ -567,7 +567,8 @@ const NavigationSection = memo(({
 
 // Safe component wrapper with error boundary and performance optimizations
 const SafeZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = memo(({ 
-  projectData 
+  projectData,
+  isPreview = true
 }) => {
   // State for mobile menu toggle
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -587,7 +588,7 @@ const SafeZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = memo(({
       if (key === 'scope') {
         return Array.isArray(projectValue) && projectValue.length > 0 
           ? projectValue.join('\n') 
-          : Array.isArray(defaultValue) 
+          : isPreview && Array.isArray(defaultValue) 
             ? defaultValue.join('\n') 
             : '';
       }
@@ -596,7 +597,8 @@ const SafeZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = memo(({
       let content = '';
       if (typeof projectValue === 'string' && projectValue.trim()) {
         content = projectValue.trim();
-      } else if (typeof defaultValue === 'string') {
+      } else if (isPreview && typeof defaultValue === 'string') {
+        // Only use default values in preview mode, not in final render
         content = defaultValue;
       }
       
@@ -607,25 +609,32 @@ const SafeZestyTemplateRenderer: React.FC<ZestyTemplateRendererProps> = memo(({
       return content;
     } catch (error) {
       console.error(`Error getting content for ${key}:`, error);
-      const defaultValue = defaultContent[key as keyof typeof defaultContent];
-      return typeof defaultValue === 'string' ? defaultValue : '';
+      // Only return default values in preview mode
+      if (isPreview) {
+        const defaultValue = defaultContent[key as keyof typeof defaultContent];
+        return typeof defaultValue === 'string' ? defaultValue : '';
+      }
+      return '';
     }
-  }, [projectData]);
+  }, [projectData, isPreview]);
 
   // Helper function to render scope array with error handling
   const renderScope = useCallback(() => {
     try {
-      const scope = projectData?.scope && Array.isArray(projectData.scope) && projectData.scope.length > 0 
+      const projectScope = projectData?.scope && Array.isArray(projectData.scope) && projectData.scope.length > 0 
         ? projectData.scope 
-        : defaultContent.scope;
+        : null;
       
-      if (!Array.isArray(scope)) {
-        return defaultContent.scope.map((item, index) => (
-          <React.Fragment key={index}>
-            {item}
-            {index < defaultContent.scope.length - 1 && <br />}
-          </React.Fragment>
-        ));
+      // If no project scope and not in preview mode, return empty
+      if (!projectScope && !isPreview) {
+        return null;
+      }
+      
+      // Use project scope if available, otherwise use default only in preview mode
+      const scope = projectScope || (isPreview ? defaultContent.scope : []);
+      
+      if (!Array.isArray(scope) || scope.length === 0) {
+        return null;
       }
       
       return scope.map((item, index) => (
