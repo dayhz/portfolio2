@@ -20,6 +20,7 @@ import { BrandsEditor } from '../components/homepage/BrandsEditor';
 import { ServicesEditor } from '../components/homepage/ServicesEditorBasic';
 import { OfferEditor } from '../components/homepage/OfferEditor';
 import { TestimonialsEditor } from '../components/homepage/TestimonialsEditor';
+import { FooterEditor } from '../components/homepage/FooterEditor';
 
 type HomepageSection = 'dashboard' | 'hero' | 'brands' | 'services' | 'offer' | 'testimonials' | 'footer';
 
@@ -261,19 +262,7 @@ export default function HomepagePage() {
       case 'testimonials':
         return <TestimonialsEditor onPreview={handlePreview} />;
       case 'footer':
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>📞 Section Footer</CardTitle>
-              <CardDescription>Fonctionnalité à venir</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                L'éditeur pour la section footer sera disponible prochainement.
-              </p>
-            </CardContent>
-          </Card>
-        );
+        return <FooterEditor onPreview={handlePreview} />;
       default:
         return renderDashboard();
     }

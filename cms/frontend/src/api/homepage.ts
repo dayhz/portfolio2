@@ -1,4 +1,4 @@
-import { HeroSection, HomepageData, HomepageSection, BrandsSection, BrandLogo, ServicesSection, ServiceItem, OfferSection, OfferPoint, TestimonialsSection, TestimonialItem } from '../../../shared/types/homepage';
+import { HeroSection, HomepageData, HomepageSection, BrandsSection, BrandLogo, ServicesSection, ServiceItem, OfferSection, OfferPoint, TestimonialsSection, TestimonialItem, FooterSection } from '../../../shared/types/homepage';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
@@ -143,6 +143,15 @@ class HomepageAPI {
       method: 'PUT',
       body: JSON.stringify({ testimonialIds }),
     });
+  }
+
+  // Footer section specific methods
+  async getFooterContent(): Promise<FooterSection> {
+    return this.getSectionContent<FooterSection>('footer');
+  }
+
+  async updateFooterContent(data: FooterSection): Promise<FooterSection> {
+    return this.updateSectionContent<FooterSection>('footer', data);
   }
 
   // Media upload
