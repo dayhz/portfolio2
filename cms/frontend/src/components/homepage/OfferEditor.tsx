@@ -14,6 +14,7 @@ import { OfferSection, OfferPoint } from '../../../../shared/types/homepage';
 
 interface OfferEditorProps {
   onPreview?: (data: OfferSection) => void;
+  onUnsavedChanges?: (hasChanges: boolean) => void;
 }
 
 interface DragItem {
@@ -21,7 +22,7 @@ interface DragItem {
   index: number;
 }
 
-export function OfferEditor({ onPreview }: OfferEditorProps) {
+export function OfferEditor({ onPreview, onUnsavedChanges }: OfferEditorProps) {
   const [formData, setFormData] = useState<OfferSection>({
     title: '',
     points: []
@@ -64,6 +65,13 @@ export function OfferEditor({ onPreview }: OfferEditorProps) {
       setHasUnsavedChanges(false);
     }
   }, [offerData]);
+
+  // Notify parent component about unsaved changes
+  useEffect(() => {
+    if (onUnsavedChanges) {
+      onUnsavedChanges(hasUnsavedChanges);
+    }
+  }, [hasUnsavedChanges, onUnsavedChanges]);
 
   // Handle field changes
   const handleFieldChange = (field: keyof OfferSection, value: string) => {

@@ -13,9 +13,10 @@ import { WorkSection } from '../../../../shared/types/homepage';
 
 interface WorkEditorProps {
   onPreview?: (data: WorkSection) => void;
+  onUnsavedChanges?: (hasChanges: boolean) => void;
 }
 
-export function WorkEditor({ onPreview }: WorkEditorProps) {
+export function WorkEditor({ onPreview, onUnsavedChanges }: WorkEditorProps) {
   const [formData, setFormData] = useState<WorkSection>({
     title: '',
     description: '',
@@ -71,6 +72,13 @@ export function WorkEditor({ onPreview }: WorkEditorProps) {
       setHasUnsavedChanges(false);
     }
   }, [workData]);
+
+  // Notify parent component about unsaved changes
+  useEffect(() => {
+    if (onUnsavedChanges) {
+      onUnsavedChanges(hasUnsavedChanges);
+    }
+  }, [hasUnsavedChanges, onUnsavedChanges]);
 
   // Handle field changes
   const handleFieldChange = (field: keyof WorkSection, value: string) => {

@@ -14,6 +14,7 @@ import { TestimonialsSection, TestimonialItem } from '../../../../shared/types/h
 
 interface TestimonialsEditorProps {
   onPreview?: (data: TestimonialsSection) => void;
+  onUnsavedChanges?: (hasChanges: boolean) => void;
 }
 
 interface DragItem {
@@ -39,7 +40,7 @@ const initialNewTestimonial: NewTestimonialForm = {
   projectImage: ''
 };
 
-export function TestimonialsEditor({ onPreview }: TestimonialsEditorProps) {
+export function TestimonialsEditor({ onPreview, onUnsavedChanges }: TestimonialsEditorProps) {
   const [formData, setFormData] = useState<TestimonialsSection>({
     testimonials: []
   });
@@ -133,6 +134,13 @@ export function TestimonialsEditor({ onPreview }: TestimonialsEditorProps) {
       setHasUnsavedChanges(false);
     }
   }, [testimonialsData]);
+
+  // Notify parent component about unsaved changes
+  useEffect(() => {
+    if (onUnsavedChanges) {
+      onUnsavedChanges(hasUnsavedChanges);
+    }
+  }, [hasUnsavedChanges, onUnsavedChanges]);
 
   // Update testimonial mutation
   const updateTestimonialMutation = useMutation({

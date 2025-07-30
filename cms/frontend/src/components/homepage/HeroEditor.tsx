@@ -13,9 +13,10 @@ import { HeroSection } from '../../../../shared/types/homepage';
 
 interface HeroEditorProps {
   onPreview?: (data: HeroSection) => void;
+  onUnsavedChanges?: (hasChanges: boolean) => void;
 }
 
-export function HeroEditor({ onPreview }: HeroEditorProps) {
+export function HeroEditor({ onPreview, onUnsavedChanges }: HeroEditorProps) {
   const [formData, setFormData] = useState<HeroSection>({
     title: '',
     description: '',
@@ -70,6 +71,13 @@ export function HeroEditor({ onPreview }: HeroEditorProps) {
       setHasUnsavedChanges(false);
     }
   }, [heroData]);
+
+  // Notify parent component about unsaved changes
+  useEffect(() => {
+    if (onUnsavedChanges) {
+      onUnsavedChanges(hasUnsavedChanges);
+    }
+  }, [hasUnsavedChanges, onUnsavedChanges]);
 
   // Handle form field changes
   const handleFieldChange = (field: keyof HeroSection, value: string) => {

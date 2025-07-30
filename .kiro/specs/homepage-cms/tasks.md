@@ -160,22 +160,22 @@
     - Test footer updates reflect on portfolio site
     - _Requirements: 7.6_
 
-- [ ] 9. Create unified CMS dashboard
-  - [ ] 9.1 Build main dashboard interface
+- [x] 9. Create unified CMS dashboard
+  - [x] 9.1 Build main dashboard interface
     - Create React dashboard with section cards
     - Implement navigation between sections
     - Add visual indicators for unsaved changes
     - Create responsive layout for dashboard
     - _Requirements: 8.1, 8.2, 8.3_
 
-  - [ ] 9.2 Implement preview functionality
+  - [x] 9.2 Implement preview functionality
     - Create preview modal/page for homepage
     - Integrate real-time preview updates
     - Add preview button to each section editor
     - Ensure preview reflects all current changes
     - _Requirements: 8.4, 8.5_
 
-  - [ ] 9.3 Add global save and publish functionality
+  - [x] 9.3 Add global save and publish functionality
     - Implement save all changes functionality
     - Create publish button to apply changes to live site
     - Add confirmation dialogs for destructive actions

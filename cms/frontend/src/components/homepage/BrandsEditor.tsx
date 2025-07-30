@@ -13,6 +13,7 @@ import { BrandsSection, BrandLogo } from '../../../../shared/types/homepage';
 
 interface BrandsEditorProps {
   onPreview?: (data: BrandsSection) => void;
+  onUnsavedChanges?: (hasChanges: boolean) => void;
 }
 
 interface DragItem {
@@ -20,7 +21,7 @@ interface DragItem {
   index: number;
 }
 
-export function BrandsEditor({ onPreview }: BrandsEditorProps) {
+export function BrandsEditor({ onPreview, onUnsavedChanges }: BrandsEditorProps) {
   const [formData, setFormData] = useState<BrandsSection>({
     title: '',
     logos: []
@@ -106,6 +107,13 @@ export function BrandsEditor({ onPreview }: BrandsEditorProps) {
       setHasUnsavedChanges(false);
     }
   }, [brandsData]);
+
+  // Notify parent component about unsaved changes
+  useEffect(() => {
+    if (onUnsavedChanges) {
+      onUnsavedChanges(hasUnsavedChanges);
+    }
+  }, [hasUnsavedChanges, onUnsavedChanges]);
 
   // Handle title change
   const handleTitleChange = (value: string) => {

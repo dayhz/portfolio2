@@ -15,6 +15,7 @@ import { ServicesSection, ServiceItem } from '../../../../shared/types/homepage'
 
 interface ServicesEditorProps {
   onPreview?: (data: ServicesSection) => void;
+  onUnsavedChanges?: (hasChanges: boolean) => void;
 }
 
 interface DragItem {
@@ -28,7 +29,7 @@ const COLOR_CLASS_OPTIONS = [
   { value: '', label: 'Aucun' }
 ];
 
-export function ServicesEditor({ onPreview }: ServicesEditorProps) {
+export function ServicesEditor({ onPreview, onUnsavedChanges }: ServicesEditorProps) {
   const [formData, setFormData] = useState<ServicesSection>({
     title: '',
     description: '',
@@ -81,6 +82,13 @@ export function ServicesEditor({ onPreview }: ServicesEditorProps) {
       setHasUnsavedChanges(false);
     }
   }, [servicesData]);
+
+  // Notify parent component about unsaved changes
+  useEffect(() => {
+    if (onUnsavedChanges) {
+      onUnsavedChanges(hasUnsavedChanges);
+    }
+  }, [hasUnsavedChanges, onUnsavedChanges]);
 
   // Handle field changes
   const handleFieldChange = (field: keyof ServicesSection, value: string) => {

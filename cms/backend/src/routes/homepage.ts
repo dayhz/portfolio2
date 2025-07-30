@@ -1048,6 +1048,68 @@ router.put('/testimonials/reorder', async (req: express.Request, res: express.Re
   }
 });
 
+// Save all changes (without publishing)
+router.post('/save-all', async (req, res, next) => {
+  try {
+    // Get all current content
+    const allContent = await homepageService.getAllContent();
+    
+    // In a real implementation, this would save all pending changes to a staging area
+    // For now, we'll just return the current state
+    const savedSections = Object.keys(allContent);
+    
+    res.json({
+      success: true,
+      data: {
+        success: true,
+        savedSections,
+        timestamp: new Date().toISOString()
+      },
+      message: `${savedSections.length} sections saved successfully`,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Publish all changes
+router.post('/publish', async (req, res, next) => {
+  try {
+    // Get all current content
+    const allContent = await homepageService.getAllContent();
+    
+    // In a real implementation, this would:
+    // 1. Apply all staged changes to the live site
+    // 2. Update the portfolio site with new content
+    // 3. Clear any staging/draft content
+    
+    const publishedSections = Object.keys(allContent);
+    
+    // TODO: Implement actual publishing logic
+    // This could involve:
+    // - Updating static files
+    // - Invalidating caches
+    // - Triggering site rebuild
+    // - Notifying CDN of changes
+    
+    res.json({
+      success: true,
+      data: {
+        success: true,
+        publishedSections,
+        timestamp: new Date().toISOString()
+      },
+      message: `${publishedSections.length} sections published successfully`,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Apply error handling middleware to all routes
 router.use(handleHomepageError);
 

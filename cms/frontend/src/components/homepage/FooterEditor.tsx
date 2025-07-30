@@ -12,9 +12,10 @@ import { FooterSection, FooterLink } from '../../../../shared/types/homepage';
 
 interface FooterEditorProps {
   onPreview?: (data: FooterSection) => void;
+  onUnsavedChanges?: (hasChanges: boolean) => void;
 }
 
-export function FooterEditor({ onPreview }: FooterEditorProps) {
+export function FooterEditor({ onPreview, onUnsavedChanges }: FooterEditorProps) {
   const [formData, setFormData] = useState<FooterSection>({
     title: '',
     email: '',
@@ -74,6 +75,13 @@ export function FooterEditor({ onPreview }: FooterEditorProps) {
       setHasUnsavedChanges(false);
     }
   }, [footerData]);
+
+  // Notify parent component about unsaved changes
+  useEffect(() => {
+    if (onUnsavedChanges) {
+      onUnsavedChanges(hasUnsavedChanges);
+    }
+  }, [hasUnsavedChanges, onUnsavedChanges]);
 
   // Handle basic field changes
   const handleFieldChange = (field: keyof FooterSection, value: string) => {

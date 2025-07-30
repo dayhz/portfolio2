@@ -190,6 +190,36 @@ class HomepageAPI {
     const result: ApiResponse<any> = await response.json();
     return result.data;
   }
+
+  // Publish all changes
+  async publishAllChanges(): Promise<{
+    success: boolean;
+    publishedSections: string[];
+    timestamp: string;
+  }> {
+    return this.request<{
+      success: boolean;
+      publishedSections: string[];
+      timestamp: string;
+    }>('/publish', {
+      method: 'POST',
+    });
+  }
+
+  // Save all changes (without publishing)
+  async saveAllChanges(): Promise<{
+    success: boolean;
+    savedSections: string[];
+    timestamp: string;
+  }> {
+    return this.request<{
+      success: boolean;
+      savedSections: string[];
+      timestamp: string;
+    }>('/save-all', {
+      method: 'POST',
+    });
+  }
 }
 
 export const homepageAPI = new HomepageAPI();
