@@ -2,25 +2,44 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.homepageService = exports.HomepageService = void 0;
 const client_1 = require("@prisma/client");
+const cacheService_1 = require("./cacheService");
 const prisma = new client_1.PrismaClient();
 class HomepageService {
     // Get all content for a specific section
     async getSectionContent(section) {
+        // Try to get from cache first
+        const cacheKey = `homepage:section:${section}`;
+        const cached = await cacheService_1.cacheService.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
         const results = await prisma.homepageContent.findMany({
             where: { section },
             orderBy: { displayOrder: 'asc' }
         });
-        return this.mapPrismaToHomepageContent(results);
+        const content = this.mapPrismaToHomepageContent(results);
+        // Cache the result for 30 minutes
+        await cacheService_1.cacheService.set(cacheKey, content, 1800);
+        return content;
     }
     // Get all homepage content
     async getAllContent() {
+        // Try to get from cache first
+        const cacheKey = 'homepage:all:content';
+        const cached = await cacheService_1.cacheService.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
         const results = await prisma.homepageContent.findMany({
             orderBy: [
                 { section: 'asc' },
                 { displayOrder: 'asc' }
             ]
         });
-        return this.mapPrismaToHomepageContent(results);
+        const content = this.mapPrismaToHomepageContent(results);
+        // Cache the result for 30 minutes
+        await cacheService_1.cacheService.set(cacheKey, content, 1800);
+        return content;
     }
     // Update or create content for a field
     async upsertContent(input) {
@@ -39,6 +58,8 @@ class HomepageService {
             },
             create: input
         });
+        // Invalidate related caches
+        await this.invalidateCache(input.section);
         return this.mapPrismaToHomepageContent([result])[0];
     }
     // Update multiple content fields for a section
@@ -56,6 +77,8 @@ class HomepageService {
                 });
                 results.push(result);
             }
+            // Invalidate all caches after bulk update
+            await this.invalidateAllCaches();
             // Cleanup old versions after successful update
             await this.cleanupOldVersions(10);
             return results;
@@ -157,8 +180,14 @@ class HomepageService {
     }
     // Get structured content (organized by sections)
     async getStructuredContent() {
+        // Try to get from cache first
+        const cacheKey = 'homepage:structured';
+        const cached = await cacheService_1.cacheService.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
         const allContent = await this.getAllContent();
-        return {
+        const structuredData = {
             hero: this.transformToHeroSection(allContent.filter(c => c.section === 'hero')),
             brands: this.transformToBrandsSection(allContent.filter(c => c.section === 'brands')),
             services: this.transformToServicesSection(allContent.filter(c => c.section === 'services')),
@@ -167,6 +196,9 @@ class HomepageService {
             testimonials: this.transformToTestimonialsSection(allContent.filter(c => c.section === 'testimonials')),
             footer: this.transformToFooterSection(allContent.filter(c => c.section === 'footer'))
         };
+        // Cache the result for 30 minutes
+        await cacheService_1.cacheService.set(cacheKey, structuredData, 1800);
+        return structuredData;
     }
     // Content transformation methods
     transformToHeroSection(content) {
@@ -307,6 +339,54 @@ class HomepageService {
     async createEmergencyBackup() {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         return await this.createVersion(`Emergency-backup-${timestamp}`);
+    }
+    // Cache management methods
+    async invalidateCache(section) {
+        await Promise.all([
+            cacheService_1.cacheService.del(`homepage:section:${section}`),
+            cacheService_1.cacheService.del('homepage:all:content'),
+            cacheService_1.cacheService.del('homepage:structured')
+        ]);
+    }
+    async invalidateAllCaches() {
+        await cacheService_1.cacheService.invalidatePattern('homepage:*');
+    }
+    // Get section with caching
+    async getSection(section) {
+        const cacheKey = `homepage:${section}`;
+        const cached = await cacheService_1.cacheService.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
+        const content = await this.getSectionContent(section);
+        let sectionData;
+        switch (section) {
+            case 'hero':
+                sectionData = this.transformToHeroSection(content);
+                break;
+            case 'brands':
+                sectionData = this.transformToBrandsSection(content);
+                break;
+            case 'services':
+                sectionData = this.transformToServicesSection(content);
+                break;
+            case 'work':
+                sectionData = this.transformToWorkSection(content);
+                break;
+            case 'offer':
+                sectionData = this.transformToOfferSection(content);
+                break;
+            case 'testimonials':
+                sectionData = this.transformToTestimonialsSection(content);
+                break;
+            case 'footer':
+                sectionData = this.transformToFooterSection(content);
+                break;
+            default:
+                sectionData = {};
+        }
+        await cacheService_1.cacheService.set(cacheKey, sectionData, 1800);
+        return sectionData;
     }
     // Validate content integrity
     async validateContentIntegrity() {

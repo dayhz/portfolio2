@@ -16,6 +16,7 @@ import {
   ContentTransformer,
   FieldType
 } from '../../../shared/types/homepage';
+import { cacheService } from './cacheService';
 
 // Type for Prisma database results
 type PrismaHomepageContent = {
@@ -42,22 +43,50 @@ const prisma = new PrismaClient();
 export class HomepageService {
   // Get all content for a specific section
   async getSectionContent(section: HomepageSection): Promise<HomepageContent[]> {
+    // Try to get from cache first
+    const cacheKey = `homepage:section:${section}`;
+    const cached = await cacheService.get<HomepageContent[]>(cacheKey);
+    
+    if (cached) {
+      return cached;
+    }
+
     const results = await prisma.homepageContent.findMany({
       where: { section },
       orderBy: { displayOrder: 'asc' }
     });
-    return this.mapPrismaToHomepageContent(results);
+    
+    const content = this.mapPrismaToHomepageContent(results);
+    
+    // Cache the result for 30 minutes
+    await cacheService.set(cacheKey, content, 1800);
+    
+    return content;
   }
 
   // Get all homepage content
   async getAllContent(): Promise<HomepageContent[]> {
+    // Try to get from cache first
+    const cacheKey = 'homepage:all:content';
+    const cached = await cacheService.get<HomepageContent[]>(cacheKey);
+    
+    if (cached) {
+      return cached;
+    }
+
     const results = await prisma.homepageContent.findMany({
       orderBy: [
         { section: 'asc' },
         { displayOrder: 'asc' }
       ]
     });
-    return this.mapPrismaToHomepageContent(results);
+    
+    const content = this.mapPrismaToHomepageContent(results);
+    
+    // Cache the result for 30 minutes
+    await cacheService.set(cacheKey, content, 1800);
+    
+    return content;
   }
 
   // Update or create content for a field
@@ -77,6 +106,10 @@ export class HomepageService {
       },
       create: input
     });
+    
+    // Invalidate related caches
+    await this.invalidateCache(input.section);
+    
     return this.mapPrismaToHomepageContent([result])[0];
   }
 
@@ -101,6 +134,9 @@ export class HomepageService {
         });
         results.push(result);
       }
+      
+      // Invalidate all caches after bulk update
+      await this.invalidateAllCaches();
       
       // Cleanup old versions after successful update
       await this.cleanupOldVersions(10);
@@ -220,9 +256,17 @@ export class HomepageService {
 
   // Get structured content (organized by sections)
   async getStructuredContent(): Promise<HomepageData> {
+    // Try to get from cache first
+    const cacheKey = 'homepage:structured';
+    const cached = await cacheService.get<HomepageData>(cacheKey);
+    
+    if (cached) {
+      return cached;
+    }
+
     const allContent = await this.getAllContent();
     
-    return {
+    const structuredData = {
       hero: this.transformToHeroSection(allContent.filter(c => c.section === 'hero')),
       brands: this.transformToBrandsSection(allContent.filter(c => c.section === 'brands')),
       services: this.transformToServicesSection(allContent.filter(c => c.section === 'services')),
@@ -231,6 +275,11 @@ export class HomepageService {
       testimonials: this.transformToTestimonialsSection(allContent.filter(c => c.section === 'testimonials')),
       footer: this.transformToFooterSection(allContent.filter(c => c.section === 'footer'))
     };
+    
+    // Cache the result for 30 minutes
+    await cacheService.set(cacheKey, structuredData, 1800);
+    
+    return structuredData;
   }
 
   // Content transformation methods
@@ -403,6 +452,61 @@ export class HomepageService {
   async createEmergencyBackup(): Promise<HomepageVersion> {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     return await this.createVersion(`Emergency-backup-${timestamp}`);
+  }
+
+  // Cache management methods
+  private async invalidateCache(section: HomepageSection): Promise<void> {
+    await Promise.all([
+      cacheService.del(`homepage:section:${section}`),
+      cacheService.del('homepage:all:content'),
+      cacheService.del('homepage:structured')
+    ]);
+  }
+
+  private async invalidateAllCaches(): Promise<void> {
+    await cacheService.invalidatePattern('homepage:*');
+  }
+
+  // Get section with caching
+  async getSection(section: HomepageSection): Promise<any> {
+    const cacheKey = `homepage:${section}`;
+    const cached = await cacheService.get(cacheKey);
+    
+    if (cached) {
+      return cached;
+    }
+
+    const content = await this.getSectionContent(section);
+    let sectionData;
+
+    switch (section) {
+      case 'hero':
+        sectionData = this.transformToHeroSection(content);
+        break;
+      case 'brands':
+        sectionData = this.transformToBrandsSection(content);
+        break;
+      case 'services':
+        sectionData = this.transformToServicesSection(content);
+        break;
+      case 'work':
+        sectionData = this.transformToWorkSection(content);
+        break;
+      case 'offer':
+        sectionData = this.transformToOfferSection(content);
+        break;
+      case 'testimonials':
+        sectionData = this.transformToTestimonialsSection(content);
+        break;
+      case 'footer':
+        sectionData = this.transformToFooterSection(content);
+        break;
+      default:
+        sectionData = {};
+    }
+
+    await cacheService.set(cacheKey, sectionData, 1800);
+    return sectionData;
   }
 
   // Validate content integrity

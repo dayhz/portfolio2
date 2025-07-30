@@ -10,6 +10,8 @@ const morgan_1 = __importDefault(require("morgan"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
 const prisma_1 = require("./lib/prisma");
+const cacheService_1 = require("./services/cacheService");
+const performanceMonitoringService_1 = require("./services/performanceMonitoringService");
 const authRoutes = require('./routes/auth-working');
 const media_1 = __importDefault(require("./routes/media"));
 const profile_1 = __importDefault(require("./routes/profile"));
@@ -18,6 +20,7 @@ const template_projects_1 = __importDefault(require("./routes/template-projects"
 const about_1 = __importDefault(require("./routes/about"));
 const auth_debug_1 = __importDefault(require("./routes/auth-debug"));
 const homepage_1 = require("./routes/homepage");
+const performance_1 = require("./routes/performance");
 // Load environment variables
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -35,6 +38,8 @@ app.use((0, cors_1.default)({
 app.use((0, morgan_1.default)('combined'));
 app.use(express_1.default.json({ limit: '10mb' }));
 app.use(express_1.default.urlencoded({ extended: true }));
+// Performance monitoring middleware
+app.use(performanceMonitoringService_1.performanceMonitoringService.trackPerformance());
 // Static files for uploads
 const uploadDir = process.env.UPLOAD_DIR || 'uploads';
 const uploadsPath = path_1.default.join(process.cwd(), uploadDir);
@@ -60,6 +65,7 @@ app.use('/api/projects', projects_1.default);
 app.use('/api/template-projects', template_projects_1.default);
 app.use('/api/about', about_1.default);
 app.use('/api/homepage', homepage_1.homepageRouter);
+app.use('/api/performance', performance_1.performanceRouter);
 // app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/media', media_1.default);
 app.use('/api/profile', profile_1.default);
@@ -86,6 +92,18 @@ async function startServer() {
         console.error('❌ Failed to connect to database. Exiting...');
         process.exit(1);
     }
+    // Initialize cache service
+    try {
+        await cacheService_1.cacheService.connect();
+        console.log('✅ Cache service connected');
+        // Warm cache with homepage content
+        setTimeout(async () => {
+            await cacheService_1.cacheService.warmCache();
+        }, 2000); // Wait 2 seconds after server start
+    }
+    catch (error) {
+        console.warn('⚠️ Cache service failed to connect, continuing without cache:', error);
+    }
     app.listen(PORT, () => {
         console.log(`🚀 Server running on port ${PORT}`);
         console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
@@ -97,6 +115,17 @@ async function startServer() {
         console.log(`   GET /api/auth/me - Get user info`);
     });
 }
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+    console.log('🔄 SIGTERM received, shutting down gracefully...');
+    await cacheService_1.cacheService.disconnect();
+    process.exit(0);
+});
+process.on('SIGINT', async () => {
+    console.log('🔄 SIGINT received, shutting down gracefully...');
+    await cacheService_1.cacheService.disconnect();
+    process.exit(0);
+});
 startServer().catch((error) => {
     console.error('❌ Failed to start server:', error);
     process.exit(1);

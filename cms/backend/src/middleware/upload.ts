@@ -3,6 +3,7 @@ import sharp from 'sharp';
 import path from 'path';
 import fs from 'fs/promises';
 import { Request, Response, NextFunction } from 'express';
+import { mediaOptimizationService } from '../services/mediaOptimizationService';
 
 // Configuration de stockage
 const storage = multer.diskStorage({
@@ -72,7 +73,7 @@ export const uploadMedia = multer({
   }
 });
 
-// Middleware pour optimiser les images avec Sharp
+// Enhanced middleware for image optimization with responsive variants
 export const optimizeImage = async (
   req: Request,
   res: Response,
@@ -80,92 +81,58 @@ export const optimizeImage = async (
 ) => {
   try {
     if (!req.file) {
-      console.log('Aucun fichier trouvé dans la requête');
+      console.log('No file found in request');
       return next();
     }
     
-    console.log(`Traitement du fichier: ${req.file.originalname}, type: ${req.file.mimetype}`);
+    console.log(`Processing file: ${req.file.originalname}, type: ${req.file.mimetype}`);
     
     if (!req.file.mimetype.startsWith('image/')) {
-      console.log(`Le fichier n'est pas une image: ${req.file.mimetype}`);
+      console.log(`File is not an image: ${req.file.mimetype}`);
       return next();
     }
 
     const inputPath = req.file.path;
-    console.log(`Chemin du fichier d'entrée: ${inputPath}`);
+    console.log(`Input file path: ${inputPath}`);
     
-    // Vérifier si le fichier existe
-    try {
-      await fs.access(inputPath);
-      console.log(`Le fichier d'entrée existe: ${inputPath}`);
-    } catch (err) {
-      console.error(`Le fichier d'entrée n'existe pas: ${inputPath}`, err);
-      return next(new Error(`Le fichier d'entrée n'existe pas: ${inputPath}`));
+    // Validate image file
+    const isValid = await mediaOptimizationService.validateImage(inputPath);
+    if (!isValid) {
+      return next(new Error('Invalid image file'));
     }
     
-    const outputPath = inputPath.replace(/\.[^/.]+$/, '.webp');
-    const thumbnailPath = inputPath.replace(/\.[^/.]+$/, '-thumb.webp');
+    // Get image metadata
+    const metadata = await mediaOptimizationService.getImageMetadata(inputPath);
+    console.log('Image metadata:', metadata);
+
+    // Optimize image with responsive variants
+    const result = await mediaOptimizationService.optimizeImage(inputPath);
     
-    console.log(`Chemin du fichier de sortie: ${outputPath}`);
-    console.log(`Chemin de la miniature: ${thumbnailPath}`);
+    console.log(`Image optimized successfully. Compression ratio: ${(result.compressionRatio * 100).toFixed(2)}%`);
+    console.log(`Generated ${result.variants.length} responsive variants`);
 
-    try {
-      // Optimiser l'image principale
-      console.log('Début de l\'optimisation de l\'image principale');
-      await sharp(inputPath)
-        .resize(1920, 1080, { 
-          fit: 'inside',
-          withoutEnlargement: true 
-        })
-        .webp({ quality: 85 })
-        .toFile(outputPath);
-      console.log('Image principale optimisée avec succès');
-    } catch (err) {
-      console.error('Erreur lors de l\'optimisation de l\'image principale:', err);
-      return next(err);
-    }
-
-    try {
-      // Créer une miniature
-      console.log('Début de la création de la miniature');
-      await sharp(inputPath)
-        .resize(300, 300, { 
-          fit: 'inside',
-          withoutEnlargement: true 
-        })
-        .webp({ quality: 80 })
-        .toFile(thumbnailPath);
-      console.log(`Miniature créée avec succès: ${thumbnailPath}`);
-    } catch (err) {
-      console.error('Erreur lors de la création de la miniature:', err);
-      // Continuer même si la création de la miniature échoue
-    }
-
-    try {
-      // Supprimer le fichier original
-      console.log(`Suppression du fichier original: ${inputPath}`);
-      await fs.unlink(inputPath);
-      console.log('Fichier original supprimé avec succès');
-    } catch (err) {
-      console.error('Erreur lors de la suppression du fichier original:', err);
-      // Continuer même si la suppression échoue
-    }
-
-    // Mettre à jour les informations du fichier
-    req.file.path = outputPath;
-    req.file.filename = path.basename(outputPath);
+    // Update file information
+    req.file.path = result.optimizedPath;
+    req.file.filename = path.basename(result.optimizedPath);
     req.file.mimetype = 'image/webp';
     
-    // Ajouter le chemin et le nom de fichier de la miniature
-    (req.file as any).thumbnailPath = thumbnailPath;
-    (req.file as any).thumbnailFilename = path.basename(thumbnailPath);
-    
-    console.log(`Miniature générée: ${path.basename(thumbnailPath)}`);
+    // Add optimization results to file object
+    (req.file as any).thumbnailPath = result.thumbnailPath;
+    (req.file as any).thumbnailFilename = path.basename(result.thumbnailPath);
+    (req.file as any).variants = result.variants.map(v => ({
+      path: v.path,
+      filename: path.basename(v.path),
+      width: v.width,
+      height: v.height,
+      size: v.size
+    }));
+    (req.file as any).compressionRatio = result.compressionRatio;
+    (req.file as any).metadata = metadata;
 
     next();
   } catch (error) {
     console.error('Image optimization error:', error);
-    // Ne pas propager l'erreur pour éviter de bloquer l'upload
+    // Continue without optimization to avoid blocking upload
     next();
   }
 };
@@ -233,16 +200,38 @@ export const optimizeImages = async (
   }
 };
 
-// Utilitaire pour générer les URLs des fichiers
-export const generateFileUrls = (req: Request, filename: string, thumbnailFilename?: string) => {
+// Enhanced utility for generating responsive image URLs
+export const generateFileUrls = (req: Request, filename: string, thumbnailFilename?: string, variants?: any[]) => {
   const baseUrl = `${req.protocol}://${req.get('host')}`;
   const uploadDir = process.env.UPLOAD_DIR || 'uploads';
   
   const url = `${baseUrl}/${uploadDir}/${filename}`;
   const thumbnailUrl = thumbnailFilename ? `${baseUrl}/${uploadDir}/${thumbnailFilename}` : undefined;
   
-  console.log(`generateFileUrls - URL: ${url}`);
-  console.log(`generateFileUrls - Miniature URL: ${thumbnailUrl}`);
+  // Generate responsive image URLs
+  const responsiveUrls = variants ? variants.map(variant => ({
+    url: `${baseUrl}/${uploadDir}/${variant.filename}`,
+    width: variant.width,
+    height: variant.height,
+    size: variant.size
+  })) : [];
   
-  return { url, thumbnailUrl };
+  // Generate srcSet for responsive images
+  const srcSet = variants ? variants.map(variant => 
+    `${baseUrl}/${uploadDir}/${variant.filename} ${variant.width}w`
+  ).join(', ') : '';
+  
+  const sizes = mediaOptimizationService.generateSizes();
+  
+  console.log(`generateFileUrls - Main URL: ${url}`);
+  console.log(`generateFileUrls - Thumbnail URL: ${thumbnailUrl}`);
+  console.log(`generateFileUrls - Generated ${responsiveUrls.length} responsive variants`);
+  
+  return { 
+    url, 
+    thumbnailUrl, 
+    responsiveUrls,
+    srcSet,
+    sizes
+  };
 };

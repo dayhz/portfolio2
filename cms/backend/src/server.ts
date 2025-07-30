@@ -5,6 +5,8 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import path from 'path';
 import { initializeDatabase } from './lib/prisma';
+import { cacheService } from './services/cacheService';
+import { performanceMonitoringService } from './services/performanceMonitoringService';
 const authRoutes = require('./routes/auth-working');
 import mediaRoutes from './routes/media';
 import profileRoutes from './routes/profile';
@@ -13,6 +15,7 @@ import templateProjectRoutes from './routes/template-projects';
 import aboutRoutes from './routes/about';
 import authDebugRoutes from './routes/auth-debug';
 import { homepageRouter } from './routes/homepage';
+import { performanceRouter } from './routes/performance';
 
 // Load environment variables
 dotenv.config();
@@ -33,6 +36,9 @@ app.use(cors({
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Performance monitoring middleware
+app.use(performanceMonitoringService.trackPerformance());
 
 // Static files for uploads
 const uploadDir = process.env.UPLOAD_DIR || 'uploads';
@@ -62,6 +68,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/template-projects', templateProjectRoutes);
 app.use('/api/about', aboutRoutes);
 app.use('/api/homepage', homepageRouter);
+app.use('/api/performance', performanceRouter);
 // app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/profile', profileRoutes);
@@ -93,6 +100,20 @@ async function startServer() {
     process.exit(1);
   }
 
+  // Initialize cache service
+  try {
+    await cacheService.connect();
+    const cacheType = cacheService.getCacheType();
+    console.log(`✅ Cache service initialized (${cacheType})`);
+    
+    // Warm cache with homepage content
+    setTimeout(async () => {
+      await cacheService.warmCache();
+    }, 2000); // Wait 2 seconds after server start
+  } catch (error) {
+    console.warn('⚠️ Cache service initialization failed:', (error as Error).message);
+  }
+
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
@@ -104,6 +125,19 @@ async function startServer() {
     console.log(`   GET /api/auth/me - Get user info`);
   });
 }
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('🔄 SIGTERM received, shutting down gracefully...');
+  await cacheService.disconnect();
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  console.log('🔄 SIGINT received, shutting down gracefully...');
+  await cacheService.disconnect();
+  process.exit(0);
+});
 
 startServer().catch((error) => {
   console.error('❌ Failed to start server:', error);

@@ -4,8 +4,16 @@ export declare const uploadImage: multer.Multer;
 export declare const uploadMedia: multer.Multer;
 export declare const optimizeImage: (req: Request, res: Response, next: NextFunction) => Promise<void>;
 export declare const optimizeImages: (req: Request, res: Response, next: NextFunction) => Promise<void>;
-export declare const generateFileUrls: (req: Request, filename: string, thumbnailFilename?: string) => {
+export declare const generateFileUrls: (req: Request, filename: string, thumbnailFilename?: string, variants?: any[]) => {
     url: string;
     thumbnailUrl: string | undefined;
+    responsiveUrls: {
+        url: string;
+        width: any;
+        height: any;
+        size: any;
+    }[];
+    srcSet: string;
+    sizes: string;
 };
 //# sourceMappingURL=upload.d.ts.map

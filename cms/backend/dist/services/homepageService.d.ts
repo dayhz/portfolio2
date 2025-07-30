@@ -24,6 +24,9 @@ export declare class HomepageService {
     cleanupOldVersions(keepCount?: number): Promise<void>;
     recoverFromError(): Promise<void>;
     createEmergencyBackup(): Promise<HomepageVersion>;
+    private invalidateCache;
+    private invalidateAllCaches;
+    getSection(section: HomepageSection): Promise<any>;
     validateContentIntegrity(): Promise<{
         isValid: boolean;
         errors: string[];
