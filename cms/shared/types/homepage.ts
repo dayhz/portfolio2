@@ -23,6 +23,7 @@ export type HomepageSection =
   | 'hero' 
   | 'brands' 
   | 'services' 
+  | 'work'
   | 'offer' 
   | 'testimonials' 
   | 'footer';
@@ -105,6 +106,13 @@ export interface FooterLinks {
   social: FooterLink[];
 }
 
+export interface WorkSection {
+  title: string;
+  description: string;
+  linkText: string;
+  linkUrl: string;
+}
+
 export interface FooterSection {
   title: string;
   email: string;
@@ -117,6 +125,7 @@ export interface HomepageData {
   hero: HeroSection;
   brands: BrandsSection;
   services: ServicesSection;
+  work: WorkSection;
   offer: OfferSection;
   testimonials: TestimonialsSection;
   footer: FooterSection;

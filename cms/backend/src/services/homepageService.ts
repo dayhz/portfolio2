@@ -9,6 +9,7 @@ import {
   HeroSection,
   BrandsSection,
   ServicesSection,
+  WorkSection,
   OfferSection,
   TestimonialsSection,
   FooterSection,
@@ -203,6 +204,7 @@ export class HomepageService {
       hero: this.transformToHeroSection(allContent.filter(c => c.section === 'hero')),
       brands: this.transformToBrandsSection(allContent.filter(c => c.section === 'brands')),
       services: this.transformToServicesSection(allContent.filter(c => c.section === 'services')),
+      work: this.transformToWorkSection(allContent.filter(c => c.section === 'work')),
       offer: this.transformToOfferSection(allContent.filter(c => c.section === 'offer')),
       testimonials: this.transformToTestimonialsSection(allContent.filter(c => c.section === 'testimonials')),
       footer: this.transformToFooterSection(allContent.filter(c => c.section === 'footer'))
@@ -240,6 +242,18 @@ export class HomepageService {
       title,
       description,
       services: JSON.parse(servicesJson)
+    };
+  }
+
+  private transformToWorkSection(content: HomepageContent[]): WorkSection {
+    const getField = (fieldName: string) => 
+      content.find(c => c.fieldName === fieldName)?.fieldValue || '';
+
+    return {
+      title: getField('title'),
+      description: getField('description'),
+      linkText: getField('linkText'),
+      linkUrl: getField('linkUrl')
     };
   }
 
@@ -291,6 +305,12 @@ export class HomepageService {
       { section: 'services', fieldName: 'title', fieldValue: snapshot.services.title, fieldType: 'text' },
       { section: 'services', fieldName: 'description', fieldValue: snapshot.services.description, fieldType: 'textarea' },
       { section: 'services', fieldName: 'services', fieldValue: JSON.stringify(snapshot.services.services), fieldType: 'json' },
+      
+      // Work section
+      { section: 'work', fieldName: 'title', fieldValue: snapshot.work.title, fieldType: 'text' },
+      { section: 'work', fieldName: 'description', fieldValue: snapshot.work.description, fieldType: 'textarea' },
+      { section: 'work', fieldName: 'linkText', fieldValue: snapshot.work.linkText, fieldType: 'text' },
+      { section: 'work', fieldName: 'linkUrl', fieldValue: snapshot.work.linkUrl, fieldType: 'text' },
       
       // Offer section
       { section: 'offer', fieldName: 'title', fieldValue: snapshot.offer.title, fieldType: 'text' },

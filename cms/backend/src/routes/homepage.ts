@@ -9,7 +9,7 @@ import fs from 'fs/promises';
 const router = express.Router();
 
 // Validation schemas
-const sectionSchema = z.enum(['hero', 'brands', 'services', 'offer', 'testimonials', 'footer']);
+const sectionSchema = z.enum(['hero', 'brands', 'services', 'work', 'offer', 'testimonials', 'footer']);
 
 const heroUpdateSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -60,6 +60,13 @@ const testimonialsUpdateSchema = z.object({
     projectImage: z.string().url('Invalid project image URL'),
     order: z.number().min(0)
   }))
+});
+
+const workUpdateSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  linkText: z.string().min(1, 'Link text is required'),
+  linkUrl: z.string().min(1, 'Link URL is required')
 });
 
 const footerUpdateSchema = z.object({
@@ -115,6 +122,9 @@ const validateSectionData = (req: express.Request, res: express.Response, next: 
         break;
       case 'services':
         schema = servicesUpdateSchema;
+        break;
+      case 'work':
+        schema = workUpdateSchema;
         break;
       case 'offer':
         schema = offerUpdateSchema;
@@ -286,6 +296,15 @@ function transformSectionDataToDatabase(section: HomepageSection, data: any) {
         { fieldName: 'title', fieldValue: data.title, fieldType: 'text' as const, displayOrder: 1 },
         { fieldName: 'description', fieldValue: data.description, fieldType: 'textarea' as const, displayOrder: 2 },
         { fieldName: 'services', fieldValue: JSON.stringify(data.services), fieldType: 'json' as const, displayOrder: 3 }
+      );
+      break;
+
+    case 'work':
+      updates.push(
+        { fieldName: 'title', fieldValue: data.title, fieldType: 'text' as const, displayOrder: 1 },
+        { fieldName: 'description', fieldValue: data.description, fieldType: 'textarea' as const, displayOrder: 2 },
+        { fieldName: 'linkText', fieldValue: data.linkText, fieldType: 'text' as const, displayOrder: 3 },
+        { fieldName: 'linkUrl', fieldValue: data.linkUrl, fieldType: 'text' as const, displayOrder: 4 }
       );
       break;
 

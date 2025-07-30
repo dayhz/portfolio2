@@ -18,11 +18,12 @@ import {
 import { HeroEditor } from '../components/homepage/HeroEditor';
 import { BrandsEditor } from '../components/homepage/BrandsEditor';
 import { ServicesEditor } from '../components/homepage/ServicesEditorBasic';
+import { WorkEditor } from '../components/homepage/WorkEditor';
 import { OfferEditor } from '../components/homepage/OfferEditor';
 import { TestimonialsEditor } from '../components/homepage/TestimonialsEditor';
 import { FooterEditor } from '../components/homepage/FooterEditor';
 
-type HomepageSection = 'dashboard' | 'hero' | 'brands' | 'services' | 'offer' | 'testimonials' | 'footer';
+type HomepageSection = 'dashboard' | 'hero' | 'brands' | 'services' | 'work' | 'offer' | 'testimonials' | 'footer';
 
 interface SectionCard {
   id: HomepageSection;
@@ -61,6 +62,14 @@ export default function HomepagePage() {
       icon: <Briefcase className="h-5 w-5" />,
       status: 'completed',
       lastModified: 'Il y a 3 jours'
+    },
+    {
+      id: 'work',
+      title: 'Section Work',
+      description: 'Titre et description de vos projets',
+      icon: <Briefcase className="h-5 w-5" />,
+      status: 'completed',
+      lastModified: 'Il y a quelques minutes'
     },
     {
       id: 'offer',
@@ -257,6 +266,8 @@ export default function HomepagePage() {
         return <BrandsEditor onPreview={handlePreview} />;
       case 'services':
         return <ServicesEditor onPreview={handlePreview} />;
+      case 'work':
+        return <WorkEditor onPreview={handlePreview} />;
       case 'offer':
         return <OfferEditor onPreview={handlePreview} />;
       case 'testimonials':

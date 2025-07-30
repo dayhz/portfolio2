@@ -50,6 +50,12 @@ const defaultHomepageContent: HomepageData = {
       }
     ]
   },
+  work: {
+    title: "Work",
+    description: "From beautiful marketing websites to fun, intuitive mobile apps, all the way to powerful, data-driven SaaS dashboards that your clients will love to use.",
+    linkText: "See all projects",
+    linkUrl: "work.html"
+  },
   offer: {
     title: "M'engager c'est...",
     points: [
@@ -182,6 +188,39 @@ async function initializeHomepageContent() {
       displayOrder: 3
     });
 
+    // Work section
+    await homepageService.upsertContent({
+      section: 'work',
+      fieldName: 'title',
+      fieldValue: defaultHomepageContent.work.title,
+      fieldType: 'text',
+      displayOrder: 1
+    });
+
+    await homepageService.upsertContent({
+      section: 'work',
+      fieldName: 'description',
+      fieldValue: defaultHomepageContent.work.description,
+      fieldType: 'textarea',
+      displayOrder: 2
+    });
+
+    await homepageService.upsertContent({
+      section: 'work',
+      fieldName: 'linkText',
+      fieldValue: defaultHomepageContent.work.linkText,
+      fieldType: 'text',
+      displayOrder: 3
+    });
+
+    await homepageService.upsertContent({
+      section: 'work',
+      fieldName: 'linkUrl',
+      fieldValue: defaultHomepageContent.work.linkUrl,
+      fieldType: 'text',
+      displayOrder: 4
+    });
+
     // Offer section
     await homepageService.upsertContent({
       section: 'offer',
@@ -250,6 +289,7 @@ async function initializeHomepageContent() {
     console.log('  - Hero section: 3 fields');
     console.log('  - Brands section: 2 fields');
     console.log('  - Services section: 3 fields');
+    console.log('  - Work section: 4 fields');
     console.log('  - Offer section: 2 fields');
     console.log('  - Testimonials section: 1 field');
     console.log('  - Footer section: 4 fields');
