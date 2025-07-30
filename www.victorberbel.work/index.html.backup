@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<!-- Last Published: Thu Jul 17 2025 19:10:11 GMT+0000 (Coordinated Universal Time) -->
+<html data-wf-domain="www.lawsonsydney.work" data-wf-page="67dac46f3007872e8a7b1331" data-wf-site="67dac46f3007872e8a7b128f" lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   Lawson Sydney —  Product Manager | Mobile Apps , Websites et SaaS
+  </title>
+  <meta content="Independent Product Designer with over 17 years of experience designing websites, SaaS platforms, and mobile apps from big corporations to small startups." name="description"/>
+  <meta content="Lawson Sydney — Independent Product Designer | Websites, SaaS and Mobile Apps" property="og:title"/>
+  <meta content="Independent Product Designer with over 17 years of experience designing websites, SaaS platforms, and mobile apps from big corporations to small startups." property="og:description"/>
+  <meta content="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/6825d2f010ce5e994222661d_webflow.png" property="og:image"/>
+  <meta content="Lawson Sydney — Independent Product Designer | Websites, SaaS and Mobile Apps" property="twitter:title"/>
+  <meta content="Independent Product Designer with over 17 years of experience designing websites, SaaS platforms, and mobile apps from big corporations to small startups." property="twitter:description"/>
+  <meta content="website" property="og:type"/>
+  <meta content="summary_large_image" name="twitter:card"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <meta content="UA-119599776-1" name="google-site-verification"/>
+  <link href="css/victor-berbel-portfolio.webflow.shared.11eeaf941.min.css" rel="stylesheet" type="text/css"/>
+  <link href="css/slater-main.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/global-custom.css" />
+  <link href="css/slater-home.css" rel="stylesheet"/>
+  <link href="css/index-custom.css" rel="stylesheet"/>
+  <link href="css/index-extracted.css" rel="stylesheet"/>
+  <link href="images/vb-icon.png" rel="shortcut icon" type="image/x-icon"/>
+  <link href="images/favicon-256px.png" rel="apple-touch-icon"/>
+  <link href="index.html" rel="canonical"/>
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-08DF2SL8QK">
+  </script>
+  <script src="https://www.google.com/recaptcha/api.js" type="text/javascript">
+  </script>
+ </head>
+ <body>
+  <div class="page_wrap" data-scroll-container="" id="Page">
+   <div class="page_code_wrap u-theme-dark">
+    <div class="page_code_base w-embed">
+    </div>
+    <div class="page_code_custom w-embed">
+    </div>
+   </div>
+   <div>
+    <nav class="navbar" data-wf--navbar--variant="base" id="navbar">
+     <div class="u-container is-large">
+      <div class="navbar_wrap">
+       <a aria-current="page" aria-label="Lawson Sydney Brand" class="vb_logo w-inline-block w--current" href="index.html">
+        <div class="w-embed">
+         <svg fill="none" height="32" viewbox="0 0 32 32" width="32" xmlns="http://www.w3.org/2000/svg">
+          <path d="M31.205 20.0112C31.6522 19.6128 32 19.065 32 18.4176V2.08393C32 0.341007 29.9131 -0.654958 28.5715 0.490393L17.3416 9.7528C16.5466 10.4002 15.4534 10.4002 14.6584 9.7528L3.42855 0.490393C2.03725 -0.654958 0 0.341007 0 2.08393V18.4176C0 19.0152 0.248448 19.6128 0.745344 20.0112L14.6087 31.5145C15.4037 32.1618 16.4969 32.1618 17.2919 31.5145L31.205 20.0112Z" fill="currentColor">
+          </path>
+         </svg>
+        </div>
+       </a>
+       <div class="navbar_links_wrp">
+        <a class="navbar_link_item" href="services.html">
+         Services
+        </a>
+        <a class="navbar_link_item" href="work.html">
+         Work
+        </a>
+        <a class="navbar_link_item" href="about.html">
+         About
+        </a>
+        <a class="navbar_link_item" href="contact.html">
+         Contact
+        </a>
+       </div>
+       <div class="toggle-menu" data-w-id="22796e3e-038a-22cb-2364-1f84b53daa9d">
+        <div class="toggle-menu-dot">
+        </div>
+        <div class="menu_mobile_wrp">
+         <div class="navbar_link_item is-dark menu-open" data-w-id="6499eff9-a069-6f1c-17f9-f695f8baaf02">
+          Menu
+         </div>
+         <div class="navbar_link_item is-dark menu-close" data-w-id="d4fc7ca8-f73a-05b0-54dd-92bb4f1c9008">
+          Close
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+     <div class="mobile-menu" data-w-id="61175bdc-4e53-e2c0-18a6-438d734a0f4e">
+      <div class="menu_items">
+       <div class="navbar_links_wrp is-mobile">
+        <div class="link-text-box">
+         <a class="u-text-style-h1 u-text-white" data-w-id="7681e6a3-3ede-7bbb-3e7e-143811b1e6a2" href="services.html">
+          Services
+         </a>
+        </div>
+        <div class="link-text-box">
+         <a class="u-text-style-h1 u-text-white" data-w-id="7681e6a3-3ede-7bbb-3e7e-143811b1e6a4" href="work.html">
+          Work
+         </a>
+        </div>
+        <div class="link-text-box">
+         <a class="u-text-style-h1 u-text-white" data-w-id="7681e6a3-3ede-7bbb-3e7e-143811b1e6a6" href="about.html">
+          About
+         </a>
+        </div>
+        <div class="link-text-box">
+         <a class="u-text-style-h1 u-text-white" data-w-id="7681e6a3-3ede-7bbb-3e7e-143811b1e6a8" href="contact.html">
+          Contact
+         </a>
+        </div>
+       </div>
+      </div>
+     </div>
+     <div class="javascript_code w-embed">
+     </div>
+     <div class="change-navbar-font-color w-embed w-script">
+     </div>
+     <div class="menu_mobile" data-w-id="941e73ce-2df7-53ea-d84e-6c98316c7afb">
+      <div class="menu_mobile-line _01">
+      </div>
+      <div class="menu_mobile-line _02">
+      </div>
+     </div>
+    </nav>
+   </div>
+   <section class="hero_main_wrap" id="hero">
+    <div class="g_section_space w-variant-e359d2da-de19-6775-b122-3e06f925f39e" data-wf--global-section-space--section-space="160-124">
+    </div>
+    <div class="hero_main_contain">
+     <div class="u-container">
+      <div class="hero_title_group">
+       <h1 class="u-text-style-display">
+        Product Designer & Manager
+       </h1>
+       <div class="hero-text_description" fade-in="">
+        <div class="u-text-style-regular u-color-gray-900" data-hero-description="">
+         Hey, I’m Lawson, an
+                Independent Product Designer delivering top-tier
+         <span class="u-color-dark">
+          Websites, SaaS, Mobile
+                  experiences
+         </span>
+         , and good vibes for almost two decades.
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="g_section_space w-variant-60a7ad7d-02b0-6682-95a5-2218e6fd1490" data-wf--global-section-space--section-space="80-80">
+    </div>
+   </section>
+   <div class="hero-animation">
+    <section class="scroll_section">
+     <div class="scroll_inner">
+      <div class="video_wrapper">
+       <div class="video_embed w-embed">
+        <video autoplay="" loop="" muted="" playsinline="" preload="auto" style="width: 100%; height: 100%; object-fit: cover; top: 0; left: 0; z-index: 1;">
+         <source src="https://vbportfolio.nyc3.cdn.digitaloceanspaces.com/vbreel2025.mp4" type="video/mp4"/>
+         Seu navegador não suporta vídeos HTML5.
+        </video>
+       </div>
+      </div>
+     </div>
+    </section>
+    <div class="position_responsive">
+     <section class="brands_main_wrap">
+      <div class="brands_main_contain" data-w-id="827198b6-df77-fff4-3db1-990da6656560">
+       <div class="g_section_space w-variant-d422cbd0-f212-c815-68df-63414354c21d" data-wf--global-section-space--section-space="60-60">
+       </div>
+       <div class="u-container">
+        <div class="brands_main_group">
+         <div class="brands_shadow-l">
+         </div>
+         <div class="brands_shadow-r">
+         </div>
+         <div class="marquee_container">
+          <div class="marquee_track">
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d414dc5b7fe3b59a96_logo-01.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d418d9035662471a57_logo-02.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d4df3ba3373555ef80_logo-03.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d49128520549c49d15_logo-04.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d4e93dc9d9b2d19425_logo-05.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d42e03c9c532611797_logo-06.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d44e0bcefc2cb6efc7_logo-07.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d435fadc68fbe5e30f_logo-08.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d445aa6489f33b0aef_logo-09.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d4ff3797629680d4b5_logo-10.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d4eb43def251f7e8e5_logo-11.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d42e03c9c5326117b4_logo-12.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d4e9c5a214e571816a_logo-13.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d4a99339ceb50dc4a8_logo-14.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d49128520549c49d1c_logo-15.svg"/>
+           </div>
+           <div class="brands_main_group-item">
+            <img alt="" class="brands_main_group-img" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67fa72d467a522f7663f6b99_logo-16.svg"/>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+       <div class="g_section_space w-variant-60a7ad7d-02b0-6682-95a5-2218e6fd1490" data-wf--global-section-space--section-space="80-80">
+       </div>
+       <div class="brands_hover_wrp">
+        <div class="brands_hover_group">
+         <div class="u-text-style-1rem">
+          I've worked with amazing clients.
+         </div>
+        </div>
+       </div>
+      </div>
+     </section>
+    </div>
+   </div>
+   <section class="work_main_wrap">
+    <div class="work_main_contain">
+     <div class="u-container">
+      <div class="work_main_heade_group p-top">
+       <div class="work_main_title_group">
+        <h2 class="u-text-style-h2" text-split="">
+         Work
+        </h2>
+        <p class="u-text-style-large teste" data-w-id="7c3e6a36-9f81-0de8-233e-e5521887d2ba" style="opacity:0">
+         From beautiful marketing websites to fun, intuitive mobile apps, all the way to powerful, data-driven
+                SaaS dashboards that your clients will love to use.
+        </p>
+       </div>
+       <a class="c-global-link uline-double w-inline-block" data-w-id="7320d164-c45c-d509-9cdb-282079bb48a3" data-wf--global-link--variant="medium" fade-in="" href="work.html">
+        <div class="text-link is-footer">
+         See all projects
+        </div>
+        <div class="w-embed">
+        </div>
+       </a>
+      </div>
+      <div class="g_section_space w-variant-d422cbd0-f212-c815-68df-63414354c21d" data-wf--global-section-space--section-space="60-60">
+      </div>
+      <div class="work_main_grid_group">
+       <a class="work_card w-inline-block" fade-in="" href="zesty.html" id="w-node-cd0c8328-2622-8d6b-295f-f4d5926d9154-926d9154" project-category="all">
+        <div class="work_img">
+         <img alt="" class="work_card_img" loading="lazy" sizes="(max-width: 1360px) 100vw, 1360px" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/6812545e30bf66bb1651e81a_thumb-zesty.avif" srcset="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/6812545e30bf66bb1651e81a_thumb-zesty-p-500.avif 500w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/6812545e30bf66bb1651e81a_thumb-zesty-p-800.avif 800w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/6812545e30bf66bb1651e81a_thumb-zesty-p-1080.avif 1080w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/6812545e30bf66bb1651e81a_thumb-zesty.avif 1360w"/>
+        </div>
+        <div class="work_card_text_footer">
+         <div class="work_card_text_title">
+          <h3 class="u-text-style-large u-color-dark">
+           Zesty
+          </h3>
+         </div>
+         <div class="u-text-style-small u-color-gray-900">
+          Talk with strangers until the chat resets
+         </div>
+        </div>
+        <div class="card-hover w-embed">
+        </div>
+       </a>
+       <a class="work_card w-inline-block" fade-in="" href="investy-club.html" id="w-node-cd0c8328-2622-8d6b-295f-f4d5926d9154-926d9154" project-category="all">
+        <div class="work_img">
+         <img alt="" class="work_card_img" loading="lazy" sizes="(max-width: 1360px) 100vw, 1360px" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/68125479832a2dcf3ff6f76e_thumb-investy.avif" srcset="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/68125479832a2dcf3ff6f76e_thumb-investy-p-500.avif 500w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/68125479832a2dcf3ff6f76e_thumb-investy-p-800.avif 800w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/68125479832a2dcf3ff6f76e_thumb-investy-p-1080.avif 1080w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/68125479832a2dcf3ff6f76e_thumb-investy.avif 1360w"/>
+        </div>
+        <div class="work_card_text_footer">
+         <div class="work_card_text_title">
+          <h3 class="u-text-style-large u-color-dark">
+           Investy Club
+          </h3>
+         </div>
+         <div class="u-text-style-small u-color-gray-900">
+          A simple crypto wallet to make your money grow
+         </div>
+        </div>
+        <div class="card-hover w-embed">
+        </div>
+       </a>
+       <a class="work_card w-inline-block" fade-in="" href="poesial.html" id="w-node-cd0c8328-2622-8d6b-295f-f4d5926d9154-926d9154" project-category="all">
+        <div class="work_img">
+         <img alt="" class="work_card_img" loading="lazy" sizes="(max-width: 1360px) 100vw, 1360px" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/681254af8df02fd5f32838b9_thumb-poesial.avif" srcset="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/681254af8df02fd5f32838b9_thumb-poesial-p-500.avif 500w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/681254af8df02fd5f32838b9_thumb-poesial-p-800.avif 800w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/681254af8df02fd5f32838b9_thumb-poesial-p-1080.avif 1080w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/681254af8df02fd5f32838b9_thumb-poesial.avif 1360w"/>
+        </div>
+        <div class="work_card_text_footer">
+         <div class="work_card_text_title">
+          <h3 class="u-text-style-large u-color-dark">
+           Poesial
+          </h3>
+         </div>
+         <div class="u-text-style-small u-color-gray-900">
+          A new type of ecommerce for high-end beauty
+                  products
+          <br/>
+         </div>
+        </div>
+        <div class="card-hover w-embed">
+        </div>
+       </a>
+       <a class="work_card w-inline-block" fade-in="" href="nobe-saas.html" id="w-node-cd0c8328-2622-8d6b-295f-f4d5926d9154-926d9154" project-category="all">
+        <div class="work_img">
+         <img alt="" class="work_card_img" loading="lazy" sizes="(max-width: 1360px) 100vw, 1360px" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/681254d0c1280dd0210d8c91_thumb-nobe.avif" srcset="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/681254d0c1280dd0210d8c91_thumb-nobe-p-500.avif 500w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/681254d0c1280dd0210d8c91_thumb-nobe-p-800.avif 800w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/681254d0c1280dd0210d8c91_thumb-nobe-p-1080.avif 1080w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/681254d0c1280dd0210d8c91_thumb-nobe.avif 1360w"/>
+        </div>
+        <div class="work_card_text_footer">
+         <div class="work_card_text_title">
+          <h3 class="u-text-style-large u-color-dark">
+           Nobe
+          </h3>
+         </div>
+         <div class="u-text-style-small u-color-gray-900">
+          Making Mexican lives easier when it comes to
+                  bureaucracy
+         </div>
+        </div>
+        <div class="card-hover w-embed">
+        </div>
+       </a>
+      </div>
+     </div>
+    </div>
+    <div class="g_section_space w-variant-b7c21afb-b67c-3084-cba2-9f8f62b01cfd" data-wf--global-section-space--section-space="160-110">
+    </div>
+   </section>
+   <section class="services_main_wrap">
+    <div class="services_main_contain">
+     <div class="u-container">
+      <div class="work_main_heade_group">
+       <div class="work_main_title_group">
+        <h2 class="u-text-style-h2" text-split="">
+         Services
+        </h2>
+        <p class="u-text-style-large teste">
+         I provide three focused design services to keep things simple and
+                effective. No headaches, just great design.
+        </p>
+       </div>
+       <a class="c-global-link uline-double w-inline-block" data-w-id="7320d164-c45c-d509-9cdb-282079bb48a3" data-wf--global-link--variant="medium" fade-in="" href="services.html">
+        <div class="text-link is-footer">
+         See my services
+        </div>
+        <div class="w-embed">
+        </div>
+       </a>
+      </div>
+      <div class="g_section_space w-variant-60a7ad7d-02b0-6682-95a5-2218e6fd1490" data-wf--global-section-space--section-space="80-80">
+      </div>
+      <div class="services_group_link">
+       <a class="services_link w-inline-block" data-w-id="8ac0aab0-cf9b-9983-13d5-44e1e7191eed" data-wf--services-link--variant="base" fade-in="" href="work@filter=website.html#options">
+        <div class="services_top_wrp">
+         <div class="services_text-group">
+          <div class="u-text-style-large item-link">
+           1.
+          </div>
+          <div class="u-text-style-h3">
+           Website
+          </div>
+         </div>
+         <div class="services_bullet_wrp">
+          <div class="services_bullet">
+           <div class="services_title">
+            See projects
+           </div>
+           <div class="services_bg_colored">
+           </div>
+           <div class="services_bg_black">
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="services_bottom_wrp">
+         <p class="service_description">
+          Clear and engaging websites that actually do their job, whether it’s
+                  starting fresh or giving an old one a makeover.
+         </p>
+        </div>
+        <div class="service_shadow">
+        </div>
+       </a>
+       <a class="services_link w-inline-block" data-w-id="8ac0aab0-cf9b-9983-13d5-44e1e7191eed" data-wf--services-link--variant="base" fade-in="" href="work@filter=product.html#options">
+        <div class="services_top_wrp">
+         <div class="services_text-group">
+          <div class="u-text-style-large item-link">
+           2.
+          </div>
+          <div class="u-text-style-h3">
+           Product
+          </div>
+         </div>
+         <div class="services_bullet_wrp">
+          <div class="services_bullet">
+           <div class="services_title">
+            See projects
+           </div>
+           <div class="services_bg_colored is-green">
+           </div>
+           <div class="services_bg_black">
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="services_bottom_wrp">
+         <p class="service_description">
+          Scalable and intuitive interfaces for B2B and B2C SaaS products that
+                  truly work. From user flows to design systems.
+         </p>
+        </div>
+        <div class="service_shadow">
+        </div>
+       </a>
+       <a class="services_link w-inline-block" data-w-id="8ac0aab0-cf9b-9983-13d5-44e1e7191eed" data-wf--services-link--variant="base" fade-in="" href="work@filter=mobile.html#options">
+        <div class="services_top_wrp">
+         <div class="services_text-group">
+          <div class="u-text-style-large item-link">
+           3.
+          </div>
+          <div class="u-text-style-h3">
+           Mobile
+          </div>
+         </div>
+         <div class="services_bullet_wrp">
+          <div class="services_bullet">
+           <div class="services_title">
+            See projects
+           </div>
+           <div class="services_bg_colored is-minty_green">
+           </div>
+           <div class="services_bg_black">
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="services_bottom_wrp">
+         <p class="service_description">
+          Seamless and fluid mobile experiences designed to fit how people use apps
+                  in the real world and actually loved by users.
+         </p>
+        </div>
+        <div class="service_shadow">
+        </div>
+       </a>
+      </div>
+     </div>
+     <div class="g_section_space w-variant-b7c21afb-b67c-3084-cba2-9f8f62b01cfd" data-wf--global-section-space--section-space="160-110">
+     </div>
+    </div>
+   </section>
+   <section class="offer_main_wrap">
+    <div class="services_main_contain">
+     <div class="u-container">
+      <div class="work_main_heade_group">
+       <div class="offer_main_texts_group">
+        <h2 class="u-text-style-h2" id="w-node-_49d5f817-73da-4ff4-d03c-2fac1460df50-8a7b1331" text-split="">
+         Together, we can...
+        </h2>
+        <div class="offer_texts_group">
+         <div class="offer_text_wrp" data-w-id="6cfc2d39-7769-857a-c09f-9c09760358dd" fade-in="" style="opacity:0">
+          <div class="orange_dot">
+          </div>
+          <div class="u-text-style-regular diff01">
+           Build a lasting partnership for ongoing design needs
+          </div>
+         </div>
+         <div class="offer_text_wrp" data-w-id="b68df55f-8057-95d8-1041-109bce71bfdf" fade-in="" style="opacity:0">
+          <div class="orange_dot">
+          </div>
+          <div class="u-text-style-regular diff01">
+           Gain deeper insights into your users and refine your product
+          </div>
+         </div>
+         <div class="offer_text_wrp" data-w-id="f9bc9c9c-f0e4-c9f2-69b2-504a2f0dfaf2" fade-in="" style="opacity:0">
+          <div class="orange_dot">
+          </div>
+          <div class="u-text-style-regular diff01">
+           Give your product a fresh and modern UI
+          </div>
+         </div>
+         <div class="offer_text_wrp" data-w-id="621c0a9f-d271-82a6-985e-946f5dfc1ce5" fade-in="" style="opacity:0">
+          <div class="orange_dot">
+          </div>
+          <div class="u-text-style-regular diff01">
+           Turn your idea into a tangible, real-world product
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+     <div class="g_section_space w-variant-8cc18b30-4618-8767-0111-f6abfe45aaa3" data-wf--global-section-space--section-space="120-72">
+     </div>
+     <div class="u-container">
+      <div class="divider">
+      </div>
+     </div>
+     <div class="g_section_space w-variant-8cc18b30-4618-8767-0111-f6abfe45aaa3" data-wf--global-section-space--section-space="120-72">
+     </div>
+    </div>
+   </section>
+   <section class="clients_main_wrap">
+    <div class="clients_main_contain">
+     <div class="u-container">
+      <div class="slider w-slider" data-animation="outin" data-autoplay="true" data-autoplay-limit="0" data-delay="20000" data-disable-swipe="false" data-duration="500" data-easing="ease" data-hide-arrows="true" data-infinite="true" data-nav-spacing="3">
+       <div class="mask w-slider-mask">
+        <div class="clientes-slide w-slide">
+         <div class="testimonials-card" data-w-id="7f8594a2-1a89-6150-e0ab-ef47ae7a4fc7">
+          <div class="testimonials-card-left">
+           <div class="testimonial-text u-color-dark">
+            “I’ve had the privilege of working with Lawson Sydney for
+                      over five years, collaborating on the design and delivery of digital experiences that support both
+                      internal teams and Savills clients. Lawson brings a rare mix of creativity, precision, and empathy
+                      to every project—always leading with a human-centered, user-first mindset.”
+           </div>
+           <div class="g_section_space w-variant-41fc0c0a-cac3-53c9-9802-6a916e3fb342" data-wf--global-section-space--section-space="even">
+           </div>
+           <div class="testimonials-card-person-group">
+            <img alt="" class="testimonials-avatar" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/683d99eb6dd7493e2e881ce9_img-jasen.png"/>
+            <div class="testimonials-person-info">
+             <div class="u-text-style-big">
+              Jasen Dowell
+             </div>
+             <div class="u-text-style-1rem u-color-gray-900">
+              VP — Digital Transformation and Innovation,
+                          Savills
+             </div>
+            </div>
+           </div>
+          </div>
+          <div class="testimonials-card-right">
+           <div class="testimonial_card_img">
+            <img alt="" class="testimonials-person-thumb" loading="lazy" sizes="100vw" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/683d9a1faa1f1b861dd17db2_img-case-stacker.png" srcset="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/683d9a1faa1f1b861dd17db2_img-case-stacker-p-500.png 500w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/683d9a1faa1f1b861dd17db2_img-case-stacker-p-800.png 800w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/683d9a1faa1f1b861dd17db2_img-case-stacker.png 880w"/>
+           </div>
+           <div class="testimonials-card-right-group">
+            <div class="div-block-26">
+             <a class="c-global-link uline-double small-3 w-inline-block" fade-in="" href="https://apps.apple.com/us/app/savills-stacker/id1516444309?platform=iphone" target="_blank">
+              <div class="text-link is-footer small-4">
+               See the full case study
+              </div>
+              <div class="w-embed">
+              </div>
+             </a>
+            </div>
+           </div>
+           <a class="area_link w-inline-block" data-w-id="50f1e4da-acc4-76d9-1f3f-b24d9de50a3e" href="https://apps.apple.com/us/app/savills-stacker/id1516444309?platform=iphone" target="_blank">
+           </a>
+          </div>
+         </div>
+        </div>
+        <div class="clientes-slide w-slide">
+         <div class="testimonials-card" data-w-id="7f8594a2-1a89-6150-e0ab-ef47ae7a4fc7">
+          <div class="testimonials-card-left">
+           <div class="testimonial-text u-color-dark">
+            “Lawson Sydney has been a great asset during our website
+                      overhaul. His attention to detail, attentiveness to our needs, and proactive communication made
+                      the whole process really enjoyable for us.”
+           </div>
+           <div class="g_section_space w-variant-41fc0c0a-cac3-53c9-9802-6a916e3fb342" data-wf--global-section-space--section-space="even">
+           </div>
+           <div class="testimonials-card-person-group">
+            <img alt="" class="testimonials-avatar" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/6813e5ee4368886f8a1f218c_img-jon.avif"/>
+            <div class="testimonials-person-info">
+             <div class="u-text-style-big">
+              Jon Persson
+             </div>
+             <div class="u-text-style-1rem u-color-gray-900">
+              Co-Owner, Greco Gum
+             </div>
+            </div>
+           </div>
+          </div>
+          <div class="testimonials-card-right">
+           <div class="testimonial_card_img">
+            <img alt="" class="testimonials-person-thumb" loading="lazy" sizes="100vw" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67dd5bb60eebacb9d1093652_img-case-greco.avif" srcset="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67dd5bb60eebacb9d1093652_img-case-greco-p-500.avif 500w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67dd5bb60eebacb9d1093652_img-case-greco-p-800.avif 800w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67dd5bb60eebacb9d1093652_img-case-greco.avif 880w"/>
+           </div>
+           <div class="testimonials-card-right-group">
+            <div class="div-block-26">
+             <a class="c-global-link uline-double small-3 w-inline-block" fade-in="" href="greco-gum.html">
+              <div class="text-link is-footer small-4">
+               See the full case study
+              </div>
+              <div class="w-embed">
+              </div>
+             </a>
+            </div>
+           </div>
+           <a class="area_link w-inline-block" data-w-id="50f1e4da-acc4-76d9-1f3f-b24d9de50a3e" href="greco-gum.html">
+           </a>
+          </div>
+         </div>
+        </div>
+        <div class="clientes-slide w-slide">
+         <div class="testimonials-card" data-w-id="7f8594a2-1a89-6150-e0ab-ef47ae7a4fc7">
+          <div class="testimonials-card-left">
+           <div class="testimonial-text u-color-dark">
+            “Lawson's work is a masterpiece. He is very well
+                      organized and makes your ideas look great. It was a few iterations for him to get my inputs and
+                      voilà. The mobile app we wanted looks awesome.”
+           </div>
+           <div class="g_section_space w-variant-41fc0c0a-cac3-53c9-9802-6a916e3fb342" data-wf--global-section-space--section-space="even">
+           </div>
+           <div class="testimonials-card-person-group">
+            <img alt="" class="testimonials-avatar" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/6813e62470565047a9e87b5a_img-rodrigo.avif"/>
+            <div class="testimonials-person-info">
+             <div class="u-text-style-big">
+              Rodrigo Pavezi
+             </div>
+             <div class="u-text-style-1rem u-color-gray-900">
+              Founder, Investy Club
+             </div>
+            </div>
+           </div>
+          </div>
+          <div class="testimonials-card-right">
+           <div class="testimonial_card_img">
+            <img alt="" class="testimonials-person-thumb" loading="lazy" sizes="(max-width: 880px) 100vw, 880px" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67dd5bb6ef8006a36f028cc7_img-case-Investy%20Club.avif" srcset="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67dd5bb6ef8006a36f028cc7_img-case-Investy%20Club-p-500.avif 500w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67dd5bb6ef8006a36f028cc7_img-case-Investy%20Club-p-800.avif 800w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67dd5bb6ef8006a36f028cc7_img-case-Investy%20Club.avif 880w"/>
+           </div>
+           <div class="testimonials-card-right-group">
+            <div class="div-block-26">
+             <a class="c-global-link uline-double small-3 w-inline-block" fade-in="" href="investy-club.html">
+              <div class="text-link is-footer small-4">
+               See the full case study
+              </div>
+              <div class="w-embed">
+              </div>
+             </a>
+            </div>
+           </div>
+           <a class="area_link w-inline-block" data-w-id="50f1e4da-acc4-76d9-1f3f-b24d9de50a3e" href="investy-club.html">
+           </a>
+          </div>
+         </div>
+        </div>
+        <div class="clientes-slide w-slide">
+         <div class="testimonials-card" data-w-id="7f8594a2-1a89-6150-e0ab-ef47ae7a4fc7">
+          <div class="testimonials-card-left">
+           <div class="testimonial-text u-color-dark">
+            “A good designer gives you what you want. Lawson gave me
+                      what I wanted  and what I did not realize I wanted until I saw what he'd created for Poesial.
+                      Lawson's creativity is a force to be reckoned with.”
+           </div>
+           <div class="g_section_space w-variant-41fc0c0a-cac3-53c9-9802-6a916e3fb342" data-wf--global-section-space--section-space="even">
+           </div>
+           <div class="testimonials-card-person-group">
+            <img alt="" class="testimonials-avatar" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/6813e5bdd8bd0a4b8928d856_img-ling.avif"/>
+            <div class="testimonials-person-info">
+             <div class="u-text-style-big">
+              Ling Xin Sia
+             </div>
+             <div class="u-text-style-1rem u-color-gray-900">
+              Co-Founder, Poesial
+             </div>
+            </div>
+           </div>
+          </div>
+          <div class="testimonials-card-right">
+           <div class="testimonial_card_img">
+            <img alt="" class="testimonials-person-thumb" loading="lazy" sizes="(max-width: 880px) 100vw, 880px" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67dd5bb670f0866ea6ce4d0b_img-case-Poesial.avif" srcset="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67dd5bb670f0866ea6ce4d0b_img-case-Poesial-p-500.avif 500w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67dd5bb670f0866ea6ce4d0b_img-case-Poesial-p-800.avif 800w, https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67dd5bb670f0866ea6ce4d0b_img-case-Poesial.avif 880w"/>
+           </div>
+           <div class="testimonials-card-right-group">
+            <div class="div-block-26">
+             <a class="c-global-link uline-double small-3 w-inline-block" fade-in="" href="poesial.html">
+              <div class="text-link is-footer small-4">
+               See the full case study
+              </div>
+              <div class="w-embed">
+              </div>
+             </a>
+            </div>
+           </div>
+           <a class="area_link w-inline-block" data-w-id="50f1e4da-acc4-76d9-1f3f-b24d9de50a3e" href="poesial.html">
+           </a>
+          </div>
+         </div>
+        </div>
+       </div>
+       <div class="left-arrow w-slider-arrow-left">
+        <div class="icon-2 w-icon-slider-left">
+        </div>
+       </div>
+       <div class="right-arrow w-slider-arrow-right">
+        <div class="icon w-icon-slider-right">
+        </div>
+       </div>
+       <div class="slide-nav w-slider-nav">
+       </div>
+      </div>
+      <div class="g_section_space w-variant-60a7ad7d-02b0-6682-95a5-2218e6fd1490" data-wf--global-section-space--section-space="80-80">
+      </div>
+     </div>
+    </div>
+   </section>
+   <section class="footer_main_wrap">
+    <div class="footer_main_contain">
+     <div class="u-container">
+      <div class="footer-divider">
+      </div>
+      <div class="g_section_space w-variant-60a7ad7d-02b0-6682-95a5-2218e6fd1490" data-wf--global-section-space--section-space="80-80">
+      </div>
+      <div class="footer-group">
+       <div class="footer-text-group">
+        <div class="u-text-style-h4 u-color-gray-700" data-w-id="15828fe9-b698-9ed3-3a55-9a383fb763b2">
+         Let’s work
+                together
+        </div>
+        <a class="c-global-link uline-double w-inline-block" data-w-id="7320d164-c45c-d509-9cdb-282079bb48a3" data-wf--global-link--variant="medium" fade-in="" href="mailto:hey@lawsonsydney.work?subject=Let's%20work%20on%20a%20project%20together!">
+         <div class="text-link is-footer">
+          hey@lawsonsydney.work
+         </div>
+         <div class="w-embed">
+         </div>
+        </a>
+        <div class="g_section_space w-variant-60a7ad7d-02b0-6682-95a5-2218e6fd1490" data-wf--global-section-space--section-space="80-80">
+        </div>
+       </div>
+       <div class="div-block-6">
+        <div class="u-mb-3">
+         <div class="u-color-gray-700 u-mb-2">
+          Explore
+         </div>
+        </div>
+        <div class="u-mb-3">
+         <div class="u-color-gray-700 u-mb-2">
+          Socials
+         </div>
+        </div>
+        <ul class="u-text-style-regular" id="w-node-_15828fe9-b698-9ed3-3a55-9a383fb763bd-3fb763ab" role="list">
+         <li class="u-mb-1">
+          <a aria-current="page" class="link w--current" href="index.html">
+           Home
+          </a>
+         </li>
+         <li class="u-mb-1">
+          <a class="link" href="services.html">
+           Services
+          </a>
+         </li>
+         <li class="u-mb-1">
+          <a class="link" href="work.html">
+           Work
+          </a>
+         </li>
+         <li class="u-mb-1">
+          <a class="link" href="about.html">
+           About
+          </a>
+         </li>
+         <li class="u-mb-1">
+          <a class="link" href="contact.html">
+           Contact
+          </a>
+         </li>
+         <li class="u-mb-1">
+          <a class="link" href="https://lawsonsydney.kit.com/" target="_blank">
+           Newsletter
+          </a>
+         </li>
+        </ul>
+        <ul class="u-text-style-regular" id="w-node-_15828fe9-b698-9ed3-3a55-9a383fb763cd-3fb763ab" role="list">
+         <li class="u-mb-1">
+          <a class="link" href="https://www.linkedin.com/in/lawsonsydney/" target="_blank">
+           LinkedIn
+          </a>
+         </li>
+         <li class="u-mb-1">
+          <a class="link" href="https://dribbble.com/victorbrb" target="_blank">
+           Dribbble
+          </a>
+         </li>
+         <li class="u-mb-1">
+          <a class="link" href="https://www.behance.net/lawsonsydney" target="_blank">
+           Behance
+          </a>
+         </li>
+         <li class="u-mb-1">
+          <a class="link" href="https://medium.com/@lawsonsydney" target="_blank">
+           Medium
+          </a>
+         </li>
+        </ul>
+        <ul class="u-text-style-regular" id="w-node-_15828fe9-b698-9ed3-3a55-9a383fb763da-3fb763ab" role="list">
+         <li class="u-mb-1">
+          <a class="link" href="https://read.cv/lawsonsydney" target="_blank">
+           Read.cv
+          </a>
+         </li>
+         <li class="u-mb-1">
+          <a class="link" href="https://contra.com/victor_berbel_uwwn37bg" target="_blank">
+           Contra
+          </a>
+         </li>
+         <li class="u-mb-1">
+          <div class="div-block-7">
+           <a class="link" href="https://clutch.co/profile/victor-berbel" target="_blank">
+            Clutch
+           </a>
+           <a class="text-tiny" href="index.html#">
+            4 reviews
+           </a>
+           <div class="star-group">
+            <div class="star-item w-embed">
+             <svg fill="none" height="10" viewbox="0 0 11 10" width="11" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4.76711 0.444982C5.05558 -0.148328 5.94442 -0.148327 6.23289 0.444983L7.24633 2.52938C7.3639 2.77119 7.60545 2.93768 7.88419 2.96904L10.287 3.23931C10.9709 3.31624 11.2455 4.11821 10.7399 4.56182L8.96348 6.12032C8.7574 6.30112 8.66513 6.57051 8.71984 6.8317L9.19139 9.08313C9.32561 9.72398 8.60652 10.2196 8.00555 9.90049L5.89422 8.7793C5.64929 8.64923 5.35071 8.64923 5.10578 8.7793L2.99445 9.90049C2.39348 10.2196 1.67439 9.72398 1.80861 9.08313L2.28016 6.8317C2.33487 6.57051 2.2426 6.30112 2.03652 6.12032L0.260099 4.56182C-0.245547 4.11821 0.0291219 3.31624 0.713052 3.2393L3.11581 2.96904C3.39455 2.93768 3.63611 2.77119 3.75367 2.52938L4.76711 0.444982Z" fill="#F75B00">
+              </path>
+             </svg>
+            </div>
+            <div class="star-item w-embed">
+             <svg fill="none" height="10" viewbox="0 0 11 10" width="11" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4.76711 0.444982C5.05558 -0.148328 5.94442 -0.148327 6.23289 0.444983L7.24633 2.52938C7.3639 2.77119 7.60545 2.93768 7.88419 2.96904L10.287 3.23931C10.9709 3.31624 11.2455 4.11821 10.7399 4.56182L8.96348 6.12032C8.7574 6.30112 8.66513 6.57051 8.71984 6.8317L9.19139 9.08313C9.32561 9.72398 8.60652 10.2196 8.00555 9.90049L5.89422 8.7793C5.64929 8.64923 5.35071 8.64923 5.10578 8.7793L2.99445 9.90049C2.39348 10.2196 1.67439 9.72398 1.80861 9.08313L2.28016 6.8317C2.33487 6.57051 2.2426 6.30112 2.03652 6.12032L0.260099 4.56182C-0.245547 4.11821 0.0291219 3.31624 0.713052 3.2393L3.11581 2.96904C3.39455 2.93768 3.63611 2.77119 3.75367 2.52938L4.76711 0.444982Z" fill="#F75B00">
+              </path>
+             </svg>
+            </div>
+            <div class="star-item w-embed">
+             <svg fill="none" height="10" viewbox="0 0 11 10" width="11" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4.76711 0.444982C5.05558 -0.148328 5.94442 -0.148327 6.23289 0.444983L7.24633 2.52938C7.3639 2.77119 7.60545 2.93768 7.88419 2.96904L10.287 3.23931C10.9709 3.31624 11.2455 4.11821 10.7399 4.56182L8.96348 6.12032C8.7574 6.30112 8.66513 6.57051 8.71984 6.8317L9.19139 9.08313C9.32561 9.72398 8.60652 10.2196 8.00555 9.90049L5.89422 8.7793C5.64929 8.64923 5.35071 8.64923 5.10578 8.7793L2.99445 9.90049C2.39348 10.2196 1.67439 9.72398 1.80861 9.08313L2.28016 6.8317C2.33487 6.57051 2.2426 6.30112 2.03652 6.12032L0.260099 4.56182C-0.245547 4.11821 0.0291219 3.31624 0.713052 3.2393L3.11581 2.96904C3.39455 2.93768 3.63611 2.77119 3.75367 2.52938L4.76711 0.444982Z" fill="#F75B00">
+              </path>
+             </svg>
+            </div>
+            <div class="star-item w-embed">
+             <svg fill="none" height="10" viewbox="0 0 11 10" width="11" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4.76711 0.444982C5.05558 -0.148328 5.94442 -0.148327 6.23289 0.444983L7.24633 2.52938C7.3639 2.77119 7.60545 2.93768 7.88419 2.96904L10.287 3.23931C10.9709 3.31624 11.2455 4.11821 10.7399 4.56182L8.96348 6.12032C8.7574 6.30112 8.66513 6.57051 8.71984 6.8317L9.19139 9.08313C9.32561 9.72398 8.60652 10.2196 8.00555 9.90049L5.89422 8.7793C5.64929 8.64923 5.35071 8.64923 5.10578 8.7793L2.99445 9.90049C2.39348 10.2196 1.67439 9.72398 1.80861 9.08313L2.28016 6.8317C2.33487 6.57051 2.2426 6.30112 2.03652 6.12032L0.260099 4.56182C-0.245547 4.11821 0.0291219 3.31624 0.713052 3.2393L3.11581 2.96904C3.39455 2.93768 3.63611 2.77119 3.75367 2.52938L4.76711 0.444982Z" fill="#F75B00">
+              </path>
+             </svg>
+            </div>
+            <div class="star-item w-embed">
+             <svg fill="none" height="10" viewbox="0 0 11 10" width="11" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4.76711 0.444982C5.05558 -0.148328 5.94442 -0.148327 6.23289 0.444983L7.24633 2.52938C7.3639 2.77119 7.60545 2.93768 7.88419 2.96904L10.287 3.23931C10.9709 3.31624 11.2455 4.11821 10.7399 4.56182L8.96348 6.12032C8.7574 6.30112 8.66513 6.57051 8.71984 6.8317L9.19139 9.08313C9.32561 9.72398 8.60652 10.2196 8.00555 9.90049L5.89422 8.7793C5.64929 8.64923 5.35071 8.64923 5.10578 8.7793L2.99445 9.90049C2.39348 10.2196 1.67439 9.72398 1.80861 9.08313L2.28016 6.8317C2.33487 6.57051 2.2426 6.30112 2.03652 6.12032L0.260099 4.56182C-0.245547 4.11821 0.0291219 3.31624 0.713052 3.2393L3.11581 2.96904C3.39455 2.93768 3.63611 2.77119 3.75367 2.52938L4.76711 0.444982Z" fill="#F75B00">
+              </path>
+             </svg>
+            </div>
+           </div>
+          </div>
+         </li>
+        </ul>
+       </div>
+      </div>
+      <div class="footer-infos" data-w-id="15828fe9-b698-9ed3-3a55-9a383fb763b7">
+       <a class="footer-info-text" href="privacy.html">
+        © 2025 Lawson Sydney — Designin' Incredibly Dope Shit Since '08.
+        <span class="text-orange">
+         Privacy
+        </span>
+       </a>
+      </div>
+     </div>
+    </div>
+    <a class="go-top-btn w-inline-block" href="index.html#navbar">
+     <div class="u-text-style-large">
+      Take me to the top
+     </div>
+     <div class="go-top-icon">
+      <div class="code-embed-2 w-embed">
+       <svg fill="none" height="22" viewbox="0 0 20 22" width="20" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10.0005 19.3765V2.6235" stroke="white" stroke-linecap="round" stroke-width="4">
+        </path>
+        <path d="M2.82031 9.80273L10.0002 2.62288L17.18 9.80273" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="4">
+        </path>
+       </svg>
+      </div>
+     </div>
+    </a>
+    <div class="g_section_space w-variant-8cc18b30-4618-8767-0111-f6abfe45aaa3" data-wf--global-section-space--section-space="120-72">
+    </div>
+   </section>
+   <div class="page_wrap-overlay">
+   </div>
+  </div>
+  <script crossorigin="anonymous" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" src="js/jquery-3.5.1.min.js" type="text/javascript">
+  </script>
+  <script src="js/webflow.schunk.1a807f015b216e46.js" type="text/javascript">
+  </script>
+  <script src="js/webflow.schunk.6066d2eb5340584a.js" type="text/javascript">
+  </script>
+  <script src="js/webflow.eb3ca7f5.95a9afe2e4f6db24.js" type="text/javascript">
+  </script>
+  <script src="js/gsap.min.js" type="text/javascript">
+  </script>
+  <script src="js/ScrollTrigger.min.js" type="text/javascript">
+  </script>
+  <script src="js/SplitText.min.js" type="text/javascript">
+  </script>
+  <!--🤙 https://slater.app/14220.js-->
+  <!-- 2. Registre os plugins -->
+  <!-- -->
+  <script src="js/global-custom.js"></script>
+  <script src="js/animations-main.js" type="text/javascript">
+  </script>
+  <script src="js/animations-home.js" type="text/javascript">
+  </script>
+  <script src="js/index-custom.js">
+  </script>
+  <script src="js/index-extracted.js">
+  </script>
+ </body>
+</html>

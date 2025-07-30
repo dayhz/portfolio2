@@ -67,42 +67,40 @@ async function getProjectHTML(projectId) {
   }
 }
 
-// Fonction SIMPLE pour injecter les projets CMS dans la section vide
+// Fonction pour remplacer TOUS les projets par les projets CMS
 function injectProjectsIntoHTML(html, projects) {
-  // Chercher le commentaire dans la section vide
-  const placeholder = '        <!-- Les projets du CMS seront injectés ici par le serveur -->';
-  
-  if (html.indexOf(placeholder) === -1) {
-    console.log('⚠️  Projects placeholder not found in HTML');
-    return html;
-  }
-  
   // Générer le HTML pour les projets du CMS
   const projectsHTML = projects.length > 0 ? projects.slice(0, 6).map(project => `
-        <a class="work_card w-inline-block" fade-in="" href="${project.slug || project.id}.html" project-category="all">
-         <div class="work_img">
-          <img alt="${project.title}" class="work_card_img" loading="lazy" 
-               src="${project.imageUrl || '/images/placeholder-project.jpg'}" />
+       <a class="work_card w-inline-block" fade-in="" href="${project.slug || project.id}.html" id="w-node-cd0c8328-2622-8d6b-295f-f4d5926d9154-926d9154" project-category="all">
+        <div class="work_img">
+         <img alt="${project.title}" class="work_card_img" loading="lazy" 
+              src="${project.imageUrl || '/images/placeholder-project.jpg'}" />
+        </div>
+        <div class="work_card_text_footer">
+         <div class="work_card_text_title">
+          <h3 class="u-text-style-large u-color-dark">
+           ${project.title}
+          </h3>
          </div>
-         <div class="work_card_text_footer">
-          <div class="work_card_text_title">
-           <h3 class="u-text-style-large u-color-dark">
-            ${project.title}
-           </h3>
-          </div>
-          <div class="u-text-style-small u-color-gray-900">
-           ${project.description}
-          </div>
+         <div class="u-text-style-small u-color-gray-900">
+          ${project.description}
          </div>
-         <div class="card-hover w-embed">
-         </div>
-        </a>`).join('') : '        <!-- Aucun projet dans le CMS -->';
+        </div>
+        <div class="card-hover w-embed">
+        </div>
+       </a>`).join('') : '       <!-- Aucun projet dans le CMS -->';
   
-  // Remplacer le placeholder par les projets CMS
-  const newHTML = html.replace(placeholder, projectsHTML);
+  // Remplacer TOUT le contenu du work_main_grid_group (tous les projets statiques)
+  const workGridRegex = /(<div class="work_main_grid_group">\s*)([\s\S]*?)(\s*<\/div>\s*<\/div>\s*<\/div>\s*<\/section>)/;
   
-  console.log('✅ Injected', projects.length, 'CMS projects into empty section');
-  return newHTML;
+  if (workGridRegex.test(html)) {
+    const newHTML = html.replace(workGridRegex, `$1${projectsHTML}$3`);
+    console.log('✅ Replaced ALL static projects with', projects.length, 'CMS projects');
+    return newHTML;
+  } else {
+    console.log('⚠️  Could not find work_main_grid_group section to replace projects');
+    return html;
+  }
 }
 
 // Fonction pour injecter le contenu Hero du CMS
