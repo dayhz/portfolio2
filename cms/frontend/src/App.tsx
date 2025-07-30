@@ -2,10 +2,7 @@ import {
   BrowserRouter as Router, 
   Routes, 
   Route, 
-  Navigate,
-  createBrowserRouter,
-  RouterProvider,
-  createRoutesFromElements
+  Navigate
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
@@ -26,7 +23,7 @@ import SearchResultsPage from './pages/SearchResultsPage';
 import ServicesPage from './pages/ServicesPage';
 import AboutPage from './pages/AboutPage';
 import HomepagePage from './pages/HomepagePage';
-import { UniversalEditorTestPage } from './pages/UniversalEditorTestPage';
+
 import { ProjectPreviewPage } from './pages/ProjectPreviewPage';
 import { TemplateProjectPage } from './pages/TemplateProjectPage';
 import { TemplateProjectsListPage } from './pages/TemplateProjectsListPage';
@@ -35,7 +32,7 @@ import { DynamicProjectPage } from './pages/DynamicProjectPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import GlobalSearch from './components/search/GlobalSearch';
-import { Button } from '@/components/ui/button';
+
 import UnifiedPreview from './components/preview/UnifiedPreview';
 // Importer les services d'intégration
 import './services/publicProjectsService';
@@ -94,7 +91,7 @@ function App() {
                           <Route path="/media" element={<MediaPage />} />
                           <Route path="/about" element={<AboutPage />} />
                           <Route path="/homepage" element={<HomepagePage />} />
-                          <Route path="/test-editor" element={<UniversalEditorTestPage />} />
+
                           <Route path="/template-projects" element={<TemplateProjectsListPage />} />
                           <Route path="/template-editor/new" element={<TemplateProjectPage />} />
                           <Route path="/template-editor/:id" element={<TemplateProjectPage />} />

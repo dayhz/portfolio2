@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, memo, lazy, Suspense } from 'react';
 import { ErrorBoundary } from './ErrorBoundary';
-import './zesty-template-styles.optimized.css';
+import './zesty-template-styles.css';
 
 // TypeScript interfaces for project data
 interface ZestyProjectData {
