@@ -249,11 +249,19 @@ router.put('/:section', validateSection, validateSectionData, async (req: expres
     const section = req.params.section as HomepageSection;
     const data = req.body;
 
+    // Validate content integrity before making changes
+    const validation = await homepageService.validateContentIntegrity();
+    if (!validation.isValid) {
+      console.warn('Content integrity issues detected:', validation.errors);
+      // Create emergency backup before proceeding
+      await homepageService.createEmergencyBackup();
+    }
+
     // Transform the section data to database format
     const contentUpdates = transformSectionDataToDatabase(section, data);
     
-    // Update the content in the database
-    await homepageService.updateSectionContent(section, contentUpdates);
+    // Update the content in the database (this will create automatic backup)
+    await homepageService.updateSectionContent(section, contentUpdates.map(update => ({ ...update, section })), true);
 
     // Get the updated structured content
     const updatedContent = await homepageService.getStructuredContent();
@@ -643,8 +651,8 @@ router.post('/brands/logo', async (req: express.Request, res: express.Response, 
 
     // Update the brands section
     const contentUpdates = [
-      { fieldName: 'title', fieldValue: currentBrands.title, fieldType: 'text' as const, displayOrder: 1 },
-      { fieldName: 'logos', fieldValue: JSON.stringify(updatedLogos), fieldType: 'json' as const, displayOrder: 2 }
+      { fieldName: 'title', fieldValue: currentBrands.title, fieldType: 'text' as const, displayOrder: 1, section: 'brands' as const },
+      { fieldName: 'logos', fieldValue: JSON.stringify(updatedLogos), fieldType: 'json' as const, displayOrder: 2, section: 'brands' as const }
     ];
 
     await homepageService.updateSectionContent('brands', contentUpdates);
@@ -702,8 +710,8 @@ router.delete('/brands/logo/:id', async (req: express.Request, res: express.Resp
 
     // Update the brands section
     const contentUpdates = [
-      { fieldName: 'title', fieldValue: currentBrands.title, fieldType: 'text' as const, displayOrder: 1 },
-      { fieldName: 'logos', fieldValue: JSON.stringify(updatedLogos), fieldType: 'json' as const, displayOrder: 2 }
+      { fieldName: 'title', fieldValue: currentBrands.title, fieldType: 'text' as const, displayOrder: 1, section: 'brands' as const },
+      { fieldName: 'logos', fieldValue: JSON.stringify(updatedLogos), fieldType: 'json' as const, displayOrder: 2, section: 'brands' as const }
     ];
 
     await homepageService.updateSectionContent('brands', contentUpdates);
@@ -785,8 +793,8 @@ router.put('/brands/reorder', async (req: express.Request, res: express.Response
 
     // Update the brands section
     const contentUpdates = [
-      { fieldName: 'title', fieldValue: currentBrands.title, fieldType: 'text' as const, displayOrder: 1 },
-      { fieldName: 'logos', fieldValue: JSON.stringify(reorderedLogos), fieldType: 'json' as const, displayOrder: 2 }
+      { fieldName: 'title', fieldValue: currentBrands.title, fieldType: 'text' as const, displayOrder: 1, section: 'brands' as const },
+      { fieldName: 'logos', fieldValue: JSON.stringify(reorderedLogos), fieldType: 'json' as const, displayOrder: 2, section: 'brands' as const }
     ];
 
     await homepageService.updateSectionContent('brands', contentUpdates);
@@ -885,7 +893,7 @@ router.post('/testimonials', async (req: express.Request, res: express.Response,
 
     // Update the testimonials section
     const contentUpdates = [
-      { fieldName: 'testimonials', fieldValue: JSON.stringify(updatedTestimonials), fieldType: 'json' as const, displayOrder: 1 }
+      { fieldName: 'testimonials', fieldValue: JSON.stringify(updatedTestimonials), fieldType: 'json' as const, displayOrder: 1, section: 'testimonials' as const }
     ];
 
     await homepageService.updateSectionContent('testimonials', contentUpdates);
@@ -943,7 +951,7 @@ router.delete('/testimonials/:id', async (req: express.Request, res: express.Res
 
     // Update the testimonials section
     const contentUpdates = [
-      { fieldName: 'testimonials', fieldValue: JSON.stringify(updatedTestimonials), fieldType: 'json' as const, displayOrder: 1 }
+      { fieldName: 'testimonials', fieldValue: JSON.stringify(updatedTestimonials), fieldType: 'json' as const, displayOrder: 1, section: 'testimonials' as const }
     ];
 
     await homepageService.updateSectionContent('testimonials', contentUpdates);
@@ -1025,7 +1033,7 @@ router.put('/testimonials/reorder', async (req: express.Request, res: express.Re
 
     // Update the testimonials section
     const contentUpdates = [
-      { fieldName: 'testimonials', fieldValue: JSON.stringify(reorderedTestimonials), fieldType: 'json' as const, displayOrder: 1 }
+      { fieldName: 'testimonials', fieldValue: JSON.stringify(reorderedTestimonials), fieldType: 'json' as const, displayOrder: 1, section: 'testimonials' as const }
     ];
 
     await homepageService.updateSectionContent('testimonials', contentUpdates);
@@ -1043,6 +1051,56 @@ router.put('/testimonials/reorder', async (req: express.Request, res: express.Re
       timestamp: new Date().toISOString()
     });
 
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/homepage/validate - Validate content integrity
+router.post('/validate', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const validation = await homepageService.validateContentIntegrity();
+    
+    res.json({
+      success: true,
+      data: validation,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/homepage/emergency-backup - Create emergency backup
+router.post('/emergency-backup', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const backup = await homepageService.createEmergencyBackup();
+    
+    res.status(201).json({
+      success: true,
+      message: 'Emergency backup created successfully',
+      data: backup,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/homepage/recover - Attempt automatic recovery
+router.post('/recover', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    await homepageService.recoverFromError();
+    
+    // Get updated content after recovery
+    const recoveredContent = await homepageService.getStructuredContent();
+    
+    res.json({
+      success: true,
+      message: 'Recovery completed successfully',
+      data: recoveredContent,
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
     next(error);
   }

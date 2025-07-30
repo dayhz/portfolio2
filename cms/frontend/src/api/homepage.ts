@@ -220,6 +220,151 @@ class HomepageAPI {
       method: 'POST',
     });
   }
+
+  // Version management methods
+  async getVersions(limit?: number): Promise<Array<{
+    id: string;
+    versionName: string | null;
+    contentSnapshot: string;
+    isActive: boolean;
+    createdAt: string;
+  }>> {
+    const query = limit ? `?limit=${limit}` : '';
+    return this.request<Array<{
+      id: string;
+      versionName: string | null;
+      contentSnapshot: string;
+      isActive: boolean;
+      createdAt: string;
+    }>>(`/versions${query}`);
+  }
+
+  async createVersion(versionName?: string): Promise<{
+    id: string;
+    versionName: string | null;
+    contentSnapshot: string;
+    isActive: boolean;
+    createdAt: string;
+  }> {
+    return this.request<{
+      id: string;
+      versionName: string | null;
+      contentSnapshot: string;
+      isActive: boolean;
+      createdAt: string;
+    }>('/versions', {
+      method: 'POST',
+      body: JSON.stringify({ versionName }),
+    });
+  }
+
+  async getVersion(versionId: string): Promise<{
+    id: string;
+    versionName: string | null;
+    contentSnapshot: string;
+    isActive: boolean;
+    createdAt: string;
+    parsedContent: HomepageData | null;
+  }> {
+    return this.request<{
+      id: string;
+      versionName: string | null;
+      contentSnapshot: string;
+      isActive: boolean;
+      createdAt: string;
+      parsedContent: HomepageData | null;
+    }>(`/versions/${versionId}`);
+  }
+
+  async restoreVersion(versionId: string): Promise<{
+    restoredVersion: {
+      id: string;
+      versionName: string | null;
+      contentSnapshot: string;
+      isActive: boolean;
+      createdAt: string;
+    };
+    currentContent: HomepageData;
+  }> {
+    return this.request<{
+      restoredVersion: {
+        id: string;
+        versionName: string | null;
+        contentSnapshot: string;
+        isActive: boolean;
+        createdAt: string;
+      };
+      currentContent: HomepageData;
+    }>(`/versions/${versionId}/restore`, {
+      method: 'PUT',
+    });
+  }
+
+  async deleteVersion(versionId: string): Promise<{
+    deletedVersion: {
+      id: string;
+      versionName: string | null;
+      contentSnapshot: string;
+      isActive: boolean;
+      createdAt: string;
+    };
+  }> {
+    return this.request<{
+      deletedVersion: {
+        id: string;
+        versionName: string | null;
+        contentSnapshot: string;
+        isActive: boolean;
+        createdAt: string;
+      };
+    }>(`/versions/${versionId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async cleanupOldVersions(keepCount?: number): Promise<void> {
+    return this.request<void>('/versions/cleanup', {
+      method: 'POST',
+      body: JSON.stringify({ keepCount }),
+    });
+  }
+
+  // Content validation and backup methods
+  async validateContent(): Promise<{
+    isValid: boolean;
+    errors: string[];
+  }> {
+    return this.request<{
+      isValid: boolean;
+      errors: string[];
+    }>('/validate', {
+      method: 'POST',
+    });
+  }
+
+  async createEmergencyBackup(): Promise<{
+    id: string;
+    versionName: string | null;
+    contentSnapshot: string;
+    isActive: boolean;
+    createdAt: string;
+  }> {
+    return this.request<{
+      id: string;
+      versionName: string | null;
+      contentSnapshot: string;
+      isActive: boolean;
+      createdAt: string;
+    }>('/emergency-backup', {
+      method: 'POST',
+    });
+  }
+
+  async recoverFromError(): Promise<HomepageData> {
+    return this.request<HomepageData>('/recover', {
+      method: 'POST',
+    });
+  }
 }
 
 export const homepageAPI = new HomepageAPI();

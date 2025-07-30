@@ -83,19 +83,41 @@ export class HomepageService {
   // Update multiple content fields for a section
   async updateSectionContent(
     section: HomepageSection, 
-    updates: CreateHomepageContentInput[]
+    updates: CreateHomepageContentInput[],
+    createBackup: boolean = true
   ): Promise<HomepageContent[]> {
+    // Create automatic backup before major changes
+    if (createBackup) {
+      await this.createVersion(`Auto-backup before ${section} update`);
+    }
+
     const results: HomepageContent[] = [];
     
-    for (const update of updates) {
-      const result = await this.upsertContent({
-        ...update,
-        section
-      });
-      results.push(result);
+    try {
+      for (const update of updates) {
+        const result = await this.upsertContent({
+          ...update,
+          section
+        });
+        results.push(result);
+      }
+      
+      // Cleanup old versions after successful update
+      await this.cleanupOldVersions(10);
+      
+      return results;
+    } catch (error) {
+      console.error('Error updating section content:', error);
+      
+      // Attempt automatic recovery by restoring the last backup
+      try {
+        await this.recoverFromError();
+      } catch (recoveryError) {
+        console.error('Failed to recover from error:', recoveryError);
+      }
+      
+      throw error;
     }
-    
-    return results;
   }
 
   // Map Prisma results to our typed interfaces
@@ -331,6 +353,13 @@ export class HomepageService {
     }
   }
 
+  // Delete a specific version
+  async deleteVersion(id: string): Promise<void> {
+    await prisma.homepageVersion.delete({
+      where: { id }
+    });
+  }
+
   // Cleanup old versions (keep only the latest N versions)
   async cleanupOldVersions(keepCount: number = 10): Promise<void> {
     const versions = await prisma.homepageVersion.findMany({
@@ -345,6 +374,87 @@ export class HomepageService {
           id: { in: idsToDelete }
         }
       });
+    }
+  }
+
+  // Error recovery - restore to the most recent backup
+  async recoverFromError(): Promise<void> {
+    console.log('Attempting automatic recovery...');
+    
+    // Find the most recent auto-backup
+    const latestBackup = await prisma.homepageVersion.findFirst({
+      where: {
+        versionName: {
+          startsWith: 'Auto-backup'
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    if (latestBackup) {
+      console.log(`Restoring from backup: ${latestBackup.versionName}`);
+      await this.restoreVersion(latestBackup.id);
+    } else {
+      console.log('No auto-backup found for recovery');
+    }
+  }
+
+  // Create emergency backup (used before risky operations)
+  async createEmergencyBackup(): Promise<HomepageVersion> {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    return await this.createVersion(`Emergency-backup-${timestamp}`);
+  }
+
+  // Validate content integrity
+  async validateContentIntegrity(): Promise<{ isValid: boolean; errors: string[] }> {
+    const errors: string[] = [];
+    
+    try {
+      const content = await this.getStructuredContent();
+      
+      // Check if all required sections exist
+      const requiredSections = ['hero', 'brands', 'services', 'work', 'offer', 'testimonials', 'footer'];
+      for (const section of requiredSections) {
+        if (!content[section as keyof HomepageData]) {
+          errors.push(`Missing section: ${section}`);
+        }
+      }
+      
+      // Check hero section
+      if (!content.hero.title || !content.hero.description) {
+        errors.push('Hero section missing required fields');
+      }
+      
+      // Check brands section
+      if (!Array.isArray(content.brands.logos)) {
+        errors.push('Brands section logos is not an array');
+      }
+      
+      // Check services section
+      if (!Array.isArray(content.services.services)) {
+        errors.push('Services section services is not an array');
+      }
+      
+      // Check testimonials section
+      if (!Array.isArray(content.testimonials.testimonials)) {
+        errors.push('Testimonials section testimonials is not an array');
+      }
+      
+      // Check footer section
+      if (!content.footer.email || !content.footer.copyright) {
+        errors.push('Footer section missing required fields');
+      }
+      
+      return {
+        isValid: errors.length === 0,
+        errors
+      };
+    } catch (error) {
+      errors.push(`Content validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      return {
+        isValid: false,
+        errors
+      };
     }
   }
 }

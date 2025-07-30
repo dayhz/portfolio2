@@ -32,6 +32,9 @@ import { FooterEditor } from '../components/homepage/FooterEditor';
 import { PreviewModal } from '../components/homepage/PreviewModal';
 import { PublishConfirmDialog } from '../components/homepage/PublishConfirmDialog';
 import { UnsavedChangesDialog } from '../components/homepage/UnsavedChangesDialog';
+import { VersionHistory } from '../components/homepage/VersionHistory';
+import { VersionComparison } from '../components/homepage/VersionComparison';
+import { SystemHealth } from '../components/homepage/SystemHealth';
 import { homepageAPI } from '../api/homepage';
 import { toast } from 'sonner';
 
@@ -64,6 +67,9 @@ export default function HomepagePage() {
   const [isUnsavedChangesDialogOpen, setIsUnsavedChangesDialogOpen] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<HomepageSection | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
+  const [isVersionComparisonOpen, setIsVersionComparisonOpen] = useState(false);
+  const [isSystemHealthOpen, setIsSystemHealthOpen] = useState(false);
 
   // Track unsaved changes across sections
   const handleUnsavedChanges = (sectionId: string, hasChanges: boolean) => {
@@ -113,6 +119,17 @@ export default function HomepagePage() {
     } finally {
       setIsSaving(false);
       setIsUnsavedChangesDialogOpen(false);
+    }
+  };
+
+  const handleVersionRestore = (restoredContent: any) => {
+    // Clear unsaved changes since we've restored to a previous version
+    setUnsavedChanges({});
+    setLastSaved(new Date());
+    // Force refresh of the current section if we're not on dashboard
+    if (activeSection !== 'dashboard') {
+      // The individual editors will need to refresh their data
+      window.location.reload(); // Simple approach for now
     }
   };
 
@@ -297,42 +314,78 @@ export default function HomepagePage() {
             </p>
           )}
         </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button 
-            variant="outline" 
-            className="flex items-center gap-2"
-            onClick={handleGlobalPreview}
-          >
-            <Eye className="h-4 w-4" />
-            Prévisualiser
-          </Button>
+        <div className="flex flex-col gap-3">
+          {/* Première ligne - Actions principales */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2 text-sm"
+              onClick={handleGlobalPreview}
+            >
+              <Eye className="h-4 w-4" />
+              Prévisualiser
+            </Button>
+            
+            <Button 
+              variant="outline"
+              className="flex items-center gap-2 text-sm"
+              onClick={handleSaveAll}
+              disabled={!hasAnyUnsavedChanges || isSaving}
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
+            </Button>
+            
+            <Button 
+              className="flex items-center gap-2 text-sm"
+              onClick={handlePublishAll}
+              disabled={!hasAnyUnsavedChanges || isPublishing}
+            >
+              {isPublishing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <CheckCircle className="h-4 w-4" />
+              )}
+              {isPublishing ? 'Publication...' : 'Publier'}
+            </Button>
+          </div>
           
-          <Button 
-            variant="outline"
-            className="flex items-center gap-2"
-            onClick={handleSaveAll}
-            disabled={!hasAnyUnsavedChanges || isSaving}
-          >
-            {isSaving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
-            {isSaving ? 'Sauvegarde...' : 'Sauvegarder tout'}
-          </Button>
-          
-          <Button 
-            className="flex items-center gap-2"
-            onClick={handlePublishAll}
-            disabled={!hasAnyUnsavedChanges || isPublishing}
-          >
-            {isPublishing ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <CheckCircle className="h-4 w-4" />
-            )}
-            {isPublishing ? 'Publication...' : 'Publier les changements'}
-          </Button>
+          {/* Deuxième ligne - Gestion des versions */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button 
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+              onClick={() => setIsVersionHistoryOpen(true)}
+            >
+              <RotateCcw className="h-4 w-4" />
+              Versions
+            </Button>
+            
+            <Button 
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+              onClick={() => setIsVersionComparisonOpen(true)}
+            >
+              <Settings className="h-4 w-4" />
+              Comparer
+            </Button>
+            
+            <Button 
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+              onClick={() => setIsSystemHealthOpen(true)}
+            >
+              <AlertCircle className="h-4 w-4" />
+              Santé
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -579,6 +632,28 @@ export default function HomepagePage() {
         onSaveAndContinue={handleSaveAndContinue}
         description="Vous avez des modifications non sauvegardées dans cette section. Que souhaitez-vous faire ?"
       />
+
+      {/* Version History Modal */}
+      {isVersionHistoryOpen && (
+        <VersionHistory
+          onVersionRestore={handleVersionRestore}
+          onClose={() => setIsVersionHistoryOpen(false)}
+        />
+      )}
+
+      {/* Version Comparison Modal */}
+      {isVersionComparisonOpen && (
+        <VersionComparison
+          onClose={() => setIsVersionComparisonOpen(false)}
+        />
+      )}
+
+      {/* System Health Modal */}
+      {isSystemHealthOpen && (
+        <SystemHealth
+          onClose={() => setIsSystemHealthOpen(false)}
+        />
+      )}
     </div>
   );
 }

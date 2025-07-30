@@ -59,27 +59,49 @@ router.get('/', async (req, res) => {
         ]);
         // Si c'est un appel depuis le portfolio (pas de format spécifié), retourner le format simple
         if (!format || format === 'portfolio') {
-            // Mapper les projets au format attendu par le portfolio
-            const portfolioProjects = projects.map(project => {
-                let images = [];
-                try {
-                    images = JSON.parse(project.images || '[]');
-                }
-                catch (e) {
-                    console.warn('Failed to parse images for project:', project.id);
-                }
-                return {
+            let portfolioProjects = [];
+            // Si la table Project est vide ou n'a pas de projets publiés, 
+            // récupérer depuis TemplateProject
+            if (projects.length === 0 || projects.filter(p => p.isPublished).length === 0) {
+                const templateProjects = await prisma.templateProject.findMany({
+                    where: { status: 'published' },
+                    orderBy: { createdAt: 'desc' }
+                });
+                portfolioProjects = templateProjects.map(project => ({
                     id: project.id,
                     title: project.title,
-                    description: project.description,
+                    description: project.challenge || 'Description non disponible',
                     slug: project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, ''),
-                    imageUrl: images.length > 0 ? images[0] : project.thumbnail,
-                    category: project.category,
-                    year: project.year,
+                    imageUrl: project.heroImage || '/uploads/default-thumbnail.jpg',
+                    category: 'WEBSITE', // Valeur par défaut pour les template projects
+                    year: parseInt(project.year) || new Date().getFullYear(),
                     client: project.client,
-                    isPublished: project.isPublished
-                };
-            });
+                    isPublished: true
+                }));
+            }
+            else {
+                // Mapper les projets au format attendu par le portfolio
+                portfolioProjects = projects.filter(p => p.isPublished).map(project => {
+                    let images = [];
+                    try {
+                        images = JSON.parse(project.images || '[]');
+                    }
+                    catch (e) {
+                        console.warn('Failed to parse images for project:', project.id);
+                    }
+                    return {
+                        id: project.id,
+                        title: project.title,
+                        description: project.description,
+                        slug: project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, ''),
+                        imageUrl: images.length > 0 ? images[0] : project.thumbnail,
+                        category: project.category,
+                        year: project.year,
+                        client: project.client,
+                        isPublished: project.isPublished
+                    };
+                });
+            }
             return res.json(portfolioProjects);
         }
         // Format CMS avec pagination

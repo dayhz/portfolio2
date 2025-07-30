@@ -17,6 +17,7 @@ const projects_1 = __importDefault(require("./routes/projects"));
 const template_projects_1 = __importDefault(require("./routes/template-projects"));
 const about_1 = __importDefault(require("./routes/about"));
 const auth_debug_1 = __importDefault(require("./routes/auth-debug"));
+const homepage_1 = require("./routes/homepage");
 // Load environment variables
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -54,10 +55,11 @@ app.get('/api/health', (req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/debug', auth_debug_1.default);
-// TODO: Add other route handlers
+// API Routes
 app.use('/api/projects', projects_1.default);
 app.use('/api/template-projects', template_projects_1.default);
 app.use('/api/about', about_1.default);
+app.use('/api/homepage', homepage_1.homepageRouter);
 // app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/media', media_1.default);
 app.use('/api/profile', profile_1.default);
