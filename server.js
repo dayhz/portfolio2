@@ -409,13 +409,16 @@ function injectFooterContentIntoHTML(html, footerData) {
 
   // Injecter le titre du footer ("Let's work together")
   if (footerData.title) {
-    const titlePattern = /(<div class="u-text-style-h4 u-color-gray-700"[^>]*>\s*)Let's work\s+together(\s*<\/div>)/;
+    // Remplacer tout le contenu entre les balises div
+    const titlePattern = /(<div class="u-text-style-h4 u-color-gray-700" data-w-id="15828fe9-b698-9ed3-3a55-9a383fb763b2">)[\s\S]*?(<\/div>)/;
     
     if (titlePattern.test(updatedHTML)) {
-      updatedHTML = updatedHTML.replace(titlePattern, `$1${footerData.title}$2`);
+      updatedHTML = updatedHTML.replace(titlePattern, `$1
+         ${footerData.title}
+        $2`);
       console.log('✅ Injected footer title:', footerData.title);
     } else {
-      console.log('⚠️  Footer title "Let\'s work together" not found');
+      console.log('⚠️  Footer title div not found');
     }
   }
 
@@ -428,11 +431,32 @@ function injectFooterContentIntoHTML(html, footerData) {
     if (emailHrefPattern.test(updatedHTML)) {
       updatedHTML = updatedHTML.replace(emailHrefPattern, `$1${footerData.email}$2`);
       console.log('✅ Injected footer email href:', footerData.email);
+    } else {
+      console.log('⚠️  Email href pattern not found');
     }
     
     if (emailTextPattern.test(updatedHTML)) {
       updatedHTML = updatedHTML.replace(emailTextPattern, `$1${footerData.email}$2`);
       console.log('✅ Injected footer email text:', footerData.email);
+    } else {
+      console.log('⚠️  Email text pattern not found');
+    }
+  }
+
+  // Injecter les titres des sections de liens
+  if (footerData.links) {
+    // Remplacer "Explore" par "Navigation"
+    const explorePattern = /(<div class="u-color-gray-700 u-mb-2">\s*)Explore(\s*<\/div>)/;
+    if (explorePattern.test(updatedHTML)) {
+      updatedHTML = updatedHTML.replace(explorePattern, `$1Navigation$2`);
+      console.log('✅ Replaced "Explore" with "Navigation"');
+    }
+
+    // Remplacer "Socials" par "Réseaux Pro"  
+    const socialsPattern = /(<div class="u-color-gray-700 u-mb-2">\s*)Socials(\s*<\/div>)/;
+    if (socialsPattern.test(updatedHTML)) {
+      updatedHTML = updatedHTML.replace(socialsPattern, `$1Réseaux Pro$2`);
+      console.log('✅ Replaced "Socials" with "Réseaux Pro"');
     }
   }
 
@@ -451,6 +475,8 @@ function injectFooterContentIntoHTML(html, footerData) {
     if (siteLinksPattern.test(updatedHTML)) {
       updatedHTML = updatedHTML.replace(siteLinksPattern, `$1${siteLinksHTML}$3`);
       console.log('✅ Injected', footerData.links.site.length, 'site navigation links');
+    } else {
+      console.log('⚠️  Site links pattern not found');
     }
   }
 
@@ -469,10 +495,12 @@ function injectFooterContentIntoHTML(html, footerData) {
     if (professionalLinksPattern.test(updatedHTML)) {
       updatedHTML = updatedHTML.replace(professionalLinksPattern, `$1${professionalLinksHTML}$3`);
       console.log('✅ Injected', footerData.links.professional.length, 'professional links');
+    } else {
+      console.log('⚠️  Professional links pattern not found');
     }
   }
 
-  // Injecter les liens sociaux (troisième liste)
+  // Injecter les liens sociaux (troisième liste) avec titre
   if (footerData.links && footerData.links.social && footerData.links.social.length > 0) {
     const socialLinksHTML = footerData.links.social.map(link => `
                                                                 <li class="u-mb-1">
@@ -481,12 +509,26 @@ function injectFooterContentIntoHTML(html, footerData) {
                                                                         </a>
                                                                 </li>`).join('');
 
+    // Ajouter un titre "Réseaux Sociaux" avant la troisième liste
+    const socialTitlePattern = /(<ul class="u-text-style-regular"\s+id="w-node-_15828fe9-b698-9ed3-3a55-9a383fb763da-3fb763ab")/;
+    if (socialTitlePattern.test(updatedHTML)) {
+      updatedHTML = updatedHTML.replace(socialTitlePattern, `<div class="u-mb-3">
+         <div class="u-color-gray-700 u-mb-2">
+          Réseaux Sociaux
+         </div>
+        </div>
+        $1`);
+      console.log('✅ Added "Réseaux Sociaux" title before social links');
+    }
+
     // Remplacer les liens sociaux (troisième liste ul)
     const socialLinksPattern = /(<ul class="u-text-style-regular"\s+id="w-node-_15828fe9-b698-9ed3-3a55-9a383fb763da-3fb763ab"\s+role="list">\s*)([\s\S]*?)(\s*<\/ul>)/;
     
     if (socialLinksPattern.test(updatedHTML)) {
       updatedHTML = updatedHTML.replace(socialLinksPattern, `$1${socialLinksHTML}$3`);
       console.log('✅ Injected', footerData.links.social.length, 'social links');
+    } else {
+      console.log('⚠️  Social links pattern not found');
     }
   }
 
@@ -499,6 +541,12 @@ function injectFooterContentIntoHTML(html, footerData) {
       console.log('✅ Injected footer copyright:', footerData.copyright);
     } else {
       console.log('⚠️  Footer copyright text not found');
+      // Essayer un pattern plus flexible
+      const flexibleCopyrightPattern = /(<a class="footer-info-text" href="privacy\.html">\s*)© 2025 Lawson Sydney[^<]*(\s*<span)/;
+      if (flexibleCopyrightPattern.test(updatedHTML)) {
+        updatedHTML = updatedHTML.replace(flexibleCopyrightPattern, `$1${footerData.copyright}$2`);
+        console.log('✅ Injected footer copyright (flexible pattern):', footerData.copyright);
+      }
     }
   }
 
