@@ -90,8 +90,8 @@ function injectProjectsIntoHTML(html, projects) {
         </div>
        </a>`).join('') : '       <!-- Aucun projet dans le CMS -->';
   
-  // Remplacer TOUT le contenu du work_main_grid_group (tous les projets statiques)
-  const workGridRegex = /(<div class="work_main_grid_group">\s*)([\s\S]*?)(\s*<\/div>\s*<\/div>\s*<\/div>\s*<\/section>)/;
+  // Remplacer SEULEMENT le contenu à l'intérieur de work_main_grid_group
+  const workGridRegex = /(<div class="work_main_grid_group">\s*)([\s\S]*?)(\s*<\/div>)/;
   
   if (workGridRegex.test(html)) {
     const newHTML = html.replace(workGridRegex, `$1${projectsHTML}$3`);
@@ -551,6 +551,11 @@ function injectFooterContentIntoHTML(html, footerData) {
   return updatedHTML;
 }
 
+// Route pour /index.html - rediriger vers la homepage avec injection CMS
+app.get('/index.html', (req, res) => {
+  res.redirect(301, '/');
+});
+
 // Route pour la homepage
 app.get('/', async (req, res) => {
   try {
@@ -586,6 +591,9 @@ app.get('/', async (req, res) => {
     
     console.log('📊 Homepage: Loaded Hero, Brands, Services, Offer, Testimonials, Footer content, and', projects.length, 'projects from CMS');
     
+    // TOUJOURS remplacer les projets statiques par les projets CMS EN PREMIER (même si vide)
+    htmlTemplate = injectProjectsIntoHTML(htmlTemplate, projects);
+    
     // Injecter le contenu Hero du CMS
     htmlTemplate = injectHeroContentIntoHTML(htmlTemplate, heroContent);
     
@@ -603,9 +611,6 @@ app.get('/', async (req, res) => {
     
     // Injecter le contenu Footer du CMS
     htmlTemplate = injectFooterContentIntoHTML(htmlTemplate, footerContent);
-    
-    // TOUJOURS remplacer les projets statiques par les projets CMS (même si vide)
-    htmlTemplate = injectProjectsIntoHTML(htmlTemplate, projects);
     
     res.send(htmlTemplate);
     
@@ -635,6 +640,11 @@ app.get('/about', async (req, res) => {
 app.get('/:slug.html', async (req, res) => {
   try {
     const slug = req.params.slug;
+    
+    // Exclure index.html qui doit être géré par la route spécifique
+    if (slug === 'index') {
+      return res.redirect(301, '/');
+    }
     
     // D'abord, essayer de servir un fichier statique existant
     const htmlFile = path.join(STATIC_DIR, `${slug}.html`);
