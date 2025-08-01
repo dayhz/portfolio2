@@ -1,10 +1,51 @@
 import express from 'express';
 import { z } from 'zod';
 import { servicesService } from '../services/servicesService';
-import { ServicesSection, ValidationError } from '../../../shared/types/services';
+import { ServicesSection, ValidationError, ServicesData } from '../../../shared/types/services';
 import { uploadMedia, optimizeImage, generateFileUrls } from '../middleware/upload';
 import path from 'path';
 import fs from 'fs/promises';
+
+// Function to publish content to static files
+async function publishToStaticFiles(content: ServicesData) {
+  try {
+    const staticFilePath = path.join(process.cwd(), '../../portfolio2/www.victorberbel.work/services.html');
+    
+    // Read the current static file
+    let htmlContent = await fs.readFile(staticFilePath, 'utf-8');
+    
+    // Update hero section
+    if (content.hero) {
+      // Update title
+      htmlContent = htmlContent.replace(
+        /<h1 class="u-text-style-h2 u-color-white u-align-self-center">\s*([^<]*)\s*<\/h1>/,
+        `<h1 class="u-text-style-h2 u-color-white u-align-self-center">
+          ${content.hero.title}
+         </h1>`
+      );
+      
+      // Update description and highlight text
+      const descriptionPattern = /<div class="u-text-style-big text_gray_500 left-mobile"[^>]*>\s*([^<]*)\s*<span class="u-color-white">\s*([^<]*)\s*<\/span>\s*([^<]*)\s*<\/div>/;
+      const newDescription = `<div class="u-text-style-big text_gray_500 left-mobile" data-w-id="0fe385c4-c807-0ffe-f6fc-c250bfb174c7" style="opacity:0">
+           ${content.hero.description.split(content.hero.highlightText)[0]}
+           <span class="u-color-white">
+            ${content.hero.highlightText}
+           </span>
+           ${content.hero.description.split(content.hero.highlightText)[1] || ''}
+          </div>`;
+      
+      htmlContent = htmlContent.replace(descriptionPattern, newDescription);
+    }
+    
+    // Write the updated content back to the file
+    await fs.writeFile(staticFilePath, htmlContent, 'utf-8');
+    
+    console.log('✅ Static file updated successfully');
+  } catch (error) {
+    console.error('❌ Error updating static file:', error);
+    throw error;
+  }
+}
 
 const router = express.Router();
 
@@ -450,12 +491,8 @@ router.post('/publish', async (req: express.Request, res: express.Response, next
     
     const publishedSections = ['hero', 'services', 'skills', 'approach', 'testimonials', 'clients'];
     
-    // TODO: Implement actual publishing logic (same as Homepage CMS)
-    // This could involve:
-    // - Updating static files
-    // - Invalidating caches
-    // - Triggering site rebuild
-    // - Notifying CDN of changes
+    // Implement actual publishing logic
+    await publishToStaticFiles(allContent);
     
     res.json({
       success: true,

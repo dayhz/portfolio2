@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Pencil, Plus, Trash2, Check } from 'lucide-react';
-import { useNotificationSystem } from '@/hooks/useNotificationSystem';
+// import { useNotificationSystem } from '@/hooks/useNotificationSystem';
 import {
   Dialog,
   DialogContent,
@@ -63,7 +63,7 @@ export default function SocialLinksEditor({ initialLinks, onSave }: SocialLinksE
     url: '',
     icon: '',
   });
-  const notificationSystem = useNotificationSystem();
+//   const notificationSystem = useNotificationSystem();
 
   const handleSave = async () => {
     try {

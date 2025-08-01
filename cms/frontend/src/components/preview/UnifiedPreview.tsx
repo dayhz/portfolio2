@@ -6,13 +6,13 @@ import AboutPreview from '@/components/about/AboutPreview';
 // import { ServicesPreview } from '@/components/services/ServicesPreview'; // TODO: Create this component in task 2
 import { ProjectPreview } from '@/components/ProjectPreview';
 import TestimonialsPreview from '@/components/testimonials/TestimonialsPreview';
-import { useNotificationSystem } from '@/hooks/useNotificationSystem';
+// import { useNotificationSystem } from '@/hooks/useNotificationSystem';
 import { htmlExportService } from '@/services/HtmlExportService';
 
 const UnifiedPreview: React.FC = () => {
   const { isPreviewMode, previewType, previewData, setPreviewMode } = usePreview();
   const [isCopied, setIsCopied] = useState(false);
-  const notificationSystem = useNotificationSystem();
+//   const notificationSystem = useNotificationSystem();
   const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

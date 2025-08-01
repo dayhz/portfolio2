@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Pencil } from 'lucide-react';
-import { useNotificationSystem } from '@/hooks/useNotificationSystem';
+// import { useNotificationSystem } from '@/hooks/useNotificationSystem';
 
 interface BiographyEditorProps {
   initialBiography: string;
@@ -13,7 +13,7 @@ export default function BiographyEditor({ initialBiography, onSave }: BiographyE
   const [biography, setBiography] = useState(initialBiography);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const notificationSystem = useNotificationSystem();
+//   const notificationSystem = useNotificationSystem();
 
   const handleSave = async () => {
     try {

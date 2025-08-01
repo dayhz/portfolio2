@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNotificationSystem } from '@/hooks/useNotificationSystem';
+// import { useNotificationSystem } from '@/hooks/useNotificationSystem';
 import {
   BiographyEditor,
   StatisticsEditor,
@@ -58,7 +58,7 @@ export default function AboutPage() {
   const [awards, setAwards] = useState(initialAwards);
   const [photos, setPhotos] = useState<Photo[]>(initialPhotos);
   const [socialLinks, setSocialLinks] = useState(initialSocialLinks);
-  const notificationSystem = useNotificationSystem();
+  // const notificationSystem = useNotificationSystem();
 
   // These functions would make API calls in a real application
   const saveBiography = async (newBiography: string) => {

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, X, ArrowLeft, ArrowRight } from 'lucide-react';
-import { useNotificationSystem } from '@/hooks/useNotificationSystem';
+// import { useNotificationSystem } from '@/hooks/useNotificationSystem';
 import {
   Dialog,
   DialogContent,
@@ -42,7 +42,7 @@ export default function PhotoGalleryEditor({ initialPhotos, onSave, onUpload }: 
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [currentPhoto, setCurrentPhoto] = useState<Photo | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const notificationSystem = useNotificationSystem();
+//   const notificationSystem = useNotificationSystem();
 
   const handleSave = async () => {
     try {

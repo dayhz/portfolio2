@@ -14,11 +14,11 @@ import {
   ServicesVersion
 } from '../../../shared/types/services';
 
-const API_BASE_URL = import.meta.env?.VITE_API_URL || '';
+const API_BASE_URL = import.meta.env?.VITE_API_URL || 'http://localhost:8000/api';
 
 class ServicesAPI {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${API_BASE_URL}/api/services${endpoint}`;
+    const url = `${API_BASE_URL}/services${endpoint}`;
     
     const defaultOptions: RequestInit = {
       headers: {

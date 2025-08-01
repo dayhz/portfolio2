@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Work, Chat, Image, Calendar } from 'react-iconly';
 import { Button } from '@/components/ui/button';
-import useNotificationSystem from '../hooks/useNotificationSystem';
+// import useNotificationSystem from '../hooks/useNotificationSystem';
 import { 
   VisitorsChart, 
   ProjectsAnalytics, 
@@ -11,7 +11,7 @@ import {
 } from './analytics';
 
 export default function DashboardHome() {
-  const { info, success, warning, error } = useNotificationSystem();
+//   const { info, success, warning, error } = useNotificationSystem();
   
   const stats = [
     {

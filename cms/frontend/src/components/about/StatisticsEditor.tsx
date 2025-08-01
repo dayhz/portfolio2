@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Pencil } from 'lucide-react';
-import { useNotificationSystem } from '@/hooks/useNotificationSystem';
+// import { useNotificationSystem } from '@/hooks/useNotificationSystem';
 
 interface Statistic {
   id: string;
@@ -20,7 +20,7 @@ export default function StatisticsEditor({ initialStatistics, onSave }: Statisti
   const [statistics, setStatistics] = useState<Statistic[]>(initialStatistics);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const notificationSystem = useNotificationSystem();
+//   const notificationSystem = useNotificationSystem();
 
   const handleStatisticChange = (id: string, field: 'label' | 'value', newValue: string) => {
     setStatistics(
