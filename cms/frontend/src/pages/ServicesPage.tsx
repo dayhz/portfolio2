@@ -17,7 +17,11 @@ import {
 } from 'lucide-react';
 import { HeroSectionEditor } from '../components/services/HeroSectionEditor';
 import { ServicesGridEditor } from '../components/services/ServicesGridEditor';
-import { HeroSectionData, ServicesGridData } from '../../../shared/types/services';
+import { SkillsVideoEditor } from '../components/services/SkillsVideoEditor';
+import { ApproachEditor } from '../components/services/ApproachEditor';
+import { TestimonialsEditor } from '../components/services/TestimonialsEditor';
+import { ClientsEditor } from '../components/services/ClientsEditor';
+import { HeroSectionData, ServicesGridData, SkillsVideoData, ApproachData, TestimonialsData, ClientsData } from '../../../shared/types/services';
 import { toast } from 'sonner';
 import servicesDataService from '../services/servicesDataService';
 
@@ -32,6 +36,29 @@ export default function ServicesPage() {
   });
   const [servicesGridData, setServicesGridData] = useState<ServicesGridData>({
     services: []
+  });
+  const [skillsVideoData, setSkillsVideoData] = useState<SkillsVideoData>({
+    description: '',
+    skills: [],
+    ctaText: '',
+    ctaUrl: '',
+    video: {
+      url: '',
+      caption: '',
+      autoplay: true,
+      loop: true,
+      muted: true
+    }
+  });
+  const [testimonialsData, setTestimonialsData] = useState<TestimonialsData>({
+    testimonials: []
+  });
+  const [clientsData, setClientsData] = useState<ClientsData>({
+    clients: []
+  });
+  const [approachData, setApproachData] = useState<ApproachData>({
+    description: '',
+    steps: []
   });
   const [isLoading, setIsLoading] = useState(true);
   const [apiMode, setApiMode] = useState(false);
@@ -48,6 +75,22 @@ export default function ServicesPage() {
         // Load services grid data
         const servicesGridDataFromService = await servicesDataService.getServicesGridData();
         setServicesGridData(servicesGridDataFromService);
+        
+        // Load skills & video data
+        const skillsVideoDataFromService = await servicesDataService.getSkillsVideoData();
+        setSkillsVideoData(skillsVideoDataFromService);
+        
+        // Load approach data
+        const approachDataFromService = await servicesDataService.getApproachData();
+        setApproachData(approachDataFromService);
+        
+        // Load testimonials data
+        const testimonialsDataFromService = await servicesDataService.getTestimonialsData();
+        setTestimonialsData(testimonialsDataFromService);
+        
+        // Load clients data
+        const clientsDataFromService = await servicesDataService.getClientsData();
+        setClientsData(clientsDataFromService);
         
         // Détermine si on est en mode API
         const apiAvailable = await servicesDataService.testApiConnection();
@@ -83,7 +126,7 @@ export default function ServicesPage() {
       title: 'Compétences & Vidéo',
       description: 'Liste des compétences et vidéo de présentation',
       icon: <Play className="h-5 w-5" />,
-      status: 'draft' as const
+      status: 'completed' as const
     },
     {
       id: 'approach' as const,
@@ -161,6 +204,66 @@ export default function ServicesPage() {
 
   const handlePreviewServicesGrid = (data: ServicesGridData) => {
     console.log('Preview services grid data:', data);
+    toast.info('Aperçu généré (voir console)');
+  };
+
+  const handleSaveSkillsVideo = async (data: SkillsVideoData) => {
+    try {
+      await servicesDataService.saveSkillsVideoData(data);
+      setSkillsVideoData(data);
+    } catch (error) {
+      console.error('Failed to save skills & video data:', error);
+      toast.error('Erreur lors de la sauvegarde');
+    }
+  };
+
+  const handlePreviewSkillsVideo = (data: SkillsVideoData) => {
+    console.log('Preview skills & video data:', data);
+    toast.info('Aperçu généré (voir console)');
+  };
+
+  const handleSaveApproach = async (data: ApproachData) => {
+    try {
+      await servicesDataService.saveApproachData(data);
+      setApproachData(data);
+    } catch (error) {
+      console.error('Failed to save approach data:', error);
+      toast.error('Erreur lors de la sauvegarde');
+    }
+  };
+
+  const handlePreviewApproach = (data: ApproachData) => {
+    console.log('Preview approach data:', data);
+    toast.info('Aperçu généré (voir console)');
+  };
+
+  const handleSaveTestimonials = async (data: TestimonialsData) => {
+    try {
+      await servicesDataService.saveTestimonialsData(data);
+      setTestimonialsData(data);
+    } catch (error) {
+      console.error('Failed to save testimonials data:', error);
+      toast.error('Erreur lors de la sauvegarde');
+    }
+  };
+
+  const handlePreviewTestimonials = (data: TestimonialsData) => {
+    console.log('Preview testimonials data:', data);
+    toast.info('Aperçu généré (voir console)');
+  };
+
+  const handleSaveClients = async (data: ClientsData) => {
+    try {
+      await servicesDataService.saveClientsData(data);
+      setClientsData(data);
+    } catch (error) {
+      console.error('Failed to save clients data:', error);
+      toast.error('Erreur lors de la sauvegarde');
+    }
+  };
+
+  const handlePreviewClients = (data: ClientsData) => {
+    console.log('Preview clients data:', data);
     toast.info('Aperçu généré (voir console)');
   };
 
@@ -310,6 +413,54 @@ export default function ServicesPage() {
               onChange={setServicesGridData}
               onSave={handleSaveServicesGrid}
               onPreview={handlePreviewServicesGrid}
+              errors={[]}
+            />
+          </div>
+        );
+      case 'skills':
+        return (
+          <div className="p-6">
+            <SkillsVideoEditor
+              data={skillsVideoData}
+              onChange={setSkillsVideoData}
+              onSave={handleSaveSkillsVideo}
+              onPreview={handlePreviewSkillsVideo}
+              errors={[]}
+            />
+          </div>
+        );
+      case 'approach':
+        return (
+          <div className="p-6">
+            <ApproachEditor
+              data={approachData}
+              onChange={setApproachData}
+              onSave={handleSaveApproach}
+              onPreview={handlePreviewApproach}
+              errors={[]}
+            />
+          </div>
+        );
+      case 'testimonials':
+        return (
+          <div className="p-6">
+            <TestimonialsEditor
+              data={testimonialsData}
+              onChange={setTestimonialsData}
+              onSave={handleSaveTestimonials}
+              onPreview={handlePreviewTestimonials}
+              errors={[]}
+            />
+          </div>
+        );
+      case 'clients':
+        return (
+          <div className="p-6">
+            <ClientsEditor
+              data={clientsData}
+              onChange={setClientsData}
+              onSave={handleSaveClients}
+              onPreview={handlePreviewClients}
               errors={[]}
             />
           </div>

@@ -1,6 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { uploadMedia, optimizeImage, generateFileUrls } from '../middleware/upload';
+import { uploadMedia, validateAndOptimizeMedia, generateFileUrls } from '../middleware/upload';
 import { authenticateToken } from '../middleware/auth';
 import path from 'path';
 import fs from 'fs/promises';
@@ -61,7 +61,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Uploader un nouveau média
-router.post('/', uploadMedia.single('file'), async (req, res) => {
+router.post('/', uploadMedia.single('file'), validateAndOptimizeMedia, async (req, res) => {
   try {
     console.log('Début de la route d\'upload');
     

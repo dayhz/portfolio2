@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import { Request, Response, NextFunction } from 'express';
 import { mediaOptimizationService } from '../services/mediaOptimizationService';
+import { mediaValidationService } from '../services/mediaValidationService';
 
 // Configuration de stockage
 const storage = multer.diskStorage({
@@ -73,8 +74,8 @@ export const uploadMedia = multer({
   }
 });
 
-// Enhanced middleware for image optimization with responsive variants
-export const optimizeImage = async (
+// Enhanced middleware for media validation and optimization
+export const validateAndOptimizeMedia = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -87,55 +88,89 @@ export const optimizeImage = async (
     
     console.log(`Processing file: ${req.file.originalname}, type: ${req.file.mimetype}`);
     
-    if (!req.file.mimetype.startsWith('image/')) {
-      console.log(`File is not an image: ${req.file.mimetype}`);
-      return next();
-    }
-
     const inputPath = req.file.path;
-    console.log(`Input file path: ${inputPath}`);
+    const contentType = req.body.contentType || 'image'; // Default to image if not specified
     
-    // Validate image file
-    const isValid = await mediaOptimizationService.validateImage(inputPath);
-    if (!isValid) {
-      return next(new Error('Invalid image file'));
+    // Validate media file based on content type
+    const validationResult = await mediaValidationService.validateMedia(
+      inputPath, 
+      contentType, 
+      req.file.mimetype
+    );
+    
+    console.log('Validation result:', validationResult);
+    
+    // Add validation results to request for later use
+    (req as any).validationResult = validationResult;
+    
+    if (!validationResult.isValid) {
+      // Clean up uploaded file
+      await fs.unlink(inputPath).catch(() => {});
+      return next(new Error(`Media validation failed: ${validationResult.errors.join(', ')}`));
     }
     
-    // Get image metadata
-    const metadata = await mediaOptimizationService.getImageMetadata(inputPath);
-    console.log('Image metadata:', metadata);
-
-    // Optimize image with responsive variants
-    const result = await mediaOptimizationService.optimizeImage(inputPath);
+    // Log warnings and recommendations
+    if (validationResult.warnings.length > 0) {
+      console.log('Validation warnings:', validationResult.warnings);
+    }
     
-    console.log(`Image optimized successfully. Compression ratio: ${(result.compressionRatio * 100).toFixed(2)}%`);
-    console.log(`Generated ${result.variants.length} responsive variants`);
-
-    // Update file information
-    req.file.path = result.optimizedPath;
-    req.file.filename = path.basename(result.optimizedPath);
-    req.file.mimetype = 'image/webp';
+    if (validationResult.recommendations.length > 0) {
+      console.log('Optimization recommendations:', validationResult.recommendations);
+    }
     
-    // Add optimization results to file object
-    (req.file as any).thumbnailPath = result.thumbnailPath;
-    (req.file as any).thumbnailFilename = path.basename(result.thumbnailPath);
-    (req.file as any).variants = result.variants.map(v => ({
-      path: v.path,
-      filename: path.basename(v.path),
-      width: v.width,
-      height: v.height,
-      size: v.size
-    }));
-    (req.file as any).compressionRatio = result.compressionRatio;
-    (req.file as any).metadata = metadata;
+    // Optimize if it's an image and optimization is recommended
+    if (req.file.mimetype.startsWith('image/')) {
+      const shouldOptimize = mediaValidationService.shouldOptimize(validationResult, contentType);
+      
+      if (shouldOptimize || contentType === 'image' || contentType === 'projectImage') {
+        console.log('Optimizing image...');
+        
+        // Get image metadata
+        const metadata = await mediaOptimizationService.getImageMetadata(inputPath);
+        console.log('Image metadata:', metadata);
+
+        // Optimize image with responsive variants
+        const result = await mediaOptimizationService.optimizeImage(inputPath);
+        
+        console.log(`Image optimized successfully. Compression ratio: ${(result.compressionRatio * 100).toFixed(2)}%`);
+        console.log(`Generated ${result.variants.length} responsive variants`);
+
+        // Update file information
+        req.file.path = result.optimizedPath;
+        req.file.filename = path.basename(result.optimizedPath);
+        req.file.mimetype = 'image/webp';
+        
+        // Add optimization results to file object
+        (req.file as any).thumbnailPath = result.thumbnailPath;
+        (req.file as any).thumbnailFilename = path.basename(result.thumbnailPath);
+        (req.file as any).variants = result.variants.map(v => ({
+          path: v.path,
+          filename: path.basename(v.path),
+          width: v.width,
+          height: v.height,
+          size: v.size
+        }));
+        (req.file as any).compressionRatio = result.compressionRatio;
+        (req.file as any).metadata = metadata;
+        (req.file as any).optimized = true;
+      } else {
+        // Still create thumbnail for non-optimized images
+        const thumbnailPath = await mediaOptimizationService.createThumbnail(inputPath);
+        (req.file as any).thumbnailPath = thumbnailPath;
+        (req.file as any).thumbnailFilename = path.basename(thumbnailPath);
+      }
+    }
 
     next();
   } catch (error) {
-    console.error('Image optimization error:', error);
+    console.error('Media validation/optimization error:', error);
     // Continue without optimization to avoid blocking upload
     next();
   }
 };
+
+// Legacy middleware for backward compatibility
+export const optimizeImage = validateAndOptimizeMedia;
 
 // Middleware pour optimiser plusieurs images
 export const optimizeImages = async (

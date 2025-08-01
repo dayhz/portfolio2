@@ -157,7 +157,7 @@ const defaultServicesData: ServicesData = {
       {
         id: 'savills',
         name: 'Savills',
-        logo: 'https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/client-savills.svg',
+        logo: '/images/client-savills.svg',
         description: 'Global real estate services provider',
         industry: 'Real Estate',
         order: 1,
@@ -166,7 +166,7 @@ const defaultServicesData: ServicesData = {
       {
         id: 'greco-gum',
         name: 'Greco Gum',
-        logo: 'https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/client-greco.svg',
+        logo: '/images/client-greco.svg',
         description: 'Premium chewing gum brand',
         industry: 'Consumer Goods',
         order: 2,
@@ -175,7 +175,7 @@ const defaultServicesData: ServicesData = {
       {
         id: 'journaler',
         name: 'Journaler',
-        logo: 'https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/client-journaler.svg',
+        logo: '/images/client-journaler.svg',
         description: 'Digital journaling platform',
         industry: 'Technology',
         order: 3,
@@ -184,7 +184,7 @@ const defaultServicesData: ServicesData = {
       {
         id: 'booksprout',
         name: 'BookSprout',
-        logo: 'https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/client-booksprout.svg',
+        logo: '/images/client-booksprout.svg',
         description: 'Book marketing platform',
         industry: 'Publishing',
         order: 4,
@@ -193,7 +193,7 @@ const defaultServicesData: ServicesData = {
       {
         id: 'investy',
         name: 'Investy Club',
-        logo: 'https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/client-investy.svg',
+        logo: '/images/client-investy.svg',
         description: 'Investment community platform',
         industry: 'Finance',
         order: 5,
@@ -202,7 +202,7 @@ const defaultServicesData: ServicesData = {
       {
         id: 'nobe',
         name: 'Nobe',
-        logo: 'https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/client-nobe.svg',
+        logo: '/images/client-nobe.svg',
         description: 'Electric vehicle manufacturer',
         industry: 'Automotive',
         order: 6,

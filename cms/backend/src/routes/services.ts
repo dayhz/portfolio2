@@ -305,7 +305,19 @@ router.get('/:section', validateSection, async (req: express.Request, res: expre
     const section = req.params.section as ServicesSection;
     const structuredContent = await servicesService.getStructuredContent();
     
-    const sectionData = structuredContent[section as keyof typeof structuredContent];
+    // Map section names to property names
+    const sectionPropertyMap: Record<ServicesSection, keyof typeof structuredContent> = {
+      'hero': 'hero',
+      'services': 'services',
+      'skills': 'skillsVideo',
+      'approach': 'approach',
+      'testimonials': 'testimonials',
+      'clients': 'clients'
+    };
+    
+    const propertyName = sectionPropertyMap[section];
+    const sectionData = structuredContent[propertyName];
+    
     if (!sectionData) {
       const error = new Error('Section not found');
       return next(error);
@@ -344,7 +356,19 @@ router.put('/:section', validateSection, validateSectionData, async (req: expres
 
     // Get the updated structured content
     const updatedContent = await servicesService.getStructuredContent();
-    const updatedSectionData = updatedContent[section as keyof typeof updatedContent];
+    
+    // Map section names to property names
+    const sectionPropertyMap: Record<ServicesSection, keyof typeof updatedContent> = {
+      'hero': 'hero',
+      'services': 'services',
+      'skills': 'skillsVideo',
+      'approach': 'approach',
+      'testimonials': 'testimonials',
+      'clients': 'clients'
+    };
+    
+    const propertyName = sectionPropertyMap[section];
+    const updatedSectionData = updatedContent[propertyName];
 
     res.json({
       success: true,
