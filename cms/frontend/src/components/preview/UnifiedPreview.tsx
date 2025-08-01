@@ -3,7 +3,7 @@ import { usePreview } from '@/contexts/PreviewContext';
 import { Button } from '@/components/ui/button';
 import { X, ExternalLink, Copy, Check } from 'lucide-react';
 import AboutPreview from '@/components/about/AboutPreview';
-import { ServicesPreview } from '@/components/services/ServicesPreview';
+// import { ServicesPreview } from '@/components/services/ServicesPreview'; // TODO: Create this component in task 2
 import { ProjectPreview } from '@/components/ProjectPreview';
 import TestimonialsPreview from '@/components/testimonials/TestimonialsPreview';
 import { useNotificationSystem } from '@/hooks/useNotificationSystem';
@@ -93,7 +93,7 @@ const UnifiedPreview: React.FC = () => {
       case 'about':
         return <AboutPreview {...previewData.about} />;
       case 'services':
-        return <ServicesPreview {...previewData.services} />;
+        return <div>Services Preview - Coming Soon</div>; // TODO: Replace with <ServicesPreview {...previewData.services} /> in task 2
       case 'projects':
         return <ProjectPreview projectData={previewData.projects} content={previewData.projects?.content || ''} />;
       case 'testimonials':

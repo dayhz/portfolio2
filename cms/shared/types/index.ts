@@ -171,3 +171,4 @@ export interface ProfileFormData {
 
 // Export homepage types
 export * from './homepage';
+export * from './services';

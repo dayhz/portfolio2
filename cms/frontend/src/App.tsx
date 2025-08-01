@@ -20,9 +20,10 @@ import ProjectsPage from './pages/ProjectsPage';
 import ProjectNewPage from './pages/ProjectNewPage';
 import ProjectContentPage from './pages/ProjectContentPage';
 import SearchResultsPage from './pages/SearchResultsPage';
-import ServicesPage from './pages/ServicesPage';
 import AboutPage from './pages/AboutPage';
 import HomepagePage from './pages/HomepagePage';
+import ServicesPage from './pages/ServicesPage';
+import HeroSectionTest from './pages/HeroSectionTest';
 
 import { ProjectPreviewPage } from './pages/ProjectPreviewPage';
 import { TemplateProjectPage } from './pages/TemplateProjectPage';
@@ -87,10 +88,11 @@ function App() {
                           <Route path="/projects/content" element={<ProjectContentPage />} />
                           <Route path="/projects/edit/:id" element={<ProjectContentPage />} />
                           <Route path="/testimonials" element={<TestimonialsPage />} />
-                          <Route path="/services" element={<ServicesPage />} />
                           <Route path="/media" element={<MediaPage />} />
                           <Route path="/about" element={<AboutPage />} />
                           <Route path="/homepage" element={<HomepagePage />} />
+                          <Route path="/services" element={<ServicesPage />} />
+                          <Route path="/hero-test" element={<HeroSectionTest />} />
 
                           <Route path="/template-projects" element={<TemplateProjectsListPage />} />
                           <Route path="/template-editor/new" element={<TemplateProjectPage />} />
