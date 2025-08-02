@@ -14,9 +14,10 @@ import {
 import { toast } from 'sonner';
 import { servicesAPI } from '../api/services';
 import { ServicesGridEditor } from '../components/services/ServicesGridEditor';
-import { ServicesGridData } from '../../../shared/types/services';
+import { SkillsVideoEditor } from '../components/services/SkillsVideoEditor';
+import { ServicesGridData, SkillsVideoData } from '../../../shared/types/services';
 
-type ActiveSection = 'dashboard' | 'hero' | 'grid';
+type ActiveSection = 'dashboard' | 'hero' | 'grid' | 'skills';
 
 export default function ServicesPage() {
   const [activeSection, setActiveSection] = useState<ActiveSection>('dashboard');
@@ -36,6 +37,21 @@ export default function ServicesPage() {
     services: []
   });
 
+  // Skills section data - chargé depuis l'API
+  const [skillsData, setSkillsData] = useState<SkillsVideoData>({
+    description: "My work adapts to each client's unique goals, and whether it's a website, a product, or a mobile app, I'm proficient in all the areas of expertise listed below.",
+    skills: [],
+    ctaText: "See all projects",
+    ctaUrl: "/work",
+    video: {
+      url: "https://vbportfolio.nyc3.cdn.digitaloceanspaces.com/services-slideshow-small.mp4",
+      caption: "Some of my work across the years — Lawson Sydney",
+      autoplay: true,
+      loop: true,
+      muted: true
+    }
+  });
+
   // Charger les données depuis l'API
   useEffect(() => {
     const loadData = async () => {
@@ -53,6 +69,12 @@ export default function ServicesPage() {
         if (gridResponse.success && gridResponse.data) {
           setGridData(gridResponse.data);
         }
+
+        // Charger les données Skills (section 'skills' dans l'API)
+        const skillsResponse = await servicesAPI.getSection('skills');
+        if (skillsResponse.success && skillsResponse.data) {
+          setSkillsData(skillsResponse.data);
+        }
       } catch (error) {
         console.error('Erreur lors du chargement:', error);
         toast.error('Erreur de chargement', {
@@ -66,6 +88,19 @@ export default function ServicesPage() {
         });
         setGridData({
           services: []
+        });
+        setSkillsData({
+          description: "My work adapts to each client's unique goals, and whether it's a website, a product, or a mobile app, I'm proficient in all the areas of expertise listed below.",
+          skills: [],
+          ctaText: "See all projects",
+          ctaUrl: "/work",
+          video: {
+            url: "https://vbportfolio.nyc3.cdn.digitaloceanspaces.com/services-slideshow-small.mp4",
+            caption: "Some of my work across the years — Lawson Sydney",
+            autoplay: true,
+            loop: true,
+            muted: true
+          }
         });
       } finally {
         setIsLoading(false);
@@ -122,6 +157,40 @@ export default function ServicesPage() {
         setLastSaveTime(new Date());
         toast.success('Section Grid sauvegardée', {
           description: `${data.services.length} service(s) configuré(s)`
+        });
+        
+        // Publier automatiquement les changements
+        await servicesAPI.publish();
+        toast.success('Changements publiés', {
+          description: 'Les modifications sont maintenant visibles sur le site'
+        });
+      } else {
+        throw new Error('Échec de la sauvegarde');
+      }
+    } catch (error) {
+      console.error('Erreur de sauvegarde:', error);
+      toast.error('Erreur de sauvegarde', {
+        description: 'Une erreur est survenue lors de la sauvegarde'
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSkillsSave = async (data: SkillsVideoData) => {
+    if (isSaving) return;
+    
+    try {
+      setIsSaving(true);
+      
+      // Sauvegarder via l'API (section 'skills' dans l'API)
+      const response = await servicesAPI.updateSection('skills', data);
+      
+      if (response.success) {
+        setSkillsData(data);
+        setLastSaveTime(new Date());
+        toast.success('Section Skills & Video sauvegardée', {
+          description: `${data.skills.length} compétence(s) configurée(s)`
         });
         
         // Publier automatiquement les changements
@@ -224,6 +293,45 @@ export default function ServicesPage() {
                 onClick={(e) => {
                   e.stopPropagation();
                   setActiveSection('grid');
+                }}
+              >
+                <Edit3 className="h-4 w-4" />
+                Éditer
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="cursor-pointer hover:shadow-lg transition-all duration-200"
+          onClick={() => setActiveSection('skills')}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <FileText className="h-5 w-5" />
+                <CardTitle className="text-base lg:text-lg">Section Skills & Video</CardTitle>
+              </div>
+              <Badge className="bg-green-100 text-green-800">
+                Disponible
+              </Badge>
+            </div>
+            <CardDescription className="text-sm">
+              Compétences et vidéo de présentation de votre travail
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                {skillsData.skills.length} compétence(s) configurée(s)
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveSection('skills');
                 }}
               >
                 <Edit3 className="h-4 w-4" />
@@ -336,7 +444,9 @@ export default function ServicesPage() {
                   <span>Services CMS</span>
                   <span>/</span>
                   <span className="font-medium">
-                    {activeSection === 'hero' ? 'Section Hero' : 'Section Grid'}
+                    {activeSection === 'hero' ? 'Section Hero' : 
+                     activeSection === 'grid' ? 'Section Grid' : 
+                     'Section Skills & Video'}
                   </span>
                 </div>
               </div>
@@ -361,6 +471,25 @@ export default function ServicesPage() {
                     data={gridData}
                     onChange={setGridData}
                     onSave={handleGridSave}
+                    isLoading={isLoading}
+                  />
+                </div>
+              </div>
+            )}
+            {activeSection === 'skills' && (
+              <div className="p-6">
+                <div className="max-w-4xl mx-auto">
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-semibold mb-2">Section Skills & Video</h2>
+                    <p className="text-gray-600">
+                      Gérez vos compétences et la vidéo de présentation. Les modifications sont automatiquement publiées sur le site.
+                    </p>
+                  </div>
+                  
+                  <SkillsVideoEditor
+                    data={skillsData}
+                    onChange={setSkillsData}
+                    onSave={handleSkillsSave}
                     isLoading={isLoading}
                   />
                 </div>

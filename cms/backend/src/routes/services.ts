@@ -56,6 +56,81 @@ async function publishToStaticFiles(content: ServicesData) {
         });
       });
     }
+
+    // Update skills section - VERY PRECISE targeting to avoid breaking other sections
+    if (content.skillsVideo) {
+      // Find the skills section specifically (between grid_left and services_video_wrapper)
+      const skillsSectionPattern = /(<div class="grid_left">[\s\S]*?)(<div class="services_video_wrapper">)/;
+      const skillsSectionMatch = htmlContent.match(skillsSectionPattern);
+      
+      if (skillsSectionMatch) {
+        let skillsSection = skillsSectionMatch[1];
+        
+        // Update description within skills section only
+        if (content.skillsVideo.description) {
+          skillsSection = skillsSection.replace(
+            /<div class="u-text-style-big u-color-gray-500">\s*([^<]*)\s*<\/div>/,
+            `<div class="u-text-style-big u-color-gray-500">
+           ${content.skillsVideo.description}
+          </div>`
+          );
+        }
+
+        // Update skills within skills section only - preserve exact structure
+        if (content.skillsVideo.skills && content.skillsVideo.skills.length > 0) {
+          const skills = content.skillsVideo.skills.sort((a, b) => a.order - b.order);
+          
+          // Replace ALL skill divs in order - handle both class variations
+          let skillIndex = 0;
+          
+          // Replace all skill divs (both class types) in the order they appear
+          skillsSection = skillsSection.replace(
+            /<div class="u-text-x-small (u-color-gray-500|text_gray_500)"([^>]*)>\s*([^<]*)\s*<\/div>/g,
+            (match, className, attributes, currentSkill) => {
+              if (skillIndex < skills.length) {
+                const newSkill = skills[skillIndex];
+                skillIndex++;
+                return `<div class="u-text-x-small ${className}"${attributes}>
+            ${newSkill.name}
+           </div>`;
+              }
+              return match;
+            }
+          );
+        }
+
+        // Update CTA text within skills section only
+        if (content.skillsVideo.ctaText) {
+          skillsSection = skillsSection.replace(
+            /<div class="text-link is-footer[^"]*">\s*([^<]*)\s*<\/div>/,
+            `<div class="text-link is-footer w-variant-01008168-2897-dfe8-cdb3-65272157938e">
+           ${content.skillsVideo.ctaText}
+          </div>`
+          );
+        }
+
+        // Replace the entire skills section back into the HTML
+        htmlContent = htmlContent.replace(skillsSectionPattern, skillsSection + '$2');
+      }
+
+      // Update video URL (this is safe as it's specific)
+      if (content.skillsVideo.video && content.skillsVideo.video.url) {
+        htmlContent = htmlContent.replace(
+          /<source src="[^"]*" type="video\/mp4"\/>/,
+          `<source src="${content.skillsVideo.video.url}" type="video/mp4"/>`
+        );
+      }
+
+      // Update video caption (this is safe as it's specific)
+      if (content.skillsVideo.video && content.skillsVideo.video.caption) {
+        htmlContent = htmlContent.replace(
+          /<div class="video_description u-color-gray-700">\s*([^<]*)\s*<\/div>/,
+          `<div class="video_description u-color-gray-700">
+          ${content.skillsVideo.video.caption}
+         </div>`
+        );
+      }
+    }
     
     // Write the updated content back to the file
     await fs.writeFile(staticFilePath, htmlContent, 'utf-8');

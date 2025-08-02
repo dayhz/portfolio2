@@ -6,7 +6,7 @@
 
 const fetch = require('node-fetch');
 
-const API_BASE = 'http://localhost:3001/api/services';
+const API_BASE = 'http://localhost:8000/api/services';
 
 async function testServicesPublish() {
   console.log('🧪 Test de la fonctionnalité de publication des services\n');

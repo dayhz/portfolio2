@@ -76,7 +76,7 @@ async function testAPI() {
       }
     } catch (error) {
       log('❌ API Services non accessible', 'red');
-      log('   Vérifiez que le serveur backend est démarré sur le port 3001', 'yellow');
+      log('   Vérifiez que le serveur backend est démarré sur le port 8000', 'yellow');
       return false;
     }
 
