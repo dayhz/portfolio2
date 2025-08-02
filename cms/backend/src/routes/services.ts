@@ -36,6 +36,26 @@ async function publishToStaticFiles(content: ServicesData) {
       
       htmlContent = htmlContent.replace(descriptionPattern, newDescription);
     }
+
+    // Update services grid section
+    if (content.services && content.services.services && content.services.services.length > 0) {
+      const services = content.services.services.sort((a, b) => a.order - b.order);
+      
+      // Update service titles in order (Website, Product, Mobile)
+      services.forEach((service, index) => {
+        const servicePattern = new RegExp(`(<div class="service_title">)\\s*([^<]*)\\s*(<\/div>)`, 'g');
+        let matchCount = 0;
+        
+        htmlContent = htmlContent.replace(servicePattern, (match, openTag, currentTitle, closeTag) => {
+          if (matchCount === index) {
+            matchCount++;
+            return `${openTag}${service.title}${closeTag}`;
+          }
+          matchCount++;
+          return match;
+        });
+      });
+    }
     
     // Write the updated content back to the file
     await fs.writeFile(staticFilePath, htmlContent, 'utf-8');

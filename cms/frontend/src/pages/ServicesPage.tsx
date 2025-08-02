@@ -13,8 +13,10 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { servicesAPI } from '../api/services';
+import { ServicesGridEditor } from '../components/services/ServicesGridEditor';
+import { ServicesGridData } from '../../../shared/types/services';
 
-type ActiveSection = 'dashboard' | 'hero';
+type ActiveSection = 'dashboard' | 'hero' | 'grid';
 
 export default function ServicesPage() {
   const [activeSection, setActiveSection] = useState<ActiveSection>('dashboard');
@@ -29,19 +31,32 @@ export default function ServicesPage() {
     highlightText: '17+ years'
   });
 
+  // Grid section data - chargé depuis l'API
+  const [gridData, setGridData] = useState<ServicesGridData>({
+    services: []
+  });
+
   // Charger les données depuis l'API
   useEffect(() => {
-    const loadHeroData = async () => {
+    const loadData = async () => {
       try {
         setIsLoading(true);
-        const response = await servicesAPI.getSection('hero');
-        if (response.success && response.data) {
-          setHeroData(response.data);
+        
+        // Charger les données Hero
+        const heroResponse = await servicesAPI.getSection('hero');
+        if (heroResponse.success && heroResponse.data) {
+          setHeroData(heroResponse.data);
+        }
+
+        // Charger les données Grid (section 'services' dans l'API)
+        const gridResponse = await servicesAPI.getSection('services');
+        if (gridResponse.success && gridResponse.data) {
+          setGridData(gridResponse.data);
         }
       } catch (error) {
         console.error('Erreur lors du chargement:', error);
         toast.error('Erreur de chargement', {
-          description: 'Impossible de charger les données de la section Hero'
+          description: 'Impossible de charger les données des sections'
         });
         // Fallback vers des données par défaut
         setHeroData({
@@ -49,12 +64,15 @@ export default function ServicesPage() {
           description: 'Description par défaut de la section hero...',
           highlightText: '17+ years'
         });
+        setGridData({
+          services: []
+        });
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadHeroData();
+    loadData();
   }, []);
 
   const handleHeroSave = async () => {
@@ -70,6 +88,40 @@ export default function ServicesPage() {
         setLastSaveTime(new Date());
         toast.success('Section Hero sauvegardée', {
           description: `Titre: "${heroData.title.substring(0, 30)}..."`
+        });
+        
+        // Publier automatiquement les changements
+        await servicesAPI.publish();
+        toast.success('Changements publiés', {
+          description: 'Les modifications sont maintenant visibles sur le site'
+        });
+      } else {
+        throw new Error('Échec de la sauvegarde');
+      }
+    } catch (error) {
+      console.error('Erreur de sauvegarde:', error);
+      toast.error('Erreur de sauvegarde', {
+        description: 'Une erreur est survenue lors de la sauvegarde'
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleGridSave = async (data: ServicesGridData) => {
+    if (isSaving) return;
+    
+    try {
+      setIsSaving(true);
+      
+      // Sauvegarder via l'API (section 'services' dans l'API)
+      const response = await servicesAPI.updateSection('services', data);
+      
+      if (response.success) {
+        setGridData(data);
+        setLastSaveTime(new Date());
+        toast.success('Section Grid sauvegardée', {
+          description: `${data.services.length} service(s) configuré(s)`
         });
         
         // Publier automatiquement les changements
@@ -139,6 +191,45 @@ export default function ServicesPage() {
               <Edit3 className="h-4 w-4" />
               Éditer
             </Button>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="cursor-pointer hover:shadow-lg transition-all duration-200"
+          onClick={() => setActiveSection('grid')}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Settings className="h-5 w-5" />
+                <CardTitle className="text-base lg:text-lg">Section Grid</CardTitle>
+              </div>
+              <Badge className="bg-green-100 text-green-800">
+                Disponible
+              </Badge>
+            </div>
+            <CardDescription className="text-sm">
+              Grille des services avec couleurs personnalisées
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                {gridData.services.length} service(s) configuré(s)
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveSection('grid');
+                }}
+              >
+                <Edit3 className="h-4 w-4" />
+                Éditer
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -244,7 +335,9 @@ export default function ServicesPage() {
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <span>Services CMS</span>
                   <span>/</span>
-                  <span className="font-medium">Section Hero</span>
+                  <span className="font-medium">
+                    {activeSection === 'hero' ? 'Section Hero' : 'Section Grid'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -252,7 +345,27 @@ export default function ServicesPage() {
 
           {/* Content */}
           <div className={activeSection === 'dashboard' ? '' : 'bg-white rounded-lg shadow-sm'}>
-            {activeSection === 'dashboard' ? renderDashboard() : renderHeroEditor()}
+            {activeSection === 'dashboard' && renderDashboard()}
+            {activeSection === 'hero' && renderHeroEditor()}
+            {activeSection === 'grid' && (
+              <div className="p-6">
+                <div className="max-w-4xl mx-auto">
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-semibold mb-2">Section Grid des Services</h2>
+                    <p className="text-gray-600">
+                      Gérez vos services avec des couleurs personnalisées. Les modifications sont automatiquement publiées sur le site.
+                    </p>
+                  </div>
+                  
+                  <ServicesGridEditor
+                    data={gridData}
+                    onChange={setGridData}
+                    onSave={handleGridSave}
+                    isLoading={isLoading}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
