@@ -246,6 +246,25 @@ async function publishToStaticFiles(content: ServicesData) {
         }
       }
     }
+
+    // Update testimonials section
+    if (content.testimonials && content.testimonials.testimonials && content.testimonials.testimonials.length > 0) {
+      const testimonials = content.testimonials.testimonials.sort((a, b) => a.order - b.order);
+      
+      // Generate testimonials HTML using the same generator
+      const { testimonialsHtmlGenerator } = await import('../services/testimonialsHtmlGenerator');
+      const testimonialsHtml = testimonialsHtmlGenerator.generateTestimonialsSection(content.testimonials);
+      
+      // Replace the testimonials section in the static file
+      const testimonialsPattern = /<div class="mask w-slider-mask">[\s\S]*?<\/div>\s*<\/div>/;
+      
+      if (testimonialsPattern.test(htmlContent)) {
+        htmlContent = htmlContent.replace(testimonialsPattern, testimonialsHtml.trim());
+        console.log(`✅ Testimonials section updated with ${testimonials.length} testimonial(s)`);
+      } else {
+        console.log('⚠️  Testimonials section pattern not found in HTML');
+      }
+    }
     
     // Write the updated content back to the file
     await fs.writeFile(staticFilePath, htmlContent, 'utf-8');
@@ -327,13 +346,13 @@ const testimonialsUpdateSchema = z.object({
     author: z.object({
       name: z.string().min(1, 'Author name is required').max(100, 'Author name must be less than 100 characters'),
       title: z.string().min(1, 'Author title is required').max(150, 'Author title must be less than 150 characters'),
-      company: z.string().min(1, 'Author company is required').max(100, 'Author company must be less than 100 characters'),
-      avatar: z.string().url('Invalid avatar URL')
+      company: z.string().max(100, 'Author company must be less than 100 characters').optional().or(z.literal('')),
+      avatar: z.string().optional().or(z.literal(''))
     }),
     project: z.object({
-      name: z.string().min(1, 'Project name is required').max(100, 'Project name must be less than 100 characters'),
-      image: z.string().url('Invalid project image URL'),
-      url: z.string().url('Invalid project URL').optional()
+      name: z.string().max(100, 'Project name must be less than 100 characters').optional().or(z.literal('')),
+      image: z.string().optional().or(z.literal('')),
+      url: z.string().optional().or(z.literal(''))
     }),
     order: z.number().min(0, 'Order must be non-negative')
   }))

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -49,7 +49,8 @@ export function TestimonialsEditor({
   isSaving = false,
   onUnsavedChanges
 }: TestimonialsEditorProps) {
-  // États locaux simples - pas de useEffect problématiques
+  const [formData, setFormData] = useState<TestimonialsData>(data);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
   // Dialog states
@@ -74,13 +75,29 @@ export function TestimonialsEditor({
     projectName: ''
   });
 
-  // Fonction utilitaire pour notifier les changements
-  const notifyChange = (newData: TestimonialsData) => {
-    onChange(newData);
+  // Initialize form data when prop data changes
+  useEffect(() => {
+    setFormData(data);
+    setHasUnsavedChanges(false);
+  }, [data]);
+
+  // Process validation errors
+  useEffect(() => {
+    const errorMap: Record<string, string> = {};
+    errors.forEach(error => {
+      if (error.section === 'testimonials') {
+        errorMap[error.field] = error.message;
+      }
+    });
+    setValidationErrors(errorMap);
+  }, [errors]);
+
+  // Notify parent about unsaved changes
+  useEffect(() => {
     if (onUnsavedChanges) {
-      onUnsavedChanges(true);
+      onUnsavedChanges(hasUnsavedChanges);
     }
-  };
+  }, [hasUnsavedChanges, onUnsavedChanges]);
 
   // Generate unique ID for new testimonials
   const generateTestimonialId = () => {
@@ -131,15 +148,17 @@ export function TestimonialsEditor({
         image: '',
         url: ''
       },
-      order: data.testimonials.length + 1
+      order: formData.testimonials.length + 1
     };
 
     const newData = {
-      ...data,
-      testimonials: [...data.testimonials, newTestimonial]
+      ...formData,
+      testimonials: [...formData.testimonials, newTestimonial]
     };
     
-    notifyChange(newData);
+    setFormData(newData);
+    setHasUnsavedChanges(true);
+    onChange(newData);
     
     // Reset form and close dialog
     setNewTestimonialForm({
@@ -180,7 +199,7 @@ export function TestimonialsEditor({
       return;
     }
 
-    const updatedTestimonials = data.testimonials.map(testimonial =>
+    const updatedTestimonials = formData.testimonials.map(testimonial =>
       testimonial.id === editingTestimonial.id
         ? {
             ...testimonial,
@@ -200,11 +219,13 @@ export function TestimonialsEditor({
     );
 
     const newData = {
-      ...data,
+      ...formData,
       testimonials: updatedTestimonials
     };
     
-    notifyChange(newData);
+    setFormData(newData);
+    setHasUnsavedChanges(true);
+    onChange(newData);
     
     // Reset form and close dialog
     setEditingTestimonial(null);
@@ -223,7 +244,7 @@ export function TestimonialsEditor({
 
   // Remove testimonial
   const handleRemoveTestimonial = (testimonialId: string) => {
-    const filteredTestimonials = data.testimonials.filter(testimonial => testimonial.id !== testimonialId);
+    const filteredTestimonials = formData.testimonials.filter(testimonial => testimonial.id !== testimonialId);
     
     // Update order numbers
     const reorderedTestimonials = filteredTestimonials.map((testimonial, index) => ({
@@ -232,11 +253,14 @@ export function TestimonialsEditor({
     }));
     
     const newData = {
-      ...data,
+      ...formData,
       testimonials: reorderedTestimonials
     };
     
-    notifyChange(newData);
+    setFormData(newData);
+    setHasUnsavedChanges(true);
+    onChange(newData);
+    
     toast.success('Témoignage supprimé avec succès');
   };
 
@@ -245,10 +269,8 @@ export function TestimonialsEditor({
     if (!onSave) return;
     
     try {
-      await onSave(data);
-      if (onUnsavedChanges) {
-        onUnsavedChanges(false);
-      }
+      await onSave(formData);
+      setHasUnsavedChanges(false);
       toast.success('Section Témoignages sauvegardée avec succès');
     } catch (error) {
       console.error('Error saving testimonials section:', error);
@@ -259,7 +281,7 @@ export function TestimonialsEditor({
   // Handle preview
   const handlePreview = () => {
     if (onPreview) {
-      onPreview(data);
+      onPreview(formData);
     }
   };
 
@@ -281,6 +303,11 @@ export function TestimonialsEditor({
           <CardTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5" />
             Section Témoignages
+            {hasUnsavedChanges && (
+              <span className="text-sm text-orange-600 font-normal">
+                (Modifications non sauvegardées)
+              </span>
+            )}
           </CardTitle>
           <CardDescription>
             Gérez les témoignages clients pour présenter les retours et projets
@@ -291,7 +318,7 @@ export function TestimonialsEditor({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-base font-medium">
-                Témoignages ({data.testimonials.length})
+                Témoignages ({formData.testimonials.length})
               </Label>
               <Button
                 onClick={() => setIsAddDialogOpen(true)}
@@ -304,7 +331,7 @@ export function TestimonialsEditor({
               </Button>
             </div>
 
-            {data.testimonials.length === 0 ? (
+            {formData.testimonials.length === 0 ? (
               <Card className="p-8 text-center border-dashed">
                 <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -320,7 +347,7 @@ export function TestimonialsEditor({
               </Card>
             ) : (
               <div className="space-y-4">
-                {data.testimonials.map((testimonial, index) => (
+                {formData.testimonials.map((testimonial, index) => (
                   <Card key={testimonial.id} className="transition-all duration-200">
                     <CardHeader className="pb-3">
                       <div className="flex items-center justify-between">
@@ -389,7 +416,7 @@ export function TestimonialsEditor({
             {onSave && (
               <Button
                 onClick={handleSave}
-                disabled={isSaving}
+                disabled={isSaving || !hasUnsavedChanges}
                 className="flex items-center gap-2"
               >
                 {isSaving ? (
@@ -412,6 +439,16 @@ export function TestimonialsEditor({
               </Button>
             )}
           </div>
+
+          {/* Unsaved Changes Warning */}
+          {hasUnsavedChanges && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Vous avez des modifications non sauvegardées. N'oubliez pas de sauvegarder vos changements.
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Validation Errors */}
           {Object.keys(validationErrors).length > 0 && (

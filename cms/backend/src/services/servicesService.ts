@@ -19,6 +19,8 @@ import {
 import { cacheService } from './cacheService';
 import { prisma } from '../lib/prisma';
 import { servicesValidationService } from './servicesValidationService';
+import { testimonialsHtmlGenerator } from './testimonialsHtmlGenerator';
+import * as path from 'path';
 
 // Type for Prisma database results
 type PrismaServicesContent = {
@@ -503,6 +505,12 @@ export class ServicesService {
     return sectionData;
   }
 
+  // Get testimonials data specifically for HTML generation
+  async getTestimonialsData(): Promise<TestimonialsData> {
+    const content = await this.getSectionContent('testimonials');
+    return this.transformToTestimonialsSection(content);
+  }
+
   // Validate content integrity using comprehensive validation service
   async validateContentIntegrity(): Promise<ValidationResult> {
     try {
@@ -577,16 +585,12 @@ export class ServicesService {
     return await servicesValidationService.validateField(section, field, value, context);
   }
 
-  // Publish content - mark as published and update timestamps (simplified like Homepage CMS)
+  // Publish content - mark as published and update timestamps (same as other sections)
   async publishContent(): Promise<{ publishedAt: string; isPublished: boolean }> {
     const publishedAt = new Date().toISOString();
     
-    // TODO: Implement actual publishing logic (same as Homepage CMS)
-    // This could involve:
-    // - Updating static files
-    // - Invalidating caches
-    // - Triggering site rebuild
-    // - Notifying CDN of changes
+    // Note: The actual HTML generation is handled by publishToStaticFiles in routes/services.ts
+    // This is consistent with how other sections (hero, services, skills, approach) work
     
     // Invalidate all caches after publishing
     await this.invalidateAllCaches();

@@ -16,9 +16,10 @@ import { servicesAPI } from '../api/services';
 import { ServicesGridEditor } from '../components/services/ServicesGridEditor';
 import { SkillsVideoEditor } from '../components/services/SkillsVideoEditor';
 import ApproachEditor from '../components/services/ApproachEditor';
-import { ServicesGridData, SkillsVideoData, ApproachData } from '../../../shared/types/services';
+import { TestimonialsEditor } from '../components/services/TestimonialsEditor';
+import { ServicesGridData, SkillsVideoData, ApproachData, TestimonialsData } from '../../../shared/types/services';
 
-type ActiveSection = 'dashboard' | 'hero' | 'grid' | 'skills' | 'approach';
+type ActiveSection = 'dashboard' | 'hero' | 'grid' | 'skills' | 'approach' | 'testimonials';
 
 export default function ServicesPage() {
   const [activeSection, setActiveSection] = useState<ActiveSection>('dashboard');
@@ -51,6 +52,11 @@ export default function ServicesPage() {
       loop: true,
       muted: true
     }
+  });
+
+  // Testimonials section data - chargé depuis l'API
+  const [testimonialsData, setTestimonialsData] = useState<TestimonialsData>({
+    testimonials: []
   });
 
   // Approach section data - chargé depuis l'API
@@ -130,6 +136,12 @@ export default function ServicesPage() {
         const approachResponse = await servicesAPI.getSection('approach');
         if (approachResponse.success && approachResponse.data) {
           setApproachData(approachResponse.data);
+        }
+
+        // Charger les données Testimonials (section 'testimonials' dans l'API)
+        const testimonialsResponse = await servicesAPI.getSection('testimonials');
+        if (testimonialsResponse.success && testimonialsResponse.data) {
+          setTestimonialsData(testimonialsResponse.data);
         }
       } catch (error) {
         console.error('Erreur lors du chargement:', error);
@@ -357,6 +369,46 @@ export default function ServicesPage() {
     }
   };
 
+  const handleTestimonialsSave = async (data: TestimonialsData) => {
+    console.log('🔍 DEBUG: handleTestimonialsSave appelé avec', data);
+    
+    if (isSaving) return;
+    
+    try {
+      setIsSaving(true);
+      
+      console.log('🔍 DEBUG: Appel servicesAPI.updateSection...');
+      // Sauvegarder via l'API (section 'testimonials' dans l'API)
+      const response = await servicesAPI.updateSection('testimonials', data);
+      console.log('🔍 DEBUG: Réponse updateSection:', response);
+      
+      if (response.success) {
+        setTestimonialsData(data);
+        setLastSaveTime(new Date());
+        toast.success('Section Témoignages sauvegardée', {
+          description: `${data.testimonials.length} témoignage(s) configuré(s)`
+        });
+        
+        // Publier automatiquement les changements
+        console.log('🔍 DEBUG: Appel servicesAPI.publish...');
+        const publishResponse = await servicesAPI.publish();
+        console.log('🔍 DEBUG: Réponse publish:', publishResponse);
+        toast.success('Changements publiés', {
+          description: 'Les modifications sont maintenant visibles sur le site'
+        });
+      } else {
+        throw new Error('Échec de la sauvegarde');
+      }
+    } catch (error) {
+      console.error('Erreur de sauvegarde:', error);
+      toast.error('Erreur de sauvegarde', {
+        description: 'Une erreur est survenue lors de la sauvegarde'
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const renderDashboard = () => (
     <div className="space-y-6">
       <div>
@@ -525,6 +577,45 @@ export default function ServicesPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Testimonials Section */}
+        <Card 
+          className="cursor-pointer hover:shadow-lg transition-all duration-200"
+          onClick={() => setActiveSection('testimonials')}
+        >
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              💬 Section Témoignages
+            </CardTitle>
+            <CardDescription>
+              Gérez les témoignages clients et leurs projets
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm text-gray-600">
+                  {testimonialsData.testimonials.length} témoignage(s) configuré(s)
+                </p>
+                <div className="flex gap-2">
+                  <Badge variant="outline">Témoignages clients</Badge>
+                  <Badge variant="outline">Projets</Badge>
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveSection('testimonials');
+                }}
+              >
+                <Edit3 className="h-4 w-4" />
+                Éditer
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
@@ -632,6 +723,7 @@ export default function ServicesPage() {
                     {activeSection === 'hero' ? 'Section Hero' : 
                      activeSection === 'grid' ? 'Section Grid' : 
                      activeSection === 'skills' ? 'Section Skills & Video' :
+                     activeSection === 'testimonials' ? 'Section Témoignages' :
                      'Section Processus'}
                   </span>
                 </div>
@@ -695,6 +787,26 @@ export default function ServicesPage() {
                     data={approachData}
                     onChange={setApproachData}
                     onSave={handleApproachSave}
+                    isLoading={isLoading}
+                    isSaving={isSaving}
+                  />
+                </div>
+              </div>
+            )}
+            {activeSection === 'testimonials' && (
+              <div className="p-6">
+                <div className="max-w-4xl mx-auto">
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-semibold mb-2">Section Témoignages</h2>
+                    <p className="text-gray-600">
+                      Gérez les témoignages clients avec leurs informations et projets associés. Les modifications sont automatiquement publiées sur le site.
+                    </p>
+                  </div>
+                  
+                  <TestimonialsEditor
+                    data={testimonialsData}
+                    onChange={setTestimonialsData}
+                    onSave={handleTestimonialsSave}
                     isLoading={isLoading}
                     isSaving={isSaving}
                   />
