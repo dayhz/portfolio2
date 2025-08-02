@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { ApproachEditor } from '../../components/services/ApproachEditor';
+import ApproachEditor from '../../components/services/ApproachEditor';
 import { ApproachData, ApproachStep, ValidationError } from '../../../../shared/types/services';
 import { toast } from 'sonner';
 

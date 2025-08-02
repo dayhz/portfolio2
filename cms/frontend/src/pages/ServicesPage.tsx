@@ -15,9 +15,10 @@ import { toast } from 'sonner';
 import { servicesAPI } from '../api/services';
 import { ServicesGridEditor } from '../components/services/ServicesGridEditor';
 import { SkillsVideoEditor } from '../components/services/SkillsVideoEditor';
-import { ServicesGridData, SkillsVideoData } from '../../../shared/types/services';
+import ApproachEditor from '../components/services/ApproachEditor';
+import { ServicesGridData, SkillsVideoData, ApproachData } from '../../../shared/types/services';
 
-type ActiveSection = 'dashboard' | 'hero' | 'grid' | 'skills';
+type ActiveSection = 'dashboard' | 'hero' | 'grid' | 'skills' | 'approach';
 
 export default function ServicesPage() {
   const [activeSection, setActiveSection] = useState<ActiveSection>('dashboard');
@@ -52,6 +53,55 @@ export default function ServicesPage() {
     }
   });
 
+  // Approach section data - chargé depuis l'API
+  const [approachData, setApproachData] = useState<ApproachData>({
+    title: "Approach",
+    description: "The ideal balance between UX and UI is what makes a winning product. The sweet spot is the combination of both, and my four-step process gives you the ultimate framework for design.",
+    video: {
+      url: "https://vbportfolio.nyc3.cdn.digitaloceanspaces.com/sweet-spot-60fps.mp4",
+      caption: "Sweet spot animation",
+      autoplay: true,
+      loop: true,
+      muted: true
+    },
+    ctaText: "Let's work together!",
+    ctaUrl: "contact.html",
+    steps: [
+      {
+        id: "step-1",
+        number: 1,
+        title: "Discovery",
+        description: "When a new contract begins, I want to learn everything I can about your project and understand what the end goal is. We will collaborate on a solution and what is required to get you there.",
+        icon: "",
+        order: 1
+      },
+      {
+        id: "step-2",
+        number: 2,
+        title: "Wireframe",
+        description: "When the goal is defined, I'll begin work on a wireframe to organize all of the information we discussed earlier and to address any UX problems that may come.",
+        icon: "",
+        order: 2
+      },
+      {
+        id: "step-3",
+        number: 3,
+        title: "Mood Board",
+        description: "We all have different tastes and preferences and to go with the best design direction for your project I'll create mood boards to discuss which one is best for you.",
+        icon: "",
+        order: 3
+      },
+      {
+        id: "step-4",
+        number: 4,
+        title: "Design",
+        description: "Now that the previous steps have been completed, it's time to work on the UI, using the approved wireframe and mood board as a guide to create a badass design.",
+        icon: "",
+        order: 4
+      }
+    ]
+  });
+
   // Charger les données depuis l'API
   useEffect(() => {
     const loadData = async () => {
@@ -74,6 +124,12 @@ export default function ServicesPage() {
         const skillsResponse = await servicesAPI.getSection('skills');
         if (skillsResponse.success && skillsResponse.data) {
           setSkillsData(skillsResponse.data);
+        }
+
+        // Charger les données Approach (section 'approach' dans l'API)
+        const approachResponse = await servicesAPI.getSection('approach');
+        if (approachResponse.success && approachResponse.data) {
+          setApproachData(approachResponse.data);
         }
       } catch (error) {
         console.error('Erreur lors du chargement:', error);
@@ -101,6 +157,53 @@ export default function ServicesPage() {
             loop: true,
             muted: true
           }
+        });
+        setApproachData({
+          title: "Approach",
+          description: "The ideal balance between UX and UI is what makes a winning product. The sweet spot is the combination of both, and my four-step process gives you the ultimate framework for design.",
+          video: {
+            url: "https://vbportfolio.nyc3.cdn.digitaloceanspaces.com/sweet-spot-60fps.mp4",
+            caption: "Sweet spot animation",
+            autoplay: true,
+            loop: true,
+            muted: true
+          },
+          ctaText: "Let's work together!",
+          ctaUrl: "contact.html",
+          steps: [
+            {
+              id: "step-1",
+              number: 1,
+              title: "Discovery",
+              description: "When a new contract begins, I want to learn everything I can about your project and understand what the end goal is. We will collaborate on a solution and what is required to get you there.",
+              icon: "",
+              order: 1
+            },
+            {
+              id: "step-2",
+              number: 2,
+              title: "Wireframe",
+              description: "When the goal is defined, I'll begin work on a wireframe to organize all of the information we discussed earlier and to address any UX problems that may come.",
+              icon: "",
+              order: 2
+            },
+            {
+              id: "step-3",
+              number: 3,
+              title: "Mood Board",
+              description: "We all have different tastes and preferences and to go with the best design direction for your project I'll create mood boards to discuss which one is best for you.",
+              icon: "",
+              order: 3
+            },
+            {
+              id: "step-4",
+              number: 4,
+              title: "Design",
+              description: "Now that the previous steps have been completed, it's time to work on the UI, using the approved wireframe and mood board as a guide to create a badass design.",
+              icon: "",
+              order: 4
+            }
+          ]
         });
       } finally {
         setIsLoading(false);
@@ -191,6 +294,49 @@ export default function ServicesPage() {
         setLastSaveTime(new Date());
         toast.success('Section Skills & Video sauvegardée', {
           description: `${data.skills.length} compétence(s) configurée(s)`
+        });
+        
+        // Publier automatiquement les changements
+        await servicesAPI.publish();
+        toast.success('Changements publiés', {
+          description: 'Les modifications sont maintenant visibles sur le site'
+        });
+      } else {
+        throw new Error('Échec de la sauvegarde');
+      }
+    } catch (error) {
+      console.error('Erreur de sauvegarde:', error);
+      toast.error('Erreur de sauvegarde', {
+        description: 'Une erreur est survenue lors de la sauvegarde'
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleApproachSave = async (data: ApproachData) => {
+    console.log("🔧 DEBUG handleApproachSave appelé", { 
+      isSaving, 
+      dataTitle: data.title,
+      stepsCount: data.steps.length 
+    });
+    
+    if (isSaving) {
+      console.log("🔧 DEBUG Sauvegarde déjà en cours, abandon");
+      return;
+    }
+    
+    try {
+      setIsSaving(true);
+      
+      // Sauvegarder via l'API (section 'approach' dans l'API)
+      const response = await servicesAPI.updateSection('approach', data);
+      
+      if (response.success) {
+        setApproachData(data);
+        setLastSaveTime(new Date());
+        toast.success('Section Processus sauvegardée', {
+          description: `${data.steps.length} étape(s) configurée(s)`
         });
         
         // Publier automatiquement les changements
@@ -340,6 +486,45 @@ export default function ServicesPage() {
             </div>
           </CardContent>
         </Card>
+
+        <Card 
+          className="cursor-pointer hover:shadow-lg transition-all duration-200"
+          onClick={() => setActiveSection('approach')}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <FileText className="h-5 w-5" />
+                <CardTitle className="text-base lg:text-lg">Section Processus</CardTitle>
+              </div>
+              <Badge className="bg-green-100 text-green-800">
+                Disponible
+              </Badge>
+            </div>
+            <CardDescription className="text-sm">
+              Processus de travail avec étapes personnalisables
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                {approachData.steps.length} étape(s) configurée(s)
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveSection('approach');
+                }}
+              >
+                <Edit3 className="h-4 w-4" />
+                Éditer
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
@@ -446,7 +631,8 @@ export default function ServicesPage() {
                   <span className="font-medium">
                     {activeSection === 'hero' ? 'Section Hero' : 
                      activeSection === 'grid' ? 'Section Grid' : 
-                     'Section Skills & Video'}
+                     activeSection === 'skills' ? 'Section Skills & Video' :
+                     'Section Processus'}
                   </span>
                 </div>
               </div>
@@ -491,6 +677,26 @@ export default function ServicesPage() {
                     onChange={setSkillsData}
                     onSave={handleSkillsSave}
                     isLoading={isLoading}
+                  />
+                </div>
+              </div>
+            )}
+            {activeSection === 'approach' && (
+              <div className="p-6">
+                <div className="max-w-4xl mx-auto">
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-semibold mb-2">Section Processus de Travail</h2>
+                    <p className="text-gray-600">
+                      Gérez les étapes de votre processus avec glisser-déposer pour réorganiser. Les modifications sont automatiquement publiées sur le site.
+                    </p>
+                  </div>
+                  
+                  <ApproachEditor
+                    data={approachData}
+                    onChange={setApproachData}
+                    onSave={handleApproachSave}
+                    isLoading={isLoading}
+                    isSaving={isSaving}
                   />
                 </div>
               </div>

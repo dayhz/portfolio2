@@ -131,6 +131,121 @@ async function publishToStaticFiles(content: ServicesData) {
         );
       }
     }
+
+    // Update approach section
+    if (content.approach) {
+      // Update approach title
+      if (content.approach.title) {
+        const approachTitlePattern = /(<div class="u-text-style-h2"[^>]*>)\s*([^<]*)\s*(<\/div>)/;
+        const approachTitleMatch = htmlContent.match(approachTitlePattern);
+        
+        if (approachTitleMatch) {
+          htmlContent = htmlContent.replace(
+            approachTitlePattern,
+            `$1
+        ${content.approach.title}
+       $3`
+          );
+        }
+      }
+
+      // Update approach description
+      if (content.approach.description) {
+        // Find the approach description section more generically
+        const approachDescPattern = /(<div class="approach-left"[^>]*>[\s\S]*?<div class="u-text-style-big">)\s*([^<]*(?:<[^>]*>[^<]*<\/[^>]*>[^<]*)*)\s*(<\/div>)/;
+        const approachDescMatch = htmlContent.match(approachDescPattern);
+        
+        if (approachDescMatch) {
+          htmlContent = htmlContent.replace(
+            approachDescPattern,
+            `$1
+         ${content.approach.description}
+        $3`
+          );
+        }
+      }
+
+      // Update approach video
+      if (content.approach.video && content.approach.video.url) {
+        const videoPattern = /(<source src=")[^"]*(" type="video\/mp4")/;
+        const videoMatch = htmlContent.match(videoPattern);
+        
+        if (videoMatch) {
+          htmlContent = htmlContent.replace(
+            videoPattern,
+            `$1${content.approach.video.url}$2`
+          );
+        }
+      }
+
+      // Update approach CTA
+      if (content.approach.ctaText) {
+        const ctaTextPattern = /(<div class="text-link is-footer">\s*)([^<]*)(\s*<\/div>)/;
+        const ctaTextMatch = htmlContent.match(ctaTextPattern);
+        
+        if (ctaTextMatch) {
+          htmlContent = htmlContent.replace(
+            ctaTextPattern,
+            `$1${content.approach.ctaText}$3`
+          );
+        }
+      }
+
+      // Update approach CTA URL
+      if (content.approach.ctaUrl) {
+        const ctaUrlPattern = /(<a class="c-global-link[^"]*"[^>]*href=")[^"]*(")/;
+        const ctaUrlMatch = htmlContent.match(ctaUrlPattern);
+        
+        if (ctaUrlMatch) {
+          htmlContent = htmlContent.replace(
+            ctaUrlPattern,
+            `$1${content.approach.ctaUrl}$2`
+          );
+        }
+      }
+
+      // Update approach steps
+      if (content.approach.steps && content.approach.steps.length > 0) {
+        const steps = content.approach.steps.sort((a, b) => a.order - b.order);
+        
+        // Find the approach steps section
+        const approachStepsPattern = /(<div class="approachs_group"[^>]*>)([\s\S]*?)(<\/div>\s*<\/div>\s*<\/div>\s*<div class="g_section_space)/;
+        const approachMatch = htmlContent.match(approachStepsPattern);
+        
+        if (approachMatch) {
+          let stepsHtml = '';
+          
+          steps.forEach((step, index) => {
+            stepsHtml += `
+        <div class="approach-iitem" data-w-id="a1de9ba8-12f0-12ca-6dcc-1d37cc3eee73">
+         <div class="approach-check">
+          <img alt="" class="icon-check" loading="lazy" src="https://cdn.prod.website-files.com/67dac46f3007872e8a7b128f/67eedda55bb860fcb17926f1_check.png"/>
+         </div>
+         <div class="approach-text-group">
+          <div class="approach-header">
+           <div class="u-text-style-1rem u-color-gray-500">
+            ${step.number}.
+           </div>
+           <div class="u-text-style-big u-color-dark">
+            ${step.title}
+           </div>
+          </div>
+          <div class="u-text-x-small">
+           ${step.description}
+          </div>
+         </div>
+        </div>`;
+          });
+          
+          // Replace the entire steps section
+          htmlContent = htmlContent.replace(
+            approachStepsPattern,
+            `$1${stepsHtml}
+       $3`
+          );
+        }
+      }
+    }
     
     // Write the updated content back to the file
     await fs.writeFile(staticFilePath, htmlContent, 'utf-8');
@@ -184,13 +299,23 @@ const skillsVideoUpdateSchema = z.object({
 });
 
 const approachUpdateSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(100, 'Title must be less than 100 characters'),
   description: z.string().min(1, 'Description is required').max(500, 'Description must be less than 500 characters'),
+  video: z.object({
+    url: z.string().url('Video URL must be valid'),
+    caption: z.string().optional(),
+    autoplay: z.boolean().optional(),
+    loop: z.boolean().optional(),
+    muted: z.boolean().optional()
+  }),
+  ctaText: z.string().min(1, 'CTA text is required').max(50, 'CTA text must be less than 50 characters'),
+  ctaUrl: z.string().min(1, 'CTA URL is required').max(200, 'CTA URL must be less than 200 characters'),
   steps: z.array(z.object({
     id: z.string().min(1, 'Step ID is required'),
     number: z.number().min(1, 'Step number is required'),
     title: z.string().min(1, 'Step title is required').max(100, 'Step title must be less than 100 characters'),
     description: z.string().min(1, 'Step description is required').max(300, 'Step description must be less than 300 characters'),
-    icon: z.string().url('Invalid icon URL').optional(),
+    icon: z.string().optional(),
     order: z.number().min(0, 'Order must be non-negative')
   })).min(3, 'At least 3 steps are required').max(6, 'Maximum 6 steps allowed')
 });
@@ -549,8 +674,12 @@ function transformSectionDataToDatabase(section: ServicesSection, data: any) {
 
     case 'approach':
       updates.push(
-        { fieldName: 'description', fieldValue: data.description, fieldType: 'textarea' as const, displayOrder: 1 },
-        { fieldName: 'steps', fieldValue: JSON.stringify(data.steps), fieldType: 'json' as const, displayOrder: 2 }
+        { fieldName: 'title', fieldValue: data.title, fieldType: 'text' as const, displayOrder: 1 },
+        { fieldName: 'description', fieldValue: data.description, fieldType: 'textarea' as const, displayOrder: 2 },
+        { fieldName: 'video', fieldValue: JSON.stringify(data.video), fieldType: 'json' as const, displayOrder: 3 },
+        { fieldName: 'ctaText', fieldValue: data.ctaText, fieldType: 'text' as const, displayOrder: 4 },
+        { fieldName: 'ctaUrl', fieldValue: data.ctaUrl, fieldType: 'text' as const, displayOrder: 5 },
+        { fieldName: 'steps', fieldValue: JSON.stringify(data.steps), fieldType: 'json' as const, displayOrder: 6 }
       );
       break;
 

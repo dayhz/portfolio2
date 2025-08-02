@@ -92,7 +92,17 @@ export interface ApproachStep {
 }
 
 export interface ApproachData {
+  title: string;
   description: string;
+  video: {
+    url: string;
+    caption?: string;
+    autoplay?: boolean;
+    loop?: boolean;
+    muted?: boolean;
+  };
+  ctaText: string;
+  ctaUrl: string;
   steps: ApproachStep[];
 }
 

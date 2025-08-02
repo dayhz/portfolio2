@@ -331,9 +331,20 @@ export class ServicesService {
       content.find(c => c.fieldName === fieldName)?.fieldValue || '';
 
     const stepsJson = content.find(c => c.fieldName === 'steps')?.fieldValue || '[]';
+    const videoJson = content.find(c => c.fieldName === 'video')?.fieldValue || '{}';
     
     return {
+      title: getField('title') || 'Approach',
       description: getField('description') || 'The ideal balance between UX and UI is what makes a winning product. The sweet spot is the combination of both, and my four-step process gives you the ultimate framework for design.',
+      video: JSON.parse(videoJson) || {
+        url: "https://vbportfolio.nyc3.cdn.digitaloceanspaces.com/sweet-spot-60fps.mp4",
+        caption: "Sweet spot animation",
+        autoplay: true,
+        loop: true,
+        muted: true
+      },
+      ctaText: getField('ctaText') || "Let's work together!",
+      ctaUrl: getField('ctaUrl') || "contact.html",
       steps: JSON.parse(stepsJson)
     };
   }
